@@ -1,0 +1,2 @@
+library(PRC)
+data("Ossenkampen")
