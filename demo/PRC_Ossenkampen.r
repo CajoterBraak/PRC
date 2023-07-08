@@ -25,8 +25,8 @@ myrda <- vegan::rda( Y~ A:B + Condition(A), data = Design)
 print(myrda)
 #SubtractReferenceValues has been replaced by the function PRC_scores
 Design_w_PRCs <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
-names(Design_w_PRCs)
-names(Design_w_PRCs$PRCplus)
+print(names(Design_w_PRCs))
+print(names(Design_w_PRCs$PRCplus))
 # prepare data for ggplot2. sc_ref sites and constraints axis  -----------
 
 library(ggplot2)
