@@ -124,7 +124,7 @@ PRC_scores <-  function(object, focal_factor_name, referencelevel = 1, rank = 2,
    DesignRef[[focal_factor_name]]<- Bref
    # predict may give a warning that a term is not a factor while it is... For this reason suppressWarnings()
    reference_scores <- suppressWarnings(stats::predict(object, newdata= DesignRef, rank =ncol(sc$constraints), type = "lc", model = "CCA", scaling = 1, const = myconst))
-   reference_scores <- stats::predict(object, newdata= DesignRef, rank =ncol(sc$constraints), type = "lc", model = "CCA", scaling = 1, const = myconst)
+   #reference_scores <- stats::predict(object, newdata= DesignRef, rank =ncol(sc$constraints), type = "lc", model = "CCA", scaling = 1, const = myconst)
 
    coln <- colnames(sc$sites)
    # scale and flip axes
