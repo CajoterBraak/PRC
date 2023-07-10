@@ -35,6 +35,7 @@
 #'  replaced by the reference level}
 #' \item{focal_factor_name}{name of the focal factor in the call to \code{PRC_scores}}
 #' \item{referencelevel}{referencelevel in the call to \code{PRC_scores}}
+#' \item{coefficients}{list of PRC-coefficients for each axis (matrix if rank is equal to 1)}
 #' @details \code{PRC_scores} uses \code{\link[vegan]{scores}} to
 #' calculate the loadings (species scores),if obtainable from the \code{object}, and the constrained and unconstrained sample scores
 #' of the units in \code{data}. The PRC treatment and sample scores are obtained by subtracting the reference scores
@@ -154,10 +155,29 @@ PRC_scores <-  function(object, focal_factor_name, referencelevel = 1, rank = 2,
    colnames(sc$constraints) <-  coln
    colnames(sc$sites) <-   paste(coln,"_E",sep = "")
    colnames(reference_scores) <- paste(coln,"_Ref",sep = "")
+
+# obtain coefficients -----------------------------------------------------
+
+   DesignComplete <- expand.grid(object$terminfo$xlev)
+
+   id <- which(duplicated(data[,names(object$terminfo$xlev)]))
+   prc_coefs <- cbind(data[-id,names(object$terminfo$xlev)], sc_ref$constraints[-id,]) # whichout the missing combinations
+   aa <- dplyr::left_join(DesignComplete, prc_coefs, by=names(object$terminfo$xlev) )
+   coefs <- list()
+   for (k in seq_len(rank)){
+     coefs[[k]] <- array(aa[,length(names(object$terminfo$xlev)) + k], dim= sapply(object$terminfo$xlev,length),dimnames = object$terminfo$xlev )
+     attr(coefs[[k]], "method") <- paste(object$method, "-based PRC",k, sep ="")
+   }
+   names(coefs) <- paste("PRC", seq_len(rank), sep = "")
+
+
    out <- list(PRCplus = data.frame(data, sc_ref$constraints, sc_ref$sites, sc$constraints, sc$sites, reference_scores),
                species = species_scores,
                reference_scores = reference_scores,
-               focal_factor_name= focal_factor_name, referencelevel=Bref)
+               focal_factor_name= focal_factor_name, referencelevel=Bref )
+   if (rank==1) {
+     out$coefficients <- unlist(coefs[[1]])
+   } else out$coefficients <- coefs
    return(out)
  }
 
