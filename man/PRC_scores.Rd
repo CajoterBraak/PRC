@@ -53,6 +53,7 @@ A named list:
  replaced by the reference level}
 \item{focal_factor_name}{name of the focal factor in the call to \code{PRC_scores}}
 \item{referencelevel}{referencelevel in the call to \code{PRC_scores}}
+\item{coefficients}{list of PRC-coefficients for each axis (matrix if rank is equal to 1)}
 }
 \description{
 \code{PRC_scores} calculates scores to display principal response curves with
@@ -111,8 +112,14 @@ myrda <- vegan::rda( Y~ A:B + Condition(A), data = Design)
 print(myrda)
 #SubtractReferenceValues has been replaced by the function PRC_scores
 Design_w_PRCs <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
-names(Design_w_PRCs)
-names(Design_w_PRCs$PRCplus)
+print(names(Design_w_PRCs))
+print(names(Design_w_PRCs$PRCplus))
+print(names(Design_w_PRCs$coefficients))
+if (is.list(Design_w_PRCs$coefficients)) print(round(Design_w_PRCs$coefficients[[1]], 2)) else
+  print(round(Design_w_PRCs$coefficients, 2))
+# note that Design_w_PRCs$coefficients is not use for plotting
+
+
 # prepare data for ggplot2. sc_ref sites and constraints axis  -----------
 
 library(ggplot2)
