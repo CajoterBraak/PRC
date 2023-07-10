@@ -30,7 +30,7 @@ print(names(Design_w_PRCs$PRCplus))
 print(names(Design_w_PRCs$coefficients))
 if (is.list(Design_w_PRCs$coefficients)) print(round(Design_w_PRCs$coefficients[[1]], 2)) else
   print(round(Design_w_PRCs$coefficients, 2))
-# note that Design_w_PRCs$coefficients is not use for plotting
+# note that Design_w_PRCs$coefficients is not used for plotting
 
 
 # prepare data for ggplot2. sc_ref sites and constraints axis  -----------
