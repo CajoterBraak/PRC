@@ -19,9 +19,9 @@ PRC_scores(
  a result of \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}},
 \code{\link[vegan]{dbrda}} or \code{\link[vegan]{capscale}}.}
 
-\item{focal_factor_name}{name of the focal factor (the treatment of interest)}
+\item{focal_factor_name}{name of one or two focal factors (the treatment(s) of interest)}
 
-\item{referencelevel}{numeric level or character (reference level of the focal factor)}
+\item{referencelevel}{numeric level(s) or character(s) (reference level(s) of the focal factor(s))}
 
 \item{rank}{number of axes to be computed}
 
