@@ -8,8 +8,8 @@
 #'  a result of \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}},
 #' \code{\link[vegan]{dbrda}} or \code{\link[vegan]{capscale}}.
 
-#' @param  focal_factor_name name of the focal factor (the treatment of interest)
-#' @param referencelevel     numeric level or character (reference level of the focal factor)
+#' @param  focal_factor_name name of one or two focal factors (the treatment(s) of interest)
+#' @param referencelevel     numeric level(s) or character(s) (reference level(s) of the focal factor(s))
 #' @param rank               number of axes to be computed
 #' @param flip               logical value or vector. Should the axes be flipped,
 #' i.e. reversed in orientation? \code{flip} can be numeric with values -1 and 1
@@ -96,7 +96,7 @@ PRC_scores <-  function(object, focal_factor_name, referencelevel = 1, rank = 2,
 
    if (scaling == "sym") stop("scaling = \"sim\" has not yet been implemented")
    if (object$method == "cca") scaling <- "ss"
-   if(!focal_factor_name %in% names(object$terminfo$xlev)) stop("Error in PRC_scores:focal_factor_name not in the model")
+   if(!focal_factor_name[1] %in% names(object$terminfo$xlev)) stop("Error in PRC_scores:focal_factor_name[1] not in the model")
 
    myconst <- sqrt((nobs(object)-1)*object$tot.chi) # scaling of scores and loadings as in prcomp (and this paper).
    #if (scaling == "vegan::prc") myconst = (nobs(object)-1)*object$CCA$eig^0.25
@@ -115,14 +115,29 @@ PRC_scores <-  function(object, focal_factor_name, referencelevel = 1, rank = 2,
 
    DesignRef <- data
 
-   if (is.null(levels(DesignRef[[focal_factor_name]]))) print(errorCondition("Error in PRC_scores:focal_factor_name or reference erroneous"))
+   if (is.null(levels(DesignRef[[focal_factor_name[1]]]))) print(errorCondition("Error in PRC_scores:focal_factor_name[1] or reference erroneous"))
+   if (length(focal_factor_name)==2) {
+     if (is.null(levels(DesignRef[[focal_factor_name[2]]]))) print(errorCondition("Error in PRC_scores:focal_factor_name[2] or reference erroneous"))
+   }
 
-   if (is.numeric(referencelevel))  Bref <- levels(DesignRef[[focal_factor_name]])[referencelevel] else {#"B1"
-     if (is.character(referencelevel)) {
-       if (referencelevel %in% levels(DesignRef[[focal_factor_name]])) Bref <- referencelevel else {stop("referenceLevel not in factor in PRC_scores")}
+
+   if (is.numeric(referencelevel[1]))  Bref <- levels(DesignRef[[focal_factor_name[1]]])[referencelevel[1]] else {#"B1"
+     if (is.character(referencelevel[1])) {
+       if (referencelevel[1] %in% levels(DesignRef[[focal_factor_name[1]]])) Bref <- referencelevel[1] else {stop("referencelevel[1] not in factor in PRC_scores")}
+     }
+}
+
+   if (length(focal_factor_name)==2) {
+     if (is.numeric(referencelevel[2]))
+     Bref[2] <- levels(DesignRef[[focal_factor_name[2]]])[referencelevel[2]] else {#"B1"
+     if (is.character(referencelevel[2])) {
+       if (referencelevel[2] %in% levels(DesignRef[[focal_factor_name[2]]])) Bref[2] <- referencelevel[2] else {stop("referencelevel[2] not in factor in PRC_scores")}
+     }
      }
    }
-   DesignRef[[focal_factor_name]]<- Bref
+
+   DesignRef[[focal_factor_name[1]]]<- Bref[1]
+   if (length(Bref)==2) DesignRef[[focal_factor_name[2]]]<- Bref[2]
    # predict may give a warning that a term is not a factor while it is... For this reason suppressWarnings()
    reference_scores <- suppressWarnings(stats::predict(object, newdata= DesignRef, rank =ncol(sc$constraints), type = "lc", model = "CCA", scaling = 1, const = myconst))
    #reference_scores <- stats::predict(object, newdata= DesignRef, rank =ncol(sc$constraints), type = "lc", model = "CCA", scaling = 1, const = myconst)
