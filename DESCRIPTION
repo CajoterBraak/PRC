@@ -1,7 +1,7 @@
 Package: PRC
 Type: Package
 Title: Principal response curves to display multivariate time-dependent (or A-) effects of a treatment B in (un)balanced factorial experiments
-Version: 0.1.1
+Version: 0.1.2
 Author: Cajo J.F. ter Braak
 Maintainer: Cajo J.F. ter Braak <cajo.terbraak@wur.nl>
 Description: PRC is small package to help creating principal response curves (PRC). It expresses ordinition scores 
