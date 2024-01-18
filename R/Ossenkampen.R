@@ -1,4 +1,4 @@
-#' @title Ossenkampen experiment
+#' @title Data from Ossenkampen experiment
 #'
 
 #' @description The dataframe \code{Ossenkampen} contains the  data from

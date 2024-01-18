@@ -1,15 +1,19 @@
 Package: PRC
 Type: Package
-Title: Principal response curves to display multivariate time-dependent (or A-) effects of a treatment B in (un)balanced factorial experiments
-Version: 0.1.2
+Title: Principal response curves to display multivariate time-dependent
+        (or A-) effects of a treatment B
+Version: 0.2.0
 Author: Cajo J.F. ter Braak
 Maintainer: Cajo J.F. ter Braak <cajo.terbraak@wur.nl>
-Description: PRC is small package to help creating principal response curves (PRC). It expresses ordinition scores 
-  from vegan::rda or cca as deviation from a reference, usually to visualize multivariate A-dependent effects of a treatment B.
+Description: PRC is a small package to create and display principal response curves (PRC). 
+  It expresses ordinition scores from vegan::rda or cca as deviation from a reference, 
+  usually to visualize multivariate A-dependent effects of a treatment B
+  in (un)balanced factorial experiments.
 Depends: R (>= 3.5.0)
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: vegan, dplyr
-Suggests: ggplot2
+Suggests: vegan, dplyr, ggplot2, gridExtra, latex2exp, ggrepel
 RoxygenNote: 7.2.3
+NeedsCompilation: no
+Packaged: 2024-01-17 15:15:02 UTC; braak008

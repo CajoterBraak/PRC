@@ -6,8 +6,8 @@
 \usage{
 PRC_scores(
   object,
-  focal_factor_name,
-  referencelevel = 1,
+  focal_factor_name = NULL,
+  referencelevel = NULL,
   rank = 2,
   flip = rep(FALSE, rank),
   scaling = "ms",
@@ -17,43 +17,52 @@ PRC_scores(
 \arguments{
 \item{object}{a \code{vegan} \code{\link[vegan]{cca.object}},
  a result of \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}},
-\code{\link[vegan]{dbrda}} or \code{\link[vegan]{capscale}}.}
+\code{\link[vegan]{dbrda}} or \code{\link[vegan]{capscale}} with model specified via a formula.}
 
-\item{focal_factor_name}{name of one or two focal factors (the treatment(s) of interest)}
+\item{focal_factor_name}{name of one or two focal factors (the treatment(s) of interest); if unspecified,
+derived from the formula in \code{object} via the function \code{\link{get_focal_and_conditioning_factors}}.}
 
-\item{referencelevel}{numeric level(s) or character(s) (reference level(s) of the focal factor(s))}
+\item{referencelevel}{numeric or or character level(s) to be used as reference of the \code{focal_factor_name}(s); default: 1.}
 
-\item{rank}{number of axes to be computed}
+\item{rank}{number of axes to be computed; default 2.}
 
-\item{flip}{logical value or vector. Should the axes be flipped,
+\item{flip}{logical value or vector; default: FALSE. Should the axes be flipped,
 i.e. reversed in orientation? \code{flip} can be numeric with values -1 and 1
 for reverse and no reverse, respectively,
 i.e. multiply the scores by either -1 or 1.}
 
 \item{scaling}{character ("ms", "ss"). Scales the axes of an RDA object to mean square species scores of 1 ("ms") or
- a sum of squares of 1 ("ss"). The only scaling for a CCA  object is "ss" (weighted mean square = 1, with weigth =
+ a sum of squares of 1 ("ss"). The only scaling for a CCA  object is "ss" (weighted mean square = 1, with weight =
  species total abundance). For a dbrda object, there are no species scores and the scaling is like "ss".
 The default scaling ("ms" for RDA and "ss" for CCA) has the advantage that
                   the PRC treatment and sample scores measure the effect sizes of the 'average' species
                   as their (weigthed) mean square is 1 (sd = 1); it is the scaling used in Canoco5 (www.canoco5.com).
                   Scaling "ss" is the default in  \code{\link[stats]{prcomp}}
-                  and used in ter Braak 2023}
+                  and used in ter Braak 2023.}
 
 \item{data}{data frame of the experimental design used in the call
 to \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}}}
 }
 \value{
 A named list:
+\itemize{
 \item{PRCplus}{a data frame that combines the design in \code{data} with the PRC and RDA/CCA scores
-                   with ("_E") and without error (the unconstrained [sites] and constrained [LC] scores, respectively),
-                   and, finally, the reference scores. Note that
-                   PRC1_E = RDA1_E - RDA1_Ref, etc for other axes}
+with ("_E") and without error (the unconstrained [sites] and constrained [LC] scores, respectively),
+and, finally, the reference scores. Note that
+PRC1_E = RDA1_E - RDA1_Ref, etc for other axes}
 \item{species}{a matrix with the loadings with respect to the PRC scores; NULL if the \code{object} lacks loadings.}
 \item{reference_scores}{a matrix with the scores of each unit in \code{data} with the level of the focal factor
  replaced by the reference level}
 \item{focal_factor_name}{name of the focal factor in the call to \code{PRC_scores}}
 \item{referencelevel}{referencelevel in the call to \code{PRC_scores}}
 \item{coefficients}{list of PRC-coefficients for each axis (matrix if rank is equal to 1)}
+\item{focal_and_conditioning_factors}{list of focal and conditioning factors; obtained from
+\code{\link{get_focal_and_conditioning_factors}} if argument \code{focal_factor_name} in the call is unset.}
+\item{terms}{object$terms. See \code{\link[vegan]{cca.object}}}.
+\item{terminfo}{object$terminfo. See \code{\link[vegan]{cca.object}}}.
+\item{method}{object$method. See \code{\link[vegan]{cca.object}}}.
+\item{percExp}{percentage variance of each axis out of the variance that can be explained by the predictors and covariates}.
+}
 }
 \description{
 \code{PRC_scores} calculates scores to display principal response curves with
@@ -76,6 +85,9 @@ There can thus be additional (perhaps quantitative) covariates,
  with formula \code{ A*B*C + Condition(A*C)} so as to display the A*C-dependent effects of focal factor B
  on the multivariate response in the call to \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}},
 \code{\link[vegan]{dbrda}} or \code{\link[vegan]{capscale}}.
+ The element \code{object$'focal_and_conditioning_factors'} in value is set
+ by applying the function \code{\link{get_focal_and_conditioning_factors}}
+ to the ordination model specified in \code{object}.
 
  CCA-based PRC is useful in data with many zeroes and which are strictly compositional,
  i.e. have row sums that have no meaning for the question of interest (ter Braak and te Beest, 2022).
@@ -111,7 +123,9 @@ Y <- log(Y+1)
 myrda <- vegan::rda( Y~ A:B + Condition(A), data = Design)
 print(myrda)
 #SubtractReferenceValues has been replaced by the function PRC_scores
-Design_w_PRCs <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
+#Design_w_PRCs <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
+Design_w_PRCs <- PRC_scores(myrda,  rank = 2, data= Design)
+
 print(names(Design_w_PRCs))
 print(names(Design_w_PRCs$PRCplus))
 print(names(Design_w_PRCs$coefficients))
@@ -119,39 +133,23 @@ if (is.list(Design_w_PRCs$coefficients)) print(round(Design_w_PRCs$coefficients[
   print(round(Design_w_PRCs$coefficients, 2))
 # note that Design_w_PRCs$coefficients is not used for plotting
 
+plotPRC(Design_w_PRCs, plot = "Plot")
+# many species scores are positive (spot the 0 in the right-hand plot), while the PRC scores are mostly negative
+# so that the conclusion is that many species decrease after N and NPK fertilization
 
-# prepare data for ggplot2. sc_ref sites and constraints axis  -----------
-
-library(ggplot2)
-# convert factor A to numeric and express as years after start
-Design_w_PRCs$PRCplus$dyear <- as.numeric(levels(Design_w_PRCs$PRCplus$A))[Design_w_PRCs$PRCplus$A] -1958
-
-pl <- ggplot(Design_w_PRCs$PRCplus,aes(x = dyear, y= PRC1 , color = B))
-pl<- pl +
-       geom_line(aes(x = dyear, y= PRC1, color = B, group = Plot),linewidth = 1.2)+
-       # outcomment the next line if the data points of  'group' are independent
-       geom_line(aes(x=dyear, y = PRC1_E, color = B, linetype = Block, group =Plot))+
-       geom_point(aes(x=dyear, y = PRC1_E, color = B, shape = Block, group =Plot))
-
-print(pl+
-        ggtitle("Ossenkampen PRC1")+
-        xlab("factor A: years after start of experiment") +
-        ylab("sample scores (T with individual plot lines)")+scale_color_discrete(name = "factor B")
-      )
-
-
-#  species taxa bar plot, first axis --------------------------------------------------
+# left hand plot only:
+plot_sample_scores_cdt(Design_w_PRCs, plot = "Plot")
+#  alternative species plot: bar plot of first axis scores --------------------------------------------------
 sc_spec <- Design_w_PRCs$species
 spec.df <- data.frame("Taxon"=rownames(sc_spec),as.data.frame(sc_spec))
-logabu <- colSums(Y)
-spec.df100 <- spec.df[logabu >100 & abs(spec.df$RDA1) > 1,]
-id <- order(spec.df100$RDA1,decreasing = FALSE)
+spec.selected <- spec.df[Design_w_PRCs$species[,"Fratio1"] >20,]
+id <- order(spec.selected$RDA1,decreasing = FALSE)
 
-spec.df100sort <- spec.df100[id,]
-spec.df100sort$Taxon <- factor(spec.df100sort$Taxon, levels = spec.df100$Taxon[id])
-RDA1.spec <- ggplot(data=spec.df100sort, aes(x=Taxon, y=RDA1)) +
-  geom_bar(stat="identity", fill="steelblue")+
-  theme_minimal() + coord_flip()
+spec.selectedsort <- spec.selected[id,]
+spec.selectedsort$Taxon <- factor(spec.selectedsort$Taxon, levels = spec.selected$Taxon[id])
+RDA1.spec <- ggplot2::ggplot(data=spec.selectedsort, ggplot2::aes(x=Taxon, y=RDA1)) +
+  ggplot2::geom_bar(stat="identity", fill="steelblue")+
+  ggplot2::theme_minimal() + ggplot2::coord_flip()
 RDA1.spec
 # many species scores are positive, while the PRC scores are mostly negative
 # so that the conclusion is that many species decrease after N and NPK fertilization
@@ -179,4 +177,7 @@ van den Brink, P.J., den Besten, P., bij de Vaate, A. & ter Braak, C.J.F. (2009)
  Principal response curves technique for the analysis of multivariate biomonitoring time series.
  Environmental Monitoring and Assessment, 152, 271-281.
  http://dx.doi.org/10.1007/s10661-008-0314-6
+}
+\seealso{
+\code{\link[PRC]{plotPRC}}, \code{\link[PRC]{plotPRC2d}}
 }

@@ -3,7 +3,7 @@
 \docType{data}
 \name{Ossenkampen}
 \alias{Ossenkampen}
-\title{Ossenkampen experiment}
+\title{Data from Ossenkampen experiment}
 \description{
 The dataframe \code{Ossenkampen} contains the  data from
 a long-term fertilizer experiment (1958-2007) in grassland with 98 response variables
