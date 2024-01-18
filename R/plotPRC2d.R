@@ -24,7 +24,7 @@
 #' @example demo/PRC_CPFNUTphytoplankton.r
 #' @export
 
-plotPRC2d <- function(object, treatment= NULL, condition = NULL,  plot=NULL, xvals = NULL, axes = c(1,2),
+plotPRC2d <- function(object, treatment= NULL, condition = NULL,  plot=1, xvals = NULL, axes = c(1,2),
                      threshold=7, title = NULL, left =NULL, right = NULL,
                      speciesname= NULL, selectname = "Fratio", xylab = NULL,
                      label.repel =FALSE, withnames_only = FALSE, max.overlaps = 10, mult_expand = 0.1, widths = c(3,2),
