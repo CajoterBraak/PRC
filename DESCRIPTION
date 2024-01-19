@@ -9,11 +9,11 @@ Description: PRC is a small package to create and display principal response cur
   It expresses ordinition scores from vegan::rda or cca as deviation from a reference, 
   usually to visualize multivariate A-dependent effects of a treatment B
   in (un)balanced factorial experiments.
-Depends: R (>= 3.5.0)
+Depends: vegan, R (>= 3.5.0)
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
-Suggests: vegan, dplyr, ggplot2, gridExtra, latex2exp, ggrepel
-RoxygenNote: 7.2.3
+Imports: dplyr, ggplot2, gridExtra, latex2exp, ggrepel
+RoxygenNote: 7.3.0
 NeedsCompilation: no
 Packaged: 2024-01-17 15:15:02 UTC; braak008
