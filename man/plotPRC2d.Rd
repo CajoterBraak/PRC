@@ -8,7 +8,7 @@ plotPRC2d(
   object,
   treatment = NULL,
   condition = NULL,
-  plot = NULL,
+  plot = 1,
   xvals = NULL,
   axes = c(1, 2),
   threshold = 7,
@@ -117,21 +117,21 @@ Y <- log(Counts+1)
 #         apart from the PRC1 score at week 4, which is erroneous in the paper.
 # PRC via vegan -----------------------------------------------------------
 
-myrda <- vegan::rda( Y~ Time * Treatment + Condition(Time), data = Design)
+myrda <- rda( Y~ Time * Treatment + Condition(Time), data = Design)
 print(myrda)
-Design_w_PRCs <- PRC_scores(myrda,  rank = 3, data= Design, flip= c(FALSE, TRUE, FALSE))
-round(Design_w_PRCs$percExp, 0)
+mod_prd <- PRC_scores(myrda,  rank = 3, data= Design, flip= c(FALSE, TRUE, FALSE))
+round(mod_prd$percExp, 0)
 
-plotPRC(Design_w_PRCs, plot = "Plot", width = c(2,1), symbols_on_curves = TRUE)
+plotPRC(mod_prd, plot = "Plot", width = c(2,1), symbols_on_curves = TRUE)
 
-plotPRC(Design_w_PRCs, plot = "Plot", width = c(2,1), axis = 2)
+plotPRC(mod_prd, plot = "Plot", width = c(2,1), axis = 2)
 # note that the default selection criterion "Fratio2" also selects species strongly reacting to axis 1
 
-plotPRC2d(Design_w_PRCs, plot = 0, threshold = 1,title = "PRC Phytoplankton van den Brink & ter Braak (1998)")
+plotPRC2d(mod_prd, plot = 0, threshold = 1,title = "PRC Phytoplankton van den Brink & ter Braak (1998)")
 
 # modifying the plot
 # Assign the plots to symbols and use grid.arrange to produce the plot you like, for example:
-gg <- plotPRC2d(Design_w_PRCs, plot = 0, verbose = FALSE)
+gg <- plotPRC2d(mod_prd, plot = 0, verbose = FALSE)
 pl_species <- gg$separateplots$species # species ordination
 pl <- gg$separateplots$treatments
 names(pl)

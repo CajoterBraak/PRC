@@ -21,29 +21,29 @@ Y <- log(Y+1)
 
 # PRC via vegan -----------------------------------------------------------
 
-myrda <- vegan::rda( Y~ A:B + Condition(A), data = Design)
+myrda <- rda( Y~ A:B + Condition(A), data = Design)
 print(myrda)
 #SubtractReferenceValues has been replaced by the function PRC_scores
-#Design_w_PRCs <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
-Design_w_PRCs <- PRC_scores(myrda,  rank = 2, data= Design)
+#mod_prc <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
+mod_prc <- PRC_scores(myrda, data= Design)
 
-print(names(Design_w_PRCs))
-print(names(Design_w_PRCs$PRCplus))
-print(names(Design_w_PRCs$coefficients))
-if (is.list(Design_w_PRCs$coefficients)) print(round(Design_w_PRCs$coefficients[[1]], 2)) else
-  print(round(Design_w_PRCs$coefficients, 2))
-# note that Design_w_PRCs$coefficients is not used for plotting
+print(names(mod_prc))
+print(names(mod_prc$PRCplus))
+print(names(mod_prc$coefficients))
+if (is.list(mod_prc$coefficients)) print(round(mod_prc$coefficients[[1]], 2)) else
+  print(round(mod_prc$coefficients, 2))
+# note that mod_prc$coefficients is not used for plotting
 
-plotPRC(Design_w_PRCs, plot = "Plot")
+plotPRC(mod_prc, plot = "Plot")
 # many species scores are positive (spot the 0 in the right-hand plot), while the PRC scores are mostly negative
 # so that the conclusion is that many species decrease after N and NPK fertilization
 
 # left hand plot only:
-plot_sample_scores_cdt(Design_w_PRCs, plot = "Plot")
+plot_sample_scores_cdt(mod_prc, plot = "Plot")
 #  alternative species plot: bar plot of first axis scores --------------------------------------------------
-sc_spec <- Design_w_PRCs$species
+sc_spec <- mod_prc$species
 spec.df <- data.frame("Taxon"=rownames(sc_spec),as.data.frame(sc_spec))
-spec.selected <- spec.df[Design_w_PRCs$species[,"Fratio1"] >20,]
+spec.selected <- spec.df[mod_prc$species[,"Fratio1"] >20,]
 id <- order(spec.selected$RDA1,decreasing = FALSE)
 
 spec.selectedsort <- spec.selected[id,]

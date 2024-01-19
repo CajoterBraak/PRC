@@ -14,6 +14,6 @@
 #'
 
 #'
-#' @docType package
+#' @docType _PACKAGE
 #' @name PRC
 NULL

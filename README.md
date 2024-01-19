@@ -17,6 +17,6 @@ invoking the R-code within an R-console:
 
 ``` r
 install.packages("remotes")
-remotes::install_github("CajoterBraak/PRC", dependencies = TRUE)
+remotes::install_github("CajoterBraak/PRC")
 ```
 

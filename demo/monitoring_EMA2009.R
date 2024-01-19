@@ -30,17 +30,17 @@ plot(Fig1_pca,display = "sites")
 
 # Fig. 2 ------------------------------------------------------------------
 DesignG <- Design[ids_Grave,]
-myrda <- vegan::rda(Y~year, data = DesignG)
+myrda <- rda(Y~year, data = DesignG)
 print(myrda)
-PRC_ref92 <- PRC_scores(myrda, data= DesignG)
+RDA_ref92 <- PRC_scores(myrda, data= DesignG)
 
-plotPRC(PRC_ref92, threshold = 20) # selection criterion is the F-ratio of species ~ ax1 regression
+plotPRC(RDA_ref92, threshold = 20) # selection criterion is the F-ratio of species ~ ax1 regression
 
 # here are the species that fit to axis 1 with 30% or more of their total variance
-colnames(PRC_ref92$species)
-plotPRC(PRC_ref92, threshold = 0.3,  selectname = "Cfit", width = c(3,1))
+colnames(RDA_ref92$species)
+plotPRC(RDA_ref92, threshold = 0.3,  selectname = "Cfit", width = c(3,1))
 # or as in the paper Fig. 2, species with score greater than 0.75 in absolute value
-plotPRC(PRC_ref92, threshold = 0.75,  selectname = "RDA", width = c(3,1))
+plotPRC(RDA_ref92, threshold = 0.75,  selectname = "RDA", width = c(3,1))
 
 
 
@@ -62,15 +62,15 @@ print(myrda)
 # the y-axis of the first PRC (a) and another 18% (sic, 17%) on the y-axis of
 # the second PRC" as noted in the PRC plots below (plotPRC).
 #
-Design_w_PRCs <- PRC_scores(myrda, data = Design)
+mod_prc <- PRC_scores(myrda, data = Design)
 #Fig3
-plotPRC(Design_w_PRCs, threshold = 0.8, selectname = "RDA", width= c(2,1))
+plotPRC(mod_prc, threshold = 0.8, selectname = "RDA", width= c(2,1))
 #Fig3B
-plotPRC(Design_w_PRCs, axis = 2, threshold = 0.8, selectname = "RDA", width= c(2,1))
+plotPRC(mod_prc, axis = 2, threshold = 0.8, selectname = "RDA", width= c(2,1))
 
 
 #Fig4
-plotPRC2d(Design_w_PRCs, max.overlaps = 20, title = "Invertebrates of Kampen (Rhine) compared to Grave (Meuse)")
+plotPRC2d(mod_prc, max.overlaps = 20, title = "Invertebrates of Kampen (Rhine) compared to Grave (Meuse)")
 # Note that the relative scaling of the axes in the  species plot in the paper
 # reflects the relative importance of the axes, while the PRC curves do so as well.
 # The plot thus has a Benzecri scaling as opposed to the (preferred) biplot scaling
