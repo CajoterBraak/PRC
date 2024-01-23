@@ -6,7 +6,7 @@
 \alias{PRC-package}
 \title{Principal Response Curves (PRC) for displaying multivariate main effects and interactions}
 \description{
-PRC is a small \code{vegan}-based package to create and display Principal Response Curves (PRC), which are a special case of Redundancy Analysis (rda) for multivariate responses in designed experiments and repeated measurement designs. PRC expresses ordinition scores as deviation from a reference, usually to visualize multivariate A-dependent effects (e.g time-dependent effects) of a treatment B in (un)balanced factorial experiments. The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}} and \code{\link{plotPRC2d}}. The easiest example is the code demo \code{PRC_pyrifos}.
+PRC is a small vegan-based package to create and display Principal Response Curves (PRC), which are a special case of Redundancy Analysis (rda) for multivariate responses in designed experiments and repeated measurement designs. PRC expresses ordination scores as deviation from a reference, usually to visualize multivariate A-dependent effects (e.g time-dependent effects) of a treatment B in (un)balanced factorial experiments. The main user functions are doPRC, plotPRC and plotPRC2d. The easiest example is the code demo PRC_pyrifos.
 }
 \references{
 ter Braak, C.J.F. (2023) Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
