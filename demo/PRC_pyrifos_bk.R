@@ -3,10 +3,10 @@ data(pyrifos, package = "vegan") #transformed species data from package vegan
 Design <- data.frame(week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 19, 24)),
                      dose=factor(rep(c(0.1, 0, 0, 0.9, 0, 44, 6, 0.1, 44, 0.9, 0, 6), 11)))
 
-# library(vegan)
+library(vegan)
 mod_rda <- rda( pyrifos ~ dose:week + Condition(week),  data = Design)
 species_scores= scores(mod_rda,choices =1:2, display="sp",scaling = 1)
-# library(PRC)
+library(PRC)
 head(rdacca_taxon_stats(mod_rda)) # stats per species
 get_focal_and_conditioning_factors(mod_rda) # factors from the model
 

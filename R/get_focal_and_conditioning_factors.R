@@ -3,20 +3,18 @@
 #' @description
 #' \code{get_focal_and_conditioning_factors} derives the focal constraining variables(s) and (if present) the
 #' conditioning variables(s) from a \code{\link[vegan]{rda}}
-#' or \code{\link[vegan]{cca}} ordination specified via a formula for use in a PRC with \code{\link{PRC_scores}})
+#' or \code{\link[vegan]{cca}} ordination specified via a formula for use in a PRC
+#' (with \code{\link{doPRC}} or \code{\link{PRC_scores}})
 #'
-#' @param  object  a result of \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}}specified via a formula (S3 method for class 'formula'),
-#' or a result of \code{\link{PRC_scores}}.
+#' @param  object  a result of \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}} specified via a formula (S3 method for class 'formula'),
+#' or a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}.
 #' @return  A list with element \code{`focal factor`} and \code{condition}
-#' @details
-#' If condition is null, the focal
-#'
 #' @example demo/PRC_pyrifos_bk.R
 #' @references
 #' ter Braak C.J.F. & Šmilauer P. (2018): Canoco reference manual and user's guide:
 #'  software for ordination, version 5.1x. Microcomputer Power, Ithaca, USA, 536 pp.
 #'  (http::www.canoco5.com)
-#' @seealso \code{\link{PRC_scores}}
+#' @seealso \code{\link{doPRC}}, \code{\link{PRC_scores}}
 #' @export
 get_focal_and_conditioning_factors <- function(object){
   #get_focal_and_conditioning_factors  from an cca-object

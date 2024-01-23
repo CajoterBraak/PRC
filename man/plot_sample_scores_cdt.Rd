@@ -17,7 +17,7 @@ plot_sample_scores_cdt(
 )
 }
 \arguments{
-\item{object}{a result of \code{\link{PRC_scores}} or a list with element
+\item{object}{a result of \code{\link{doPRC}} or \code{\link{PRC_scores}} or a list with element
 PRCplus (a data frame with a variables to plot, see details).}
 
 \item{treatment}{character vector of names of factors in \code{object$PRCplus},
@@ -27,7 +27,7 @@ Default: derived from \code{object$'focal_and_conditioning_factors'}.}
 \item{condition}{character vector of names of factors in \code{object$PRCplus}, the first one being used as x-axis.
 Default: derived from \code{object$'focal_and_conditioning_factors'}.}
 
-\item{plot}{0 or 1 ((no/yes individual plot points)) or
+\item{plot}{0 or 1 (no/yes individual plot points) or
 character name of a factor in \code{object$PRCplus} indicating the plots
 (microcosms, subjects or objects) in a longitudinal study so as to plot lines.
 Default: 1 yielding points instead of lines.}
@@ -40,7 +40,7 @@ obtained using the function \code{\link{fvalues4levels}} applied to \code{object
 
 \item{size}{size of symbols and symbols in the legend. default: c(2, 2). If the length is not 2 than the first entry is replicated.}
 
-\item{symbols_on_curves}{logical draw symbols on the PRC curves at the measurement times (default FALSE).
+\item{symbols_on_curves}{logical, draw symbols on the PRC curves at the measurement times (default FALSE).
 If \code{TRUE}, symbols are for the treatment, if there is one, and for the second treatment if there are two.}
 
 \item{verbose}{logical for printing the current model, \code{score_name}, \code{condition} and \code{treatment} (default TRUE).}
@@ -55,7 +55,7 @@ a ggplot object
 \code{plot_sample_scores_cdt} can be used to
 plot any ordination score or variable against the condition with treatments indicated by colors and line type
 by setting \code{score_name} to the name of the variable of interest and argument \code{plot} to 0.
-If object is not a result of \code{\link{PRC_scores}}) set \code{treatment} and \code{condition}
+If object is not a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}), set \code{treatment} and \code{condition}
 (or \code{object$'focal_and_conditioning_factors'}) and set \code{object} to a list with element \code{PRCplus};
 \code{object$PRCplus} should contain the names indicated by the arguments treatment, condition and, optionally, plot
 \itemize{
@@ -72,7 +72,7 @@ Design <- data.frame(week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 1
                      dose=factor(rep(c(0.1, 0, 0, 0.9, 0, 44, 6, 0.1, 44, 0.9, 0, 6), 11)),
                      ditch = gl(12, 1, length=132))
 
-mod_rda <- rda( pyrifos ~ dose:week + Condition(week),  data = Design)
+mod_rda <- vegan::rda( pyrifos ~ dose:week + Condition(week),  data = Design)
 Design_w_PRCs <- PRC_scores(mod_rda, focal_factor_name= "dose", referencelevel = "0",
                             rank = 2, data= Design, scaling ="ms", flip = FALSE)
 

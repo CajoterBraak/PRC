@@ -1,3 +1,5 @@
+#' @title PRC creates 1d and 2d PRC-diagrams using Principal Response Curves analysis (van den Brink & ter Braak 1999).
+#' @description
 #' PRC creates 1d and 2d PRC-diagrams using Principal Response Curves analysis (van den Brink & ter Braak 1999).
 #' The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}} and \code{\link[PRC]{plotPRC2d}}.
 #' The easiest example is the code demo \code{PRC_pyrifos}.

@@ -20,7 +20,7 @@
 #' predictors after adjustment for the covariates.}
 #' \item{Cfit\emph{k}}{fraction of the sample variance explained
 #' by the first \emph{k} axes (the axes are constrained
-#' in a constrained ordination) and unconstrained otherwise.}
+#' in a constrained ordination and unconstrained otherwise).}
 #' \item{Fratio\emph{k}}{F-ratio of the regression model with \emph{k} axes (as predictors) and the model without axes
 #' (i.e. with covariates or the intercept only).}
 #' }

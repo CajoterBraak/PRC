@@ -42,6 +42,6 @@ library(vegan)
 ctrl <- how(plots = Plots(strata = Design$ditch,type = "free"),
             within = Within(type = "none"), nperm = 99)
 
-anova(mod_rda, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
+anova(mod_prc, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
 
 

@@ -11,7 +11,7 @@
 #' @param scale Scales species to unit variance (like correlations) if \code{method} is \code{"rda"}
 #' (default: \code{FALSE}), else void. See \code{\link[vegan]{rda}}.
 #' @param referencelevel  numeric or  character level(s) to be used as reference level or levels
-#' of the focal treatment; default: 1.  The focal treatment is given in the
+#' of the focal treatment(s); default: 1 (first level(s)).  The focal treatment is (or treatments are) given in the
 #' resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}
 #' @param data  Data frame containing the variables on the right hand side of the model formula.
 #' @inheritParams PRC_scores
@@ -33,10 +33,9 @@
 #'  https://doi.org/10.1007/s10651-022-00545-4
 #'
 #' van den Brink, P.J. & ter Braak, C. (1998) Multivariate analysis of stress in experimental ecosystems
-#'  by Principal Response Curves and similarity analysis.
-#'  Aquatic Ecology, 32, 163-178.
+#'  by Principal Response Curves and similarity analysis. Aquatic Ecology, 32, 163-178.
 #'  http://dx.doi.org/10.1023/A:1009944004756
-
+#'
 #' van den Brink, P.J. & ter Braak, C.J.F. (1999) Principal Response Curves: Analysis of
 #'  time-dependent multivariate responses of a biological community to stress.
 #'  Environmental Toxicology and Chemistry, 18, 138-148.

@@ -7,8 +7,8 @@
 get_focal_and_conditioning_factors(object)
 }
 \arguments{
-\item{object}{a result of \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}}specified via a formula (S3 method for class 'formula'),
-or a result of \code{\link{PRC_scores}}.}
+\item{object}{a result of \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}} specified via a formula (S3 method for class 'formula'),
+or a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}.}
 }
 \value{
 A list with element \code{`focal factor`} and \code{condition}
@@ -16,10 +16,8 @@ A list with element \code{`focal factor`} and \code{condition}
 \description{
 \code{get_focal_and_conditioning_factors} derives the focal constraining variables(s) and (if present) the
 conditioning variables(s) from a \code{\link[vegan]{rda}}
-or \code{\link[vegan]{cca}} ordination specified via a formula for use in a PRC with \code{\link{PRC_scores}})
-}
-\details{
-If condition is null, the focal
+or \code{\link[vegan]{cca}} ordination specified via a formula for use in a PRC
+(with \code{\link{doPRC}} or \code{\link{PRC_scores}})
 }
 \examples{
 data(pyrifos, package = "vegan") #transformed species data from package vegan
@@ -27,10 +25,10 @@ data(pyrifos, package = "vegan") #transformed species data from package vegan
 Design <- data.frame(week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 19, 24)),
                      dose=factor(rep(c(0.1, 0, 0, 0.9, 0, 44, 6, 0.1, 44, 0.9, 0, 6), 11)))
 
-# library(vegan)
+library(vegan)
 mod_rda <- rda( pyrifos ~ dose:week + Condition(week),  data = Design)
 species_scores= scores(mod_rda,choices =1:2, display="sp",scaling = 1)
-# library(PRC)
+library(PRC)
 head(rdacca_taxon_stats(mod_rda)) # stats per species
 get_focal_and_conditioning_factors(mod_rda) # factors from the model
 
@@ -49,5 +47,5 @@ ter Braak C.J.F. & Šmilauer P. (2018): Canoco reference manual and user's guide
  (http::www.canoco5.com)
 }
 \seealso{
-\code{\link{PRC_scores}}
+\code{\link{doPRC}}, \code{\link{PRC_scores}}
 }

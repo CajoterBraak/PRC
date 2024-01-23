@@ -16,14 +16,14 @@
 #' i.e. reversed in orientation? \code{flip} can be numeric with values -1 and 1
 #' for reverse and no reverse, respectively,
 #' i.e. multiply the scores by either -1 or 1.
-#' @param scaling    character ("ms", "ss"). Scales the axes of an RDA object to mean square species scores of 1 ("ms") or
-#'   a sum of squares of 1 ("ss"). The only scaling for a CCA  object is "ss" (weighted mean square = 1, with weight =
+#' @param scaling    character \code{c("ms", "ss")}. Scales the axes of an RDA object to mean square species scores of 1 (\code{"ms"}) or
+#'   a sum of squares of 1 (\code{"ss"}). The only scaling for a CCA  object is \code{"ss"} (weighted mean square = 1, with weight =
 #'   species total abundance). For a dbrda object, there are no species scores and the scaling is like "ss".
-#'  The default scaling ("ms" for RDA and "ss" for CCA) has the advantage that
+#'  The default scaling (\code{"ms"} for RDA and \code{"ss"} for CCA) has the advantage that
 #'                    the PRC treatment and sample scores measure the effect sizes of the 'average' species
 #'                    as their (weigthed) mean square is 1 (sd = 1); it is the scaling used in Canoco5 (www.canoco5.com).
-#'                    Scaling "ss" is the default in  \code{\link[stats]{prcomp}}
-#'                    and used in ter Braak 2023.
+#'                    Scaling \code{"ss"} is the default in  \code{\link[stats]{prcomp}}
+#'                    and used in ter Braak (2023).
 #' @param data data frame of the experimental design used in the call
 #'  to \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}}
 #' @return  A named list:
@@ -32,18 +32,18 @@
 #' with ("_E") and without error (the unconstrained [sites] and constrained [LC] scores, respectively),
 #' and, finally, the reference scores. Note that
 #' PRC1_E = RDA1_E - RDA1_Ref, etc for other axes}
-#' \item{species:} { a matrix with the loadings with respect to the PRC scores; NULL if the \code{object} lacks loadings.}
-#' \item{reference_scores:} { a matrix with the scores of each unit in \code{data} with the level of the focal factor
-#'  replaced by the reference level}
-#' \item{focal_factor_name:} { name of the focal factor in the call to \code{PRC_scores}}
-#' \item{referencelevel:} { referencelevel in the call to \code{PRC_scores}}
-#' \item{coefficients:} { list of PRC-coefficients for each axis (matrix if rank is equal to 1)}
+#' \item{species:}  a matrix with the loadings with respect to the PRC scores; NULL if the \code{object} lacks loadings.
+#' \item{reference_scores:}  a matrix with the scores of each unit in \code{data} with the level of the focal factor
+#'  replaced by the reference level
+#' \item{focal_factor_name:}  name of the focal factor in the call to \code{PRC_scores}
+#' \item{referencelevel:}  referencelevel in the call to \code{PRC_scores}
+#' \item{coefficients:}  list of PRC-coefficients for each axis (matrix if rank is equal to 1)
 #' \item{focal_and_conditioning_factors:}{ list of focal and conditioning factors; obtained from
 #' \code{\link{get_focal_and_conditioning_factors}} if argument \code{focal_factor_name} in the call is unset.}
-#' \item{terms:}{ object$terms. See \code{\link[vegan]{cca.object}}}.
-#' \item{terminfo:}{ object$terminfo. See \code{\link[vegan]{cca.object}}}.
-#' \item{method:}{ object$method. See \code{\link[vegan]{cca.object}}}.
-#' \item{percExp:}{ percentage variance of each axis out of the variance that can be explained by the predictors and covariates}.
+#' \item{terms:} object$terms. See \code{\link[vegan]{cca.object}}.
+#' \item{terminfo:} object$terminfo. See \code{\link[vegan]{cca.object}}.
+#' \item{method:} object$method. See \code{\link[vegan]{cca.object}}.
+#' \item{percExp:} percentage variance of each axis out of the variance that can be explained by the predictors and covariates.
 #'}
 #' @details \code{PRC_scores} uses \code{\link[vegan]{scores}} to
 #' calculate the loadings (species scores),if obtainable from the \code{object}, and the constrained and unconstrained sample scores
@@ -74,7 +74,7 @@
 #'
 #' @example demo/PRC_pyrifos_cdt.R
 #'
-#' @seealso \code{\link[PRC]{plotPRC}}, \code{\link[PRC]{plotPRC2d}}
+#' @seealso \code{\link[PRC]{doPRC}}, \code{\link[PRC]{plotPRC}}, \code{\link[PRC]{plotPRC2d}}
 
 
 

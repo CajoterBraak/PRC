@@ -2,12 +2,12 @@
 #'
 #' @description
 #' \code{plot_species_scores_bk} creates a vertical line plot of species scores for a PRC diagram with selection criterion
-#'  of which species to plot with names.
+#'  for which species to plot with names.
 #' @param  species_scores  a species-by-scores matrix, a data frame with rownames (species names) or a tibble
 #'  with variable with name \code{speciesname} containing species names and
 #'  a column or variabe with name \code{scoresname} containing the scores
 #' (default: \code{"RDA1"}), e.g. species scores from library \code{vegan}
-#' @param ylab y-axis label. Default: b_k.
+#' @param ylab y-axis label. Default: $b_k$.
 #' @param y_lab_interval interval of the y-axis ticks. A tick at no effect (0) is always included; default: 0.5.
 #' @param threshold species with criterion (specified by \code{selectname}) higher than the \code{threshold} are displayed.
 #' Default: 7
@@ -26,7 +26,7 @@
 #'
 #' @return  a ggplot object
 #' @example demo/PRC_pyrifos_bk.r
-#' @seealso \code{\link{PRC_scores}}
+#' @seealso \code{\link{doPRC}}, \code{\link{plotPRC}}
 #' @export
 
 plot_species_scores_bk <- function(species_scores, ylab = latex2exp::TeX("$b_k$"), threshold=7, y_lab_interval=0.5,

@@ -24,11 +24,11 @@ The data analyzed in Berendse et al. (2021) also contained the limed plots and c
 imputations of the few missing samples after 1966.
 
 \itemize{
- \item\code{Sample} numeric identifier for sample
-\item\code{Plot} identifier for sample (detailed fertilizer treatment with Block code)
+ \item\code{Sample} numeric identifier for a sample
+\item\code{Plot} identifier for a sample (the identifier details the fertilizer treatment and \code{Block})
 \item\code{Block} numeric identifier of the block (1 or 2)
 \item\code{A} year of sampling
-\item\code{B} fertilizer treatment, condensed to four treatments ("Cntrl" is the referencelevel)
+\item\code{B} fertilizer treatment, condensed to four treatments (\code{"Cntrl"} is the referencelevel)
 \item\code{AgrCap} count out of 100 subsamples of species AgrCap, and so on for the remaining 97 species
 }
 }
@@ -47,5 +47,5 @@ Berendse, F., Geerts, R.H.E.M., Elberse, W.T., Bezemer, T.M.,
 ter Braak, C.J.F. (2023)
  Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
  and outperforms its extensions. Chemometrics and Intelligent Laboratory Systems, 104898.
- https://www.sciencedirect.com/science/article/pii/S016974392300148X
+ https://doi.org/10.1016/j.chemolab.2023.104898
 }

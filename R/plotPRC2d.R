@@ -1,7 +1,7 @@
 #' @title 2d PRC diagram
 #'
 #' @description
-#' \code{plotPRC2d} creates a two-dimensional PRC diagram with species loadings from a result of \code{\link{PRC_scores}}
+#' \code{plotPRC2d} creates a two-dimensional PRC diagram with species loadings from a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}
 #' @param xylab character vector of length 2 defining x- and y-axis title of the species ordination so as to overwrite the defauls axis labels
 #' @param selectname name of the column or variable containing the criterion for the selection of species to be displayed
 #' Default: \code{"Fratio"}; if \code{selectname} is not found in \code{object$species_scores},

@@ -21,7 +21,7 @@ plot_species_scores_2d(
 \item{species_scores}{a species-by-scores matrix, a data frame with rownames (species names) or a tibble
  with variable with name \code{speciesname} containing species names and
  a column or variabe with names \code{scorenames} containing the scores
-(default: \code{"RDA1"}), e.g. species scores from library \code{vegan}}
+(default: \code{c("RDA1","RDA2")} being the species score names from \code{\link[vegan]{rda}}.}
 
 \item{threshold}{species with criterion (specified by \code{selectname}) higher than the \code{threshold} are displayed.
 Default: 5
@@ -30,10 +30,10 @@ at \code{p=0.01} with \code{60} df for the error in a multiple regression
 of each single species onto the condition and the ordination axes).
 If \code{selectname}  is not in the data the \code{threshold} is divided by ten, so that the default is 0.5.}
 
-\item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames)}
+\item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames).}
 
 \item{scorenames}{names of the two columns or variables containing the species scores to be plotted
-(default \code{c("RDA1","RDA2")})}
+(default \code{c("RDA1","RDA2")}).}
 
 \item{selectname}{name of the column or variable containing the criterion for the selection of species to be displayed
 Default: \code{"Fratio2"}; if \code{selectname} is not found in \code{species_scores},
@@ -42,13 +42,16 @@ set to the Euclidian norm (length) of the vectors defined by row-wise combining 
 \item{label.repel}{logical (default: \code{FALSE}) for using labels in white boxes with borders using \code{\link[ggrepel]{geom_label_repel}}
 instead of using plain text labels using \code{\link[ggrepel]{geom_text_repel}}.}
 
-\item{withnames_only}{plot the species that exceed the \code{treshold} only.}
+\item{withnames_only}{logical to plot the species that exceed the \code{treshold} only, i.e. to \emph{not} plot points indicating species
+that do not reach the \code{threshold}. (Default: \code{FALSE}).}
 
 \item{max.overlaps}{exclude text labels that overlap too many things. Default: 10 (see \code{\link[ggrepel]{geom_text_repel}}).}
 
 \item{mult_expand}{fraction of range expansion of the diagram (default = 0.1). See \code{\link[ggplot2]{expansion}}.}
 
-\item{verbose}{locigal for printing the number of species with names out of the total number (default: \code{TRUE}).}
+\item{verbose}{logical for printing the number of species
+that \code{\link[ggrepel]{geom_text_repel}} or \code{\link[ggrepel]{geom_label_repel}} will try to name in the plot
+out of the total number of species (default: \code{TRUE}).}
 }
 \value{
 a ggplot object
@@ -58,7 +61,9 @@ a ggplot object
  of which species to plot with names.
 }
 \details{
-The names of species are added using \code{\link[ggrepel]{geom_text_repel}}.
+The names of species are added using \code{\link[ggrepel]{geom_text_repel}} or \code{\link[ggrepel]{geom_label_repel}}.
+These functions may not be able to plot the names of all selected species.
+This issue can be diminished by increasing the value of \code{max.overlaps}.
 }
 \examples{
 data(pyrifos, package = "vegan") #transformed species data from package vegan
@@ -66,10 +71,10 @@ data(pyrifos, package = "vegan") #transformed species data from package vegan
 Design <- data.frame(week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 19, 24)),
                      dose=factor(rep(c(0.1, 0, 0, 0.9, 0, 44, 6, 0.1, 44, 0.9, 0, 6), 11)))
 
-# library(vegan)
+library(vegan)
 mod_rda <- rda( pyrifos ~ dose:week + Condition(week),  data = Design)
 species_scores= scores(mod_rda,choices =1:2, display="sp",scaling = 1)
-# library(PRC)
+library(PRC)
 head(rdacca_taxon_stats(mod_rda)) # stats per species
 get_focal_and_conditioning_factors(mod_rda) # factors from the model
 
@@ -83,5 +88,5 @@ plot_species_scores_2d(species_scores, max.overlaps = 30, label.repel = TRUE)
 
 }
 \seealso{
-\code{\link{PRC_scores}}, \code{\link{plotPRC}}
+\code{\link{doPRC}}, \code{\link{plotPRC2d}}
 }

@@ -6,9 +6,6 @@
 #' @param  object  a data frame or tibble.
 #' @param fctr name of a factor in object (character or symbol)
 #' @return  a numeric named vector (names are levels)
-#' @details
-#' If condition is null, the focal
-#'
 #' @example demo/PRC_pyrifos_fval.R
 #' @export
 fvalues4levels <- function(object, fctr){

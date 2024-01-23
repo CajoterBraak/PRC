@@ -25,7 +25,7 @@ plotPRC(
 )
 }
 \arguments{
-\item{object}{a result of \code{\link{PRC_scores}} or a list with element
+\item{object}{a result of \code{\link{doPRC}} or \code{\link{PRC_scores}} or a list with element
 PRCplus (a data frame with a variables to plot, see details).}
 
 \item{treatment}{character vector of names of factors in \code{object$PRCplus},
@@ -35,7 +35,7 @@ Default: derived from \code{object$'focal_and_conditioning_factors'}.}
 \item{condition}{character vector of names of factors in \code{object$PRCplus}, the first one being used as x-axis.
 Default: derived from \code{object$'focal_and_conditioning_factors'}.}
 
-\item{plot}{0 or 1 ((no/yes individual plot points)) or
+\item{plot}{0 or 1 (no/yes individual plot points) or
 character name of a factor in \code{object$PRCplus} indicating the plots
 (microcosms, subjects or objects) in a longitudinal study so as to plot lines.
 Default: 1 yielding points instead of lines.}
@@ -48,7 +48,7 @@ obtained using the function \code{\link{fvalues4levels}} applied to \code{object
 
 \item{size}{size of symbols and symbols in the legend. default: c(2, 2). If the length is not 2 than the first entry is replicated.}
 
-\item{symbols_on_curves}{logical draw symbols on the PRC curves at the measurement times (default FALSE).
+\item{symbols_on_curves}{logical, draw symbols on the PRC curves at the measurement times (default FALSE).
 If \code{TRUE}, symbols are for the treatment, if there is one, and for the second treatment if there are two.}
 
 \item{width}{relative width of treatment PRC plot and the loading plot (see \code{\link[gridExtra]{grid.arrange}}).}
@@ -57,7 +57,7 @@ If \code{TRUE}, symbols are for the treatment, if there is one, and for the seco
 
 \item{left}{left axis text (see \code{\link[gridExtra]{arrangeGrob}}).}
 
-\item{right}{right axis text (see \code{\link[gridExtra]{arrangeGrob}})}
+\item{right}{right axis text (see \code{\link[gridExtra]{arrangeGrob}}).}
 
 \item{threshold}{species with criterion (specified by \code{selectname}) higher than the \code{threshold} are displayed.
 Default: 7
@@ -71,7 +71,7 @@ If \code{selectname} is not in \code{species_scores}, the \code{threshold} is di
 \item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames in \code{object$species})}
 
 \item{selectname}{name of the column or variable containing the criterion for the selection of species to be displayed
-without \code{".1"} or other \code{axis} number.
+without \code{"1"} or other \code{axis} number.
 Default: \code{"Fratio"};if \code{selectname} is not found in \code{object$species_scores}, set to \code{scoresname}.
 e.g. the \code{"RDA1"} scores.}
 
@@ -83,7 +83,7 @@ and a list of two ggplot2 objects (the treatment PRC-diagram and the vertical li
 }
 \description{
 \code{plotPRC} creates a one-dimensional PRC diagram with
-vertical line plot of species loadings from a result of \code{\link{PRC_scores}}.
+vertical line plot of species loadings from a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}.
 }
 \details{
 The function creates the treatment PRC diagram using \code{\link{plot_sample_scores_cdt}} and the
@@ -135,7 +135,7 @@ library(vegan)
 ctrl <- how(plots = Plots(strata = Design$ditch,type = "free"),
             within = Within(type = "none"), nperm = 99)
 
-anova(mod_rda, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
+anova(mod_prc, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
 
 
 }

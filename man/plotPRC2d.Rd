@@ -27,7 +27,7 @@ plotPRC2d(
 )
 }
 \arguments{
-\item{object}{a result of \code{\link{PRC_scores}} or a list with element
+\item{object}{a result of \code{\link{doPRC}} or \code{\link{PRC_scores}} or a list with element
 PRCplus (a data frame with a variables to plot, see details).}
 
 \item{treatment}{character vector of names of factors in \code{object$PRCplus},
@@ -37,7 +37,7 @@ Default: derived from \code{object$'focal_and_conditioning_factors'}.}
 \item{condition}{character vector of names of factors in \code{object$PRCplus}, the first one being used as x-axis.
 Default: derived from \code{object$'focal_and_conditioning_factors'}.}
 
-\item{plot}{0 or 1 ((no/yes individual plot points)) or
+\item{plot}{0 or 1 (no/yes individual plot points) or
 character name of a factor in \code{object$PRCplus} indicating the plots
 (microcosms, subjects or objects) in a longitudinal study so as to plot lines.
 Default: 1 yielding points instead of lines.}
@@ -59,9 +59,9 @@ If \code{selectname}  is not in the data the \code{threshold} is divided by ten,
 
 \item{left}{left axis text (see \code{\link[gridExtra]{arrangeGrob}}).}
 
-\item{right}{right axis text (see \code{\link[gridExtra]{arrangeGrob}})}
+\item{right}{right axis text (see \code{\link[gridExtra]{arrangeGrob}}).}
 
-\item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames)}
+\item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames).}
 
 \item{selectname}{name of the column or variable containing the criterion for the selection of species to be displayed
 Default: \code{"Fratio"}; if \code{selectname} is not found in \code{object$species_scores},
@@ -72,13 +72,16 @@ set to the Euclidian norm (length) of the vectors defined by row-wise combining 
 \item{label.repel}{logical (default: \code{FALSE}) for using labels in white boxes with borders using \code{\link[ggrepel]{geom_label_repel}}
 instead of using plain text labels using \code{\link[ggrepel]{geom_text_repel}}.}
 
-\item{withnames_only}{plot the species that exceed the \code{treshold} only.}
+\item{withnames_only}{logical to plot the species that exceed the \code{treshold} only, i.e. to \emph{not} plot points indicating species
+that do not reach the \code{threshold}. (Default: \code{FALSE}).}
 
 \item{max.overlaps}{exclude text labels that overlap too many things. Default: 10 (see \code{\link[ggrepel]{geom_text_repel}}).}
 
 \item{mult_expand}{fraction of range expansion of the diagram (default = 0.1). See \code{\link[ggplot2]{expansion}}.}
 
-\item{verbose}{locigal for printing the number of species with names out of the total number (default: \code{TRUE}).}
+\item{verbose}{logical for printing the number of species
+that \code{\link[ggrepel]{geom_text_repel}} or \code{\link[ggrepel]{geom_label_repel}} will try to name in the plot
+out of the total number of species (default: \code{TRUE}).}
 }
 \value{
 a list of a gridExtra object (plot using \code{\link[gridExtra]{arrangeGrob}})
@@ -86,7 +89,7 @@ and a list of five ggplot2 objects, arranged in a list of two: treatments = the 
 and and species= the 2d species ordination plot).
 }
 \description{
-\code{plotPRC2d} creates a two-dimensional PRC diagram with species loadings from a result of \code{\link{PRC_scores}}
+\code{plotPRC2d} creates a two-dimensional PRC diagram with species loadings from a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}
 }
 \details{
 The function creates the treatment PRC diagrams for the \code{axes} using \code{\link{plot_sample_scores_cdt}}, with diagrams for the

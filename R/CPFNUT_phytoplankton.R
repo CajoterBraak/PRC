@@ -6,7 +6,7 @@
 #' there are three
 #' treatments: control (\code{con}), nutrients (\code{nut}) and nutrients with chlorpyrifos application (\code{cpf-nut}), each with
 #' four cosms (replications) sampled 13 times (twice before nutrients where added and six times before the additional
-#' application of chorpyrifos). The phytoplankton data are counts and 26 species in total.
+#' application of chorpyrifos). The phytoplankton data are counts and there are 26 species in total.
 #'
 #'
 

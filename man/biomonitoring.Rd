@@ -5,10 +5,10 @@
 \alias{biomonitoring}
 \title{Biomonitoring example from van den Brink et al. (2009)}
 \description{
-The data frame \code{biomonitoring} contains the design and species from van den Brink et al.(2009). The data is
+The data frame \code{biomonitoring} contains the design and species data from van den Brink et al.(2009). The data is
 on biomonitoring of macroinvertebrate species in the Rhine and Meuse rivers, near the
 towns of Kampen and Grave, respectively, from 1992 - 2000, sampled six times per year,
-except in 1998 (4x), 1999 and 2000 (7x). The first example uses reference coding of an reduncancy without covariates
+except in 1998 (4x), 1999 and 2000 (7x). The first example uses reference coding of an reduncancy analysis without covariates
 so as to emphasize the compositional difference from a reference. The second example is a more regular PRC, contrasting
 the compositional changes at one site without those in another.
 \itemize{

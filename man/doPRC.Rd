@@ -27,7 +27,7 @@ because a multiplicative model has more realism for non-negative data than an ad
 (default: \code{FALSE}), else void. See \code{\link[vegan]{rda}}.}
 
 \item{referencelevel}{numeric or  character level(s) to be used as reference level or levels
-of the focal treatment; default: 1.  The focal treatment is given in the
+of the focal treatment(s); default: 1 (first level(s)).  The focal treatment is (or treatments are) given in the
 resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}}
 
 \item{rank}{number of axes to be computed; default 2.}
@@ -37,14 +37,14 @@ i.e. reversed in orientation? \code{flip} can be numeric with values -1 and 1
 for reverse and no reverse, respectively,
 i.e. multiply the scores by either -1 or 1.}
 
-\item{scaling}{character ("ms", "ss"). Scales the axes of an RDA object to mean square species scores of 1 ("ms") or
- a sum of squares of 1 ("ss"). The only scaling for a CCA  object is "ss" (weighted mean square = 1, with weight =
+\item{scaling}{character \code{c("ms", "ss")}. Scales the axes of an RDA object to mean square species scores of 1 (\code{"ms"}) or
+ a sum of squares of 1 (\code{"ss"}). The only scaling for a CCA  object is \code{"ss"} (weighted mean square = 1, with weight =
  species total abundance). For a dbrda object, there are no species scores and the scaling is like "ss".
-The default scaling ("ms" for RDA and "ss" for CCA) has the advantage that
+The default scaling (\code{"ms"} for RDA and \code{"ss"} for CCA) has the advantage that
                   the PRC treatment and sample scores measure the effect sizes of the 'average' species
                   as their (weigthed) mean square is 1 (sd = 1); it is the scaling used in Canoco5 (www.canoco5.com).
-                  Scaling "ss" is the default in  \code{\link[stats]{prcomp}}
-                  and used in ter Braak 2023.}
+                  Scaling \code{"ss"} is the default in  \code{\link[stats]{prcomp}}
+                  and used in ter Braak (2023).}
 
 \item{data}{Data frame containing the variables on the right hand side of the model formula.}
 }
@@ -105,7 +105,7 @@ library(vegan)
 ctrl <- how(plots = Plots(strata = Design$ditch,type = "free"),
             within = Within(type = "none"), nperm = 99)
 
-anova(mod_rda, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
+anova(mod_prc, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
 
 
 }
@@ -120,9 +120,9 @@ ter Braak, C.J.F. & te Beest, D.E. 2022. Testing environmental effects on taxono
  https://doi.org/10.1007/s10651-022-00545-4
 
 van den Brink, P.J. & ter Braak, C. (1998) Multivariate analysis of stress in experimental ecosystems
- by Principal Response Curves and similarity analysis.
- Aquatic Ecology, 32, 163-178.
+ by Principal Response Curves and similarity analysis. Aquatic Ecology, 32, 163-178.
  http://dx.doi.org/10.1023/A:1009944004756
+
 van den Brink, P.J. & ter Braak, C.J.F. (1999) Principal Response Curves: Analysis of
  time-dependent multivariate responses of a biological community to stress.
  Environmental Toxicology and Chemistry, 18, 138-148.

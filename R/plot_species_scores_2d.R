@@ -7,31 +7,36 @@
 #' @param  species_scores  a species-by-scores matrix, a data frame with rownames (species names) or a tibble
 #'  with variable with name \code{speciesname} containing species names and
 #'  a column or variabe with names \code{scorenames} containing the scores
-#' (default: \code{"RDA1"}), e.g. species scores from library \code{vegan}
+#' (default: \code{c("RDA1","RDA2")} being the species score names from \code{\link[vegan]{rda}}.
 #' @param threshold species with criterion (specified by \code{selectname}) higher than the \code{threshold} are displayed.
 #' Default: 5
 #' (which is the threshold F-ratio for testing two regression coefficients (one for each axis)
 #' at \code{p=0.01} with \code{60} df for the error in a multiple regression
 #' of each single species onto the condition and the ordination axes).
 #' If \code{selectname}  is not in the data the \code{threshold} is divided by ten, so that the default is 0.5.
-#' @param speciesname name of the variable containing the species names (default \code{NULL} uses rownames)
+#' @param speciesname name of the variable containing the species names (default \code{NULL} uses rownames).
 #' @param scorenames names of the two columns or variables containing the species scores to be plotted
-#' (default \code{c("RDA1","RDA2")})
+#' (default \code{c("RDA1","RDA2")}).
 #' @param selectname name of the column or variable containing the criterion for the selection of species to be displayed
 #' Default: \code{"Fratio2"}; if \code{selectname} is not found in \code{species_scores},
 #' set to the Euclidian norm (length) of the vectors defined by row-wise combining the values defined by \code{scorenames}.
-#' @param withnames_only plot the species that exceed the \code{treshold} only.
+#' @param withnames_only logical to plot the species that exceed the \code{treshold} only, i.e. to \emph{not} plot points indicating species
+#' that do not reach the \code{threshold}. (Default: \code{FALSE}).
 #' @param max.overlaps  exclude text labels that overlap too many things. Default: 10 (see \code{\link[ggrepel]{geom_text_repel}}).
 #' @param mult_expand fraction of range expansion of the diagram (default = 0.1). See \code{\link[ggplot2]{expansion}}.
-#' @param verbose locigal for printing the number of species with names out of the total number (default: \code{TRUE}).
+#' @param verbose logical for printing the number of species
+#' that \code{\link[ggrepel]{geom_text_repel}} or \code{\link[ggrepel]{geom_label_repel}} will try to name in the plot
+#' out of the total number of species (default: \code{TRUE}).
 #' @param label.repel logical (default: \code{FALSE}) for using labels in white boxes with borders using \code{\link[ggrepel]{geom_label_repel}}
 #' instead of using plain text labels using \code{\link[ggrepel]{geom_text_repel}}.
 #' @details
-#' The names of species are added using \code{\link[ggrepel]{geom_text_repel}}.
+#' The names of species are added using \code{\link[ggrepel]{geom_text_repel}} or \code{\link[ggrepel]{geom_label_repel}}.
+#' These functions may not be able to plot the names of all selected species.
+#' This issue can be diminished by increasing the value of \code{max.overlaps}.
 #'
 #' @return  a ggplot object
 #' @example demo/PRC_pyrifos_bk.r
-#' @seealso \code{\link{PRC_scores}}, \code{\link{plotPRC}}
+#' @seealso \code{\link{doPRC}}, \code{\link{plotPRC2d}}
 #' @export
 
 plot_species_scores_2d <- function(species_scores,  threshold=7,
