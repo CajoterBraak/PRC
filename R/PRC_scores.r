@@ -1,4 +1,4 @@
-#' @title Calculates principal response curve (PRC) scores from vegan::rda, cca, dbrda or capscale
+#' @title Calculate principal response curve (PRC) scores from vegan::rda, cca, dbrda or capscale objects
 #'
 #' @description
 #' \code{PRC_scores} calculates scores to display principal response curves with
@@ -10,7 +10,7 @@
 
 #' @param  focal_factor_name name of one or two focal factors (the treatment(s) of interest); if unspecified,
 #' derived from the formula in \code{object} via the function \code{\link{get_focal_and_conditioning_factors}}.
-#' @param referencelevel     numeric or or character level(s) to be used as reference of the \code{focal_factor_name}(s); default: 1.
+#' @param referencelevel     numeric or character level(s) to be used as reference of the \code{focal_factor_name}(s); default: 1.
 #' @param rank               number of axes to be computed; default 2.
 #' @param flip               logical value or vector; default: FALSE. Should the axes be flipped,
 #' i.e. reversed in orientation? \code{flip} can be numeric with values -1 and 1
@@ -28,22 +28,22 @@
 #'  to \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}}
 #' @return  A named list:
 #' \itemize{
-#' \item{PRCplus}{a data frame that combines the design in \code{data} with the PRC and RDA/CCA scores
+#' \item{PRCplus:} { a data frame that combines the design in \code{data} with the PRC and RDA/CCA scores
 #' with ("_E") and without error (the unconstrained [sites] and constrained [LC] scores, respectively),
 #' and, finally, the reference scores. Note that
 #' PRC1_E = RDA1_E - RDA1_Ref, etc for other axes}
-#' \item{species}{a matrix with the loadings with respect to the PRC scores; NULL if the \code{object} lacks loadings.}
-#' \item{reference_scores}{a matrix with the scores of each unit in \code{data} with the level of the focal factor
+#' \item{species:} { a matrix with the loadings with respect to the PRC scores; NULL if the \code{object} lacks loadings.}
+#' \item{reference_scores:} { a matrix with the scores of each unit in \code{data} with the level of the focal factor
 #'  replaced by the reference level}
-#' \item{focal_factor_name}{name of the focal factor in the call to \code{PRC_scores}}
-#' \item{referencelevel}{referencelevel in the call to \code{PRC_scores}}
-#' \item{coefficients}{list of PRC-coefficients for each axis (matrix if rank is equal to 1)}
-#' \item{focal_and_conditioning_factors}{list of focal and conditioning factors; obtained from
+#' \item{focal_factor_name:} { name of the focal factor in the call to \code{PRC_scores}}
+#' \item{referencelevel:} { referencelevel in the call to \code{PRC_scores}}
+#' \item{coefficients:} { list of PRC-coefficients for each axis (matrix if rank is equal to 1)}
+#' \item{focal_and_conditioning_factors:}{ list of focal and conditioning factors; obtained from
 #' \code{\link{get_focal_and_conditioning_factors}} if argument \code{focal_factor_name} in the call is unset.}
-#' \item{terms}{object$terms. See \code{\link[vegan]{cca.object}}}.
-#' \item{terminfo}{object$terminfo. See \code{\link[vegan]{cca.object}}}.
-#' \item{method}{object$method. See \code{\link[vegan]{cca.object}}}.
-#' \item{percExp}{percentage variance of each axis out of the variance that can be explained by the predictors and covariates}.
+#' \item{terms:}{ object$terms. See \code{\link[vegan]{cca.object}}}.
+#' \item{terminfo:}{ object$terminfo. See \code{\link[vegan]{cca.object}}}.
+#' \item{method:}{ object$method. See \code{\link[vegan]{cca.object}}}.
+#' \item{percExp:}{ percentage variance of each axis out of the variance that can be explained by the predictors and covariates}.
 #'}
 #' @details \code{PRC_scores} uses \code{\link[vegan]{scores}} to
 #' calculate the loadings (species scores),if obtainable from the \code{object}, and the constrained and unconstrained sample scores
@@ -72,31 +72,7 @@
 #'  CCA can be applied without log-transforming the data and thereby avoids the issue of
 #'  replacement of zeroes (ter Braak and te Beest, 2022).
 #'
-#' @example demo/PRC_Ossenkampen.r
-#' @references
-#' ter Braak (2023) Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
-#'  and outperforms its extensions
-#' Chemometrics and Intelligent Laboratory Systems https://doi.org/10.1016/j.chemolab.2023.104898
-#'
-#' ter Braak, C.J.F. & te Beest, D.E. 2022. Testing environmental effects on taxonomic composition
-#'  with canonical correspondence analysis: alternative permutation tests are not equal.
-#'  Environmental and Ecological Statistics. 29 (4), 849-868.
-#'  https://doi.org/10.1007/s10651-022-00545-4
-#'
-#' van den Brink, P.J. & ter Braak, C. (1998) Multivariate analysis of stress in experimental ecosystems
-#'  by Principal Response Curves and similarity analysis.
-#'  Aquatic Ecology, 32, 163-178.
-#'  http://dx.doi.org/10.1023/A:1009944004756
-
-#' van den Brink, P.J. & ter Braak, C.J.F. (1999) Principal Response Curves: Analysis of
-#'  time-dependent multivariate responses of a biological community to stress.
-#'  Environmental Toxicology and Chemistry, 18, 138-148.
-#'  https://doi.org/10.1002/etc.5620180207
-#'
-#' van den Brink, P.J., den Besten, P., bij de Vaate, A. & ter Braak, C.J.F. (2009)
-#'  Principal response curves technique for the analysis of multivariate biomonitoring time series.
-#'  Environmental Monitoring and Assessment, 152, 271-281.
-#'  http://dx.doi.org/10.1007/s10661-008-0314-6
+#' @example demo/PRC_pyrifos_cdt.R
 #'
 #' @seealso \code{\link[PRC]{plotPRC}}, \code{\link[PRC]{plotPRC2d}}
 

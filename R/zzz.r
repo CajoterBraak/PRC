@@ -1,9 +1,9 @@
 #' PRC creates 1d and 2d PRC-diagrams using Principal Response Curves analysis (van den Brink & ter Braak 1999).
-#' The main user functions are \code{\link{PRC_scores}}, \code{\link{plotPRC}} and \code{\link[PRC]{plotPRC2d}}.
+#' The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}} and \code{\link[PRC]{plotPRC2d}}.
 #' The easiest example is the code demo \code{PRC_pyrifos}.
 #'
 #' @references
-#' ter Braak (2023) Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
+#' ter Braak, C.J.F. (2023) Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
 #'  and outperforms its extensions
 #' Chemometrics and Intelligent Laboratory Systems https://doi.org/10.1016/j.chemolab.2023.104898
 #'
@@ -12,8 +12,6 @@
 #'  Environmental Toxicology and Chemistry, 18, 138-148.
 #'  https://doi.org/10.1002/etc.5620180207
 #'
-
-#'
-#' @docType _PACKAGE
-#' @name PRC
+#' @seealso \code{\link{prc}},\code{\link[vegan]{prc}}
+#' @name PRC-package
 NULL

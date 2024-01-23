@@ -15,11 +15,11 @@ Counts <- as.matrix(biomonitoring[,-(1:3)]); rownames(Counts)<-biomonitoring$sam
 # Analysis of Grave data --------------------------------------------------
 # Fig.1
 ids_Grave <- which(Design$location=="Grave")
-Y <- log(2*Counts[ids_Grave,] + 1)
+YG <- log(2*Counts[ids_Grave,] + 1)
 # Remark: this transformation reproduces the results in van den Brink et al 2009
 # http://dx.doi.org/10.1007/s10661-008-0314-6
 #pca
-Fig1_pca <- vegan::rda(Y)
+Fig1_pca <- vegan::rda(YG)
 # percentage explained
 round(100*Fig1_pca$CA$eig/Fig1_pca$tot.chi,1)[1:10]
 #PC1  PC2  PC3  PC4  PC5  PC6  PC7  PC8  PC9 PC10
@@ -30,9 +30,9 @@ plot(Fig1_pca,display = "sites")
 
 # Fig. 2 ------------------------------------------------------------------
 DesignG <- Design[ids_Grave,]
-myrda <- rda(Y~year, data = DesignG)
-print(myrda)
-RDA_ref92 <- PRC_scores(myrda, data= DesignG)
+#myrda <- rda(Y~year, data = DesignG)
+#print(myrda)
+RDA_ref92 <- doPRC(YG~year, data= DesignG)
 
 plotPRC(RDA_ref92, threshold = 20) # selection criterion is the F-ratio of species ~ ax1 regression
 
@@ -47,8 +47,9 @@ plotPRC(RDA_ref92, threshold = 0.75,  selectname = "RDA", width = c(3,1))
 # Fig. 3 ------------------------------------------------------------------
 
 Y <- log(2*Counts + 1)
-myrda <- vegan::rda(Y~year:location+Condition(year), data = Design)
-print(myrda)
+
+mod_prc <- doPRC(Y~year:location+Condition(year), data = Design)
+print(mod_prc)
 #                 Proportio Rank
 # Total           1.0000
 # Conditional     0.2172    8 #22% (between-year variation)
@@ -62,7 +63,6 @@ print(myrda)
 # the y-axis of the first PRC (a) and another 18% (sic, 17%) on the y-axis of
 # the second PRC" as noted in the PRC plots below (plotPRC).
 #
-mod_prc <- PRC_scores(myrda, data = Design)
 #Fig3
 plotPRC(mod_prc, threshold = 0.8, selectname = "RDA", width= c(2,1))
 #Fig3B

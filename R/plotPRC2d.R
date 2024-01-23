@@ -19,7 +19,7 @@
 #' @return  a list of a gridExtra object (plot using \code{\link[gridExtra]{arrangeGrob}})
 #' and a list of five ggplot2 objects, arranged in a list of two: treatments = the  PRC1, PRC2-diagrams with line x=y and x= -y diagrams
 #' and and species= the 2d species ordination plot).
-#' @seealso \code{\link{PRC_scores}}, \code{\link{plot_sample_scores_cdt}},
+#' @seealso \code{\link{doPRC}}, \code{\link{plot_sample_scores_cdt}},
 #' \code{\link{plot_species_scores_2d}} and \code{\link[gridExtra]{grid.arrange}}
 #' @example demo/PRC_CPFNUTphytoplankton.r
 #' @export

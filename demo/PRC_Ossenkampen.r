@@ -11,7 +11,7 @@ Design$B <- factor(Design$B, levels = c("Cntrl","PK","NPK","N"))
 Design$Plot <- Design$Plot
 Design$Block <- factor(Design$Block)
 
-print(with(Design,table(A,B)))
+#print(with(Design,table(A,B)))
 
 # extract response variables
 Y <- as.matrix(Ossenkampen[,-(1:5)]); rownames(Y)<-Ossenkampen$Sample
@@ -19,13 +19,11 @@ Y <- as.matrix(Ossenkampen[,-(1:5)]); rownames(Y)<-Ossenkampen$Sample
 # But need to add pseudocount to avoid log(0)= infinite
 Y <- log(Y+1)
 
-# PRC via vegan -----------------------------------------------------------
 
-myrda <- rda( Y~ A:B + Condition(A), data = Design)
-print(myrda)
-#SubtractReferenceValues has been replaced by the function PRC_scores
-#mod_prc <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)
-mod_prc <- PRC_scores(myrda, data= Design)
+
+# PRC via doPrC -----------------------------------------------------------
+
+mod_prc <- doPRC(Y~ A:B + Condition(A), data= Design)
 
 print(names(mod_prc))
 print(names(mod_prc$PRCplus))
@@ -54,3 +52,12 @@ RDA1.spec <- ggplot2::ggplot(data=spec.selectedsort, ggplot2::aes(x=Taxon, y=RDA
 RDA1.spec
 # many species scores are positive, while the PRC scores are mostly negative
 # so that the conclusion is that many species decrease after N and NPK fertilization
+
+
+# same using function  vegan::rda and function PRC_scores ------------------------------------------
+
+
+#myrda <- rda( Y~ A:B + Condition(A), data = Design)
+#print(myrda)
+#SubtractReferenceValues has been replaced by the function PRC_scores
+#mod_prc <- PRC_scores(myrda, focal_factor_name= "B", referencelevel = 1, rank = 2, data= Design)

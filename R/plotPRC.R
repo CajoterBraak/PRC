@@ -22,7 +22,7 @@
 #'
 #' @return  a list of a gridExtra object (plot using \code{\link[gridExtra]{arrangeGrob}})
 #' and a list of two ggplot2 objects (the treatment PRC-diagram and the vertical line plot).
-#' @seealso \code{\link{PRC_scores}}, \code{\link{plot_sample_scores_cdt}},
+#' @seealso \code{\link{doPRC}}, \code{\link{plotPRC2d}}, \code{\link{plot_sample_scores_cdt}},
 #' \code{\link{plot_species_scores_bk}} and \code{\link[gridExtra]{grid.arrange}}
 #' @example demo/PRC_pyrifos.r
 #' @export
