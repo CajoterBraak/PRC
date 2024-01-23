@@ -7,7 +7,7 @@ Authors@R: person(given ="Cajo J.F", family = "ter Braak", email="cajo.terbraak@
 Maintainer: Cajo J.F. ter Braak <cajo.terbraak@wur.nl>
 Description: PRC is a small \code{vegan}-based package to create and display Principal Response Curves (PRC), which are a special case of Redundancy Analysis (rda) for multivariate responses in designed experiments and repeated measurement designs.  
   PRC expresses ordinition scores as deviation from a reference, usually to visualize multivariate A-dependent effects (e.g time-dependent effects) of a treatment B in (un)balanced factorial experiments.
-  The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}} and \code{\link[PRC]{plotPRC2d}}.
+  The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}} and \code{\link{plotPRC2d}}.
   The easiest example is the code demo \code{PRC_pyrifos}.
 URL: https://doi.org/10.1002/etc.5620180207, https://doi.org/10.1016/j.chemolab.2023.104898
 BugReports: https://github.com/CajoterBraak/PRC/issues
