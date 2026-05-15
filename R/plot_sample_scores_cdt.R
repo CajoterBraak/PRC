@@ -30,8 +30,8 @@
 #' (or \code{object$'focal_and_conditioning_factors'}) and set \code{object} to a list with element \code{PRCplus};
 #' \code{object$PRCplus} should contain the names indicated by the arguments treatment, condition and, optionally, plot
 #' \itemize{
-#' \item{treatment}{: a factor for the treatments},
-#' \item{condition}{: a factor or variable condition}
+#' \item{treatment:} a factor for the treatments,
+#' \item{condition:} a factor or variable condition
 #' }
 #' If \code{plot!=0}, the scores (values) for individual sample points or lines must be in the variable "PRC1_E" or,
 #' in general, \code{paste(score_name,"_E", sep = "")}.

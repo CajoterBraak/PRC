@@ -1,6 +1,9 @@
 monitoring_EMA2009 biomonitoring examples of van den Brink et al. (2009) in Environmental monitoring and assessment
 PRC_CPFNUTphytoplankton Demo of creating 1d and 2d PRC diagrams using the van den Brink & ter Braak 1998 phytoplankton data
 PRC_pyrifos        Demo of creating a 1-dimensional PRC diagram with PRC curves and vertical taxon loading plot
+smoothPRC_Ossenkampen    Demo of smooth PRC using the Ossenkampen data
+smoothPRC_pyrifos        Demo of smooth PRC using the pyrifos data
+smoothPRC_SimData        Demo of smooth PRC using simulated data with underlying straight PRC lines
 PRC_Ossenkampen    Demo of the PRC_scores function using the Ossenkampen data, its data requirements and plotting the PRC diagram
 PRC_pyrifos_cdt    Demo of the utility function for creating a PRC curve plot of treatments and sample-scores or trajectories
 PRC_pyrifos_bk     Demo of the utility function for creating a vertical plot of the species scores of a PRC diagram

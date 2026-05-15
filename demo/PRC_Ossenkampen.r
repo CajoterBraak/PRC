@@ -1,4 +1,4 @@
-
+library(PRC)
 data("Ossenkampen")
 
 # Read example data ----------------------------------------------------

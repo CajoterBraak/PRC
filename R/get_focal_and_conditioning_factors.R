@@ -8,6 +8,7 @@
 #'
 #' @param  object  a result of \code{\link[vegan]{rda}}, \code{\link[vegan]{cca}} specified via a formula (S3 method for class 'formula'),
 #' or a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}.
+#' @param factors_only logical to exclude numeric variables from the focal factor(s). Default \code{TRUE}.
 #' @return  A list with element \code{`focal factor`} and \code{condition}
 #' @example demo/PRC_pyrifos_bk.R
 #' @references
@@ -16,7 +17,7 @@
 #'  (http::www.canoco5.com)
 #' @seealso \code{\link{doPRC}}, \code{\link{PRC_scores}}
 #' @export
-get_focal_and_conditioning_factors <- function(object){
+get_focal_and_conditioning_factors <- function(object, factors_only = TRUE){
   #get_focal_and_conditioning_factors  from an cca-object
   tl <- attr(object$terms, "term.labels")
   if (is.null(tl)){
@@ -31,7 +32,7 @@ get_focal_and_conditioning_factors <- function(object){
   if (is.na(idC)) { Condi_nams <- NULL} else {
     # get names of the Condition
     condi <- tl[idC]
-    condi <- attr(terms(as.formula(paste("~",substr(condi, 11, nchar(condi)-1), sep = ""))), "term.labels")
+    condi <- attr(stats::terms(stats::as.formula(paste("~",substr(condi, 11, nchar(condi)-1), sep = ""))), "term.labels")
     tl2 <- strsplit(condi, split = ":", fixed = TRUE)
     id_interactions <- which (sapply(tl2, length) >1)
     if (length(id_interactions)) Condi_nams <- unlist(tl2[-id_interactions]) else Condi_nams <- unlist(tl2)
@@ -55,10 +56,12 @@ get_focal_and_conditioning_factors <- function(object){
     id <- which(interaction %in% Condi_nams)
     if (length(id)) {
       focal_nams <- interaction[-id]; Condi_nams <- interaction[id]
-    # there may be numeric variables in focal_nams (e.g. if condition is a factor but numeric in treatment)
+      if (factors_only){
+      # there may be numeric variables in focal_nams (e.g. if condition is a factor but numeric in treatment)
       # delete those
-    # factors are names(object$terminfo$xlev)
+      # factors are names(object$terminfo$xlev)
       focal_nams <- focal_nams[focal_nams %in% names(object$terminfo$xlev)]
+      }
     }else {
       # unusual case:
       focal_nams <- interaction

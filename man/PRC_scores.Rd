@@ -46,22 +46,31 @@ to \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}}}
 \value{
 A named list:
 \itemize{
-\item{PRCplus:} { a data frame that combines the design in \code{data} with the PRC and RDA/CCA scores
-with ("_E") and without error (the unconstrained [sites] and constrained [LC] scores, respectively),
+\item{PRCplus:}  a data frame that combines the design in \code{data} with
+the PRC and RDA/CCA scores
+with (_E) and without error (the unconstrained and constrained
+scores (sites and LC), respectively),
 and, finally, the reference scores. Note that
-PRC1_E = RDA1_E - RDA1_Ref, etc for other axes}
-\item{species:}  a matrix with the loadings with respect to the PRC scores; NULL if the \code{object} lacks loadings.
-\item{reference_scores:}  a matrix with the scores of each unit in \code{data} with the level of the focal factor
+PRC1_E = RDA1_E - RDA1_Ref, etc for other axes
+\item{species:}  a matrix with the loadings with respect to the PRC scores;
+NULL if the \code{object} lacks loadings.
+\item{reference_scores:}  a matrix with the scores of each unit in
+\code{data} with the level of the focal factor
  replaced by the reference level
-\item{focal_factor_name:}  name of the focal factor in the call to \code{PRC_scores}
-\item{referencelevel:}  referencelevel in the call to \code{PRC_scores}
-\item{coefficients:}  list of PRC-coefficients for each axis (matrix if rank is equal to 1)
-\item{focal_and_conditioning_factors:}{ list of focal and conditioning factors; obtained from
-\code{\link{get_focal_and_conditioning_factors}} if argument \code{focal_factor_name} in the call is unset.}
+\item{focal_factor_name:}  name of the focal factor in the call to
+ \code{PRC_scores}
+\item{referencelevel:}  reference level in the call to \code{PRC_scores}
+\item{coefficients:}  list of PRC-coefficients for each axis (matrix if rank
+is equal to 1)
+\item{focal_and_conditioning_factors:} list of focal and
+ conditioning factors; obtained from
+\code{\link{get_focal_and_conditioning_factors}}
+if argument \code{focal_factor_name} in the call is unset.
 \item{terms:} object$terms. See \code{\link[vegan]{cca.object}}.
 \item{terminfo:} object$terminfo. See \code{\link[vegan]{cca.object}}.
 \item{method:} object$method. See \code{\link[vegan]{cca.object}}.
-\item{percExp:} percentage variance of each axis out of the variance that can be explained by the predictors and covariates.
+\item{percExp:} percentage variance of each axis out of the variance that
+ can be explained by the predictors and covariates.
 }
 }
 \description{
@@ -114,5 +123,5 @@ plot_sample_scores_cdt(Design_w_PRCs, plot = "Ditch")
 
 }
 \seealso{
-\code{\link[PRC]{doPRC}}, \code{\link[PRC]{plotPRC}}, \code{\link[PRC]{plotPRC2d}}
+\code{\link{doPRC}}, \code{\link{plotPRC}}, \code{\link{plotPRC2d}}
 }

@@ -5,7 +5,7 @@
 #' vertical line plot of species loadings from a result of \code{\link{doPRC}} or \code{\link{PRC_scores}}.
 #' @param title overall title.
 #' @param axis axis shown; default 1, showing the first PRC axis.
-#' @param width relative width of treatment PRC plot and the loading plot (see \code{\link[gridExtra]{grid.arrange}}).
+#' @param widths relative width of treatment PRC plot and the loading plot (see \code{\link[gridExtra]{grid.arrange}}).
 #' @param left left axis text (see \code{\link[gridExtra]{arrangeGrob}}).
 #' @param right right axis text (see \code{\link[gridExtra]{arrangeGrob}}).
 #' @param speciesname name of the variable containing the species names (default \code{NULL} uses rownames in \code{object$species})
@@ -13,6 +13,7 @@
 #' without \code{"1"} or other \code{axis} number.
 #' Default: \code{"Fratio"};if \code{selectname} is not found in \code{object$species_scores}, set to \code{scoresname}.
 #' e.g. the \code{"RDA1"} scores.
+#' @param verbose logical for plotting and printing the current model, \code{score_name}, \code{condition} and \code{treatment} (default TRUE).
 #' @inheritParams plot_sample_scores_cdt
 #' @inheritParams plot_species_scores_bk
 #' @details
@@ -29,7 +30,7 @@
 
 plotPRC <- function(object, treatment= NULL, condition = NULL,  plot=1, xvals = NULL, axis = 1,
                      size= c(2,2), symbols_on_curves= FALSE,
-                     width = c(4,1),  title = NULL, left ="Treatment and plot scores", right = "taxon scores",
+                     widths = c(4,1),  title = NULL, left ="Treatment and plot scores", right = "taxon scores",
                      threshold=7, y_lab_interval=0.5,
                      speciesname= NULL, selectname = "Fratio",
                      verbose = TRUE){
@@ -63,7 +64,7 @@ plotPRC <- function(object, treatment= NULL, condition = NULL,  plot=1, xvals = 
       title <- paste(title," (ratio to next axis: ",round(object$percExp[axis_k]/object$percExp[axis_k+1],1),")" ,sep="")
   }
 
-  gg_object <- gridExtra::arrangeGrob(pl.cdt1+ggplot2::ylab(NULL)+ ggplot2::ggtitle(""),pl.bk1, ncol =2,widths = width,
+  gg_object <- gridExtra::arrangeGrob(pl.cdt1+ggplot2::ylab(NULL)+ ggplot2::ggtitle(""),pl.bk1, ncol =2,widths = widths,
                                        top = title, left =left, right =  right)
 
 

@@ -13,7 +13,7 @@ plotPRC(
   axis = 1,
   size = c(2, 2),
   symbols_on_curves = FALSE,
-  width = c(4, 1),
+  widths = c(4, 1),
   title = NULL,
   left = "Treatment and plot scores",
   right = "taxon scores",
@@ -51,7 +51,7 @@ obtained using the function \code{\link{fvalues4levels}} applied to \code{object
 \item{symbols_on_curves}{logical, draw symbols on the PRC curves at the measurement times (default FALSE).
 If \code{TRUE}, symbols are for the treatment, if there is one, and for the second treatment if there are two.}
 
-\item{width}{relative width of treatment PRC plot and the loading plot (see \code{\link[gridExtra]{grid.arrange}}).}
+\item{widths}{relative width of treatment PRC plot and the loading plot (see \code{\link[gridExtra]{grid.arrange}}).}
 
 \item{title}{overall title.}
 
@@ -75,7 +75,7 @@ without \code{"1"} or other \code{axis} number.
 Default: \code{"Fratio"};if \code{selectname} is not found in \code{object$species_scores}, set to \code{scoresname}.
 e.g. the \code{"RDA1"} scores.}
 
-\item{verbose}{logical for printing the current model, \code{score_name}, \code{condition} and \code{treatment} (default TRUE).}
+\item{verbose}{logical for plotting and printing the current model, \code{score_name}, \code{condition} and \code{treatment} (default TRUE).}
 }
 \value{
 a list of a gridExtra object (plot using \code{\link[gridExtra]{arrangeGrob}})
@@ -91,6 +91,7 @@ vertical line plot of loadings using \code{\link{plot_species_scores_bk}}. These
 combined in a single object using \code{\link[gridExtra]{arrangeGrob}}.
 }
 \examples{
+library(PRC)
 data(pyrifos, package = "vegan") #log-transformed species data from package vegan
 #the chlorpyrifos experiment from van den Brink & ter Braak 1999
 Design <- data.frame(week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 19, 24)),
@@ -120,12 +121,19 @@ plotPRC(mod_prc, plot = "ditch", threshold = 10,width = c(4,1))
 
 # modifying the plot
 gg <- plotPRC(mod_prc, plot = "ditch",width = c(4,1), verbose = FALSE)
-p1 <- gg$separateplots$treatments + ggplot2::ggtitle(paste("new title:", latex2exp::TeX("$c_{dt}$")))   # PRC plot of samples (c_dt)
-p2 <- gg$separateplots$species    + ggplot2::ylab("new title: loadings")# loadings of species  (b_k)
-# Assign these plots to symbols and use grid.arrange to produce the plot  you like, for example:
-gridExtra::grid.arrange(p1+ ggplot2::ylab("")+ ggplot2::xlab("week since chorpyrifos application") + ggplot2::ggtitle(""),
-                        p2, ncol =2, widths = c(4,1),
-                        top = "new title", left ="PRC curves of treaments", right =  "PRC species loadings")
+# PRC plot of samples (c_dt)
+p1 <- gg$separateplots$treatments +
+  ggplot2::ggtitle(paste("new title:", latex2exp::TeX("$c_{dt}$")))
+
+p2 <- gg$separateplots$species    +
+  ggplot2::ylab("new title: loadings")# loadings of species  (b_k)
+# Assign these plots to symbols and use grid.arrange to produce the plot
+#you like, for example:
+gridExtra::grid.arrange(p1+ ggplot2::ylab("")+
+    ggplot2::xlab("week since chorpyrifos application") + ggplot2::ggtitle(""),
+        p2, ncol =2, widths = c(4,1),
+        top = "new title", left ="PRC curves of treaments",
+        right =  "PRC species loadings")
 
 # test significance of PRC/RDA axes ---------------------------------------
 
@@ -135,7 +143,8 @@ library(vegan)
 ctrl <- how(plots = Plots(strata = Design$ditch,type = "free"),
             within = Within(type = "none"), nperm = 99)
 
-anova(mod_prc, by = "axis",permutations=  ctrl, model = "reduced", cutoff = 0.10)
+anova(mod_prc, by = "axis",permutations=  ctrl, model = "reduced",
+      cutoff = 0.10)
 
 
 }

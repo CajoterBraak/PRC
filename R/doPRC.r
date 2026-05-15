@@ -13,8 +13,10 @@
 #' @param referencelevel  numeric or  character level(s) to be used as reference level or levels
 #' of the focal treatment(s); default: 1 (first level(s)).  The focal treatment is (or treatments are) given in the
 #' resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}
+#' @param method character rda or cca. Default: \code{"rda"}
 #' @param data  Data frame containing the variables on the right hand side of the model formula.
 #' @inheritParams PRC_scores
+#'
 #' @details
 #' The function performs PRC using \code{\link[vegan]{rda}} or \code{\link[vegan]{cca}} with
 #' the specified \code{formula} and applies \code{\link{PRC_scores}} to the result.
@@ -46,16 +48,17 @@
 #'  Environmental Monitoring and Assessment, 152, 271-281.
 #'  http://dx.doi.org/10.1007/s10661-008-0314-6
 #' @example demo/PRC_pyrifos.r
+#' @seealso \code{\link{plotPRC}}, \code{\link{plotPRC2d}}
 #' @export
 doPRC <- function(formula, scale =  FALSE,  referencelevel = NULL, rank = 2,
                  flip = rep(FALSE,rank), scaling = "ms",  method = "rda",
-                 data, ...){
+                 data){
   ev <- environment()
   parent.env(ev) <- environment(formula)
   environment(formula) <- ev
   if (method=="rda")  {
-    mod_rda <- vegan:::rda.formula( formula= formula,  data = data, scale= scale,...)
-  } else      mod_rda <- vegan:::cca.formula( formula= formula,  data = data,...)
+    mod_rda <- vegan::rda( formula= formula,  data = data, scale= scale)
+  } else      mod_rda <- vegan::cca( formula= formula,  data = data)
 
   Design_w_PRCs <- PRC_scores(object = mod_rda,
                     focal_factor_name = NULL, referencelevel = referencelevel,
