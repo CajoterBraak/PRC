@@ -362,7 +362,7 @@ ggplot(data = smooth_prc_df,
 Boer, Martin P. 2023.
 Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
 Statistical Modelling 23 (5-6): 465–79.
-\doi{10.1177/1471082X231178591.i}
+\doi{10.1177/1471082X231178591}
 }
 \seealso{
 \code{\link{smoothPRC}}
