@@ -48,7 +48,7 @@
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
 #' Statistical Modelling 23 (5-6): 465–79.
-#' \doi{10.1177/1471082X231178591.i}
+#' \doi{10.1177/1471082X231178591}
 #' @export
 smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
                                                         k = 3, mA = 3,
