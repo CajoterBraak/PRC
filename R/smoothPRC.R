@@ -140,14 +140,14 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
       break
   }
   Yb <- Yb - fitted(objH0)
-  PRC <-  get_xhat(obj, dat0 = lmm_model$dat0)
+  PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
   out <-list(b = b, x = xhat, PRC = PRC,
              obj = obj, objH0=objH0, iter = iter,Y= Y, x_star = Yb,
              lmm_model = lmm_model,options_iter = options_iter)
   class(out) <- c("smoothPRC", "list")
   return(out)
 }
-get_xhat <-function(obj,dat0=NULL){
+get_PRC <-function(obj,dat0=NULL){
   # full fitted values
   xhat <- fitted(obj)
   pred0 <- predict(obj, newdata = dat0)
