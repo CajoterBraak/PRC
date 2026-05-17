@@ -51,7 +51,7 @@
 #' \doi{10.1177/1471082X231178591}
 #' @export
 smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
-                                                        k = 3, mA = 3,
+                                                        k = 3, mA = 4,
                                                         tol = 1e-8, maxiter = 50)) {
 
   normalizeb <- function(b){b/sqrt(sum(b^2))  }
@@ -95,7 +95,7 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
                            data = cbind(lmm_model$data, Yb = Yb) )
       # extract spline latent axis xhat
         # spline fit under H0
-        objH0 <-      LMMsolve(fixed = lmm_model$fixed,
+        objH0 <-      LMMsolve(fixed = lmm_model$fixedH0,
                                spline = lmm_model$splineH0,
                                random  = lmm_model$random,
                                residual = lmm_model$residual,
@@ -140,8 +140,8 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
       break
   }
   Yb <- Yb - fitted(objH0)
-  PRC <-get_xhat(obj, dat0 = lmm_model$dat0)
-  out <-list(b = b, xhat = xhat, PRC = PRC,
+  PRC <-  get_xhat(obj, dat0 = lmm_model$dat0)
+  out <-list(b = b, x = xhat, PRC = PRC,
              obj = obj, objH0=objH0, iter = iter,Y= Y, x_star = Yb,
              lmm_model = lmm_model,options_iter = options_iter)
   class(out) <- c("smoothPRC", "list")

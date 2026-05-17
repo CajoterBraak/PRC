@@ -31,7 +31,7 @@
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
 #' Statistical Modelling 23 (5-6): 465–79.
-#' \doi{10.1177/1471082X231178591.i}
+#' \doi{10.1177/1471082X231178591}
 #'
 #' @details
 #'  An atypical aspect of the function is that the time and treatment factors
@@ -99,7 +99,7 @@ set_smoothPRC_model <-
       datI <- as.data.frame(datI)
       idsl <- 1:(nlevels(data$Treatment)-1)
       names(datI) <- paste0("D", idsl)
-      if(is.null(spline)){
+      if(!is.null(splineH0) && is.null(spline)){
         spline <- paste0("~spl1D(time, nseg =",
                       nseg[1],", degree =", degree[1],", pord = ", pord[3],")")
         txt<-  paste("spl1D(D",idsl,", nseg=",
@@ -110,12 +110,13 @@ set_smoothPRC_model <-
       datI[data$time <= 0, ] <- 0
       data <- cbind(data,datI)
     } else {
-      if(is.null(spline))spline <- as.formula(paste0("~ spl2D(time, dose, nseg = c(",
+      if(!is.null(splineH0) && is.null(spline))spline <- as.formula(paste0("~ spl2D(time, dose, nseg = c(",
                                   nseg[1],",",nseg[2],"), degree =", degree[1],", pord = ", pord[2],")"))
     }
     # sets LMMsolver_model with response in formulafixed and data : Design
     dat0 <- data
     dat0$dose <- 0
+    dat0$Treatment <- levels(data$Treatment)[1]
     if("D1" %in% names(dat0)) {
       id <- which(names(dat0) %in% "D1")
       dat0[, id : ncol(dat0)] <- 0
