@@ -7,7 +7,7 @@
 smoothPRC(
   Y,
   lmm_model,
-  options_iter = list(b_init = NULL, k = 3, mA = 3, tol = 1e-08, maxiter = 50)
+  options_iter = list(b_init = NULL, k = 3, mA = 4, tol = 1e-08, maxiter = 50)
 )
 }
 \arguments{
