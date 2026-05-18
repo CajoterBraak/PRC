@@ -23,7 +23,7 @@ library(PRC)
 
 # The PRC package {.unnumbered}
 
-The aim of the `PRC` package is to help ecologists unravel time-dependent treatment effects from multivariate response **Y** in longitudinal designed experiments. Principal response curve analysis (PRC) [@vandenBrink1999PRC] uses partial redundancy analysis with model $Time + Time:Treatment$ with $Time$ and $Treatment$ as factors. Here $Time$ is a covariable in the language of ordination [@legendre2012numerical; @Braak1988theory]. Partial redundancy analysis (RDA) is equivalent to reduced rank regression with concomitant variables, where, in PRC, $Time$ is a concomitant factor variable (that is, a set of concomitant indicator variables) [@Braak2023redundancy; @Braak1994biplots; @vandenBrink1999PRC]. Version 2.0.0 of the `PRC` package adds smoothPRC, which produced smooth PRC curves. 
+The aim of the `PRC` package is to help ecologists unravel time-dependent treatment effects from multivariate response **Y** in longitudinal designed experiments. Principal response curve analysis (PRC) [@vandenBrink1999PRC] uses partial redundancy analysis with model $Time + Time:Treatment$ with $Time$ and $Treatment$ as factors. Here $Time$ is a covariable in the language of ordination [@legendre2012numerical; @Braak1988theory]. Partial redundancy analysis (RDA) is equivalent to reduced rank regression with concomitant variables, where, in PRC, $Time$ is a concomitant factor variable (that is, a set of concomitant indicator variables) [@Braak2023redundancy; @Braak1994biplots; @vandenBrink1999PRC]. Version 2.0.0 of the `PRC` package adds smoothPRC, which produced smooth PRC curves. See https://github.com/CajoterBraak/PRC
 
 # Theory of PRC and smoothPRC
 
