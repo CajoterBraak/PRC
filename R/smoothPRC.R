@@ -139,10 +139,14 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
     if (sqrt(sum((b - b_old)^2)) < options_iter$tol)
       break
   }
-  Yb <- Yb - fitted(objH0)
   PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
-  out <-list(b = b, x = xhat, PRC = PRC,
-             obj = obj, objH0=objH0, iter = iter,Y= Y, x_star = Yb,
+  PRCstar <-  get_PRCstar(obj, dat0 = lmm_model$dat0)
+  if (lmm_model$scaling =="ms") mult <- sqrt(length(b))else mult <- 1
+  out <-list(b = b*mult,
+             x = xhat/mult,
+             x_star = (Yb - fitted(objH0))/mult,
+             PRC = PRC/mult, PRCstar = PRCstar/mult,
+             obj = obj, objH0=objH0, iter = iter,Y= Y, Yb=Yb,
              lmm_model = lmm_model,options_iter = options_iter)
   class(out) <- c("smoothPRC", "list")
   return(out)
@@ -152,6 +156,13 @@ get_PRC <-function(obj,dat0=NULL){
   xhat <- fitted(obj)
   pred0 <- predict(obj, newdata = dat0)
   xhat <- xhat - pred0$ypred # only the deviations from the control
-  xmean <-  - mean(xhat)
+  #xmean <-  - mean(xhat)
   return(xhat)
+}
+get_PRCstar <-function(obj,dat0=NULL){
+  # full fitted values
+  pred0 <- predict(obj, newdata = dat0)
+  xstar <- obj$Yb - pred0$ypred # only the deviations from the control
+  #xmean <-  - mean(xhat)
+  return(xstar)
 }

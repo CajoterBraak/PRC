@@ -17,6 +17,7 @@ set_smoothPRC_model(
   nseg = c(time = 6, dose = 6),
   degree = 3,
   start_time = 0,
+  scaling = "ms",
   data
 )
 }
@@ -69,6 +70,10 @@ can be large.
 
 \item{start_time}{numeric time of the start of the treatment application.
 Default: \code{0}.}
+
+\item{scaling}{The default gives mean square species scores of 1, otherwise
+the sum of squares of the species scores is 1. See \link{doPRC}.
+Default: "ms"}
 
 \item{data}{A data.frame containing the modeling data.}
 }

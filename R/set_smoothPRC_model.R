@@ -27,6 +27,9 @@
 #' can be large.
 #'  Default \code{ c(time = 6, dose = 6)}.
 #'@param degree degree of the B-splines. Default \code{3}.
+#'@param scaling The default gives mean square species scores of 1, otherwise
+#' the sum of squares of the species scores is 1. See \link{doPRC}.
+#' Default: "ms"
 #' @references
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
@@ -79,7 +82,9 @@ set_smoothPRC_model <-
            pord = c(time = 2, dose = 2, time.overall = 3, Treatment = 2),
            nseg =  c(time = 6, dose = 6),
            degree =3,
-           start_time = 0,data){
+           start_time = 0,
+           scaling = "ms",
+           data){
     #data with Time and Treatment as factors, modified here to quantitative time and dose
     # pretimes dose to 0
     # start_time = numeric value or vector of length(nrow(data))
@@ -122,9 +127,10 @@ set_smoothPRC_model <-
       dat0[, id : ncol(dat0)] <- 0
     }
 
-
-    out <- list(spline,splineH0,fixed, fixedH0, random, residual, weights, as.data.frame(dat0), as.data.frame(data))
-    names(out) = c("spline","splineH0","fixed","fixedH0", "random", "residual", "weights", "dat0","data")
+    out <- list(spline,splineH0,fixed, fixedH0, random, residual,
+                weights, scaling, as.data.frame(dat0), as.data.frame(data))
+    names(out) = c("spline","splineH0","fixed","fixedH0", "random", "residual",
+                   "weights","scaling", "dat0","data")
     return(out)
   }
 
