@@ -26,7 +26,7 @@ because a multiplicative model has more realism for non-negative data than an ad
 (default: \code{FALSE}), else void. See \code{\link[vegan]{rda}}.}
 
 \item{referencelevel}{numeric or  character level(s) to be used as reference level or levels
-of the focal treatment(s); default: 1 (first level(s)).  The focal treatment is (or treatments are) given in the
+of the focal treatment(s); default: 1 (first level(s)).  With \code{\link{doPRC}}, the focal treatment is (or treatments are) given in the
 resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}}
 
 \item{rank}{number of axes to be computed; default 2.}

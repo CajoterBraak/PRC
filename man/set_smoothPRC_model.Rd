@@ -17,6 +17,7 @@ set_smoothPRC_model(
   nseg = c(time = 6, dose = 6),
   degree = 3,
   start_time = 0,
+  referencelevel = NULL,
   scaling = "ms",
   data
 )
@@ -66,14 +67,19 @@ where the first two orders are used only with
 can be large.
  Default \code{ c(time = 6, dose = 6)}.}
 
-\item{degree}{degree of the B-splines. Default \code{3}.}
+\item{degree}{degree of the B-splines. Default \code{3}.
+factor(data$Treatment).}
 
 \item{start_time}{numeric time of the start of the treatment application.
 Default: \code{0}.}
 
+\item{referencelevel}{numeric or  character level(s) to be used as reference level or levels
+of the focal treatment(s); default: 1 (first level(s)).  With \code{\link{doPRC}}, the focal treatment is (or treatments are) given in the
+resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}}
+
 \item{scaling}{The default gives mean square species scores of 1, otherwise
 the sum of squares of the species scores is 1. See \link{doPRC}.
-Default: "ms"}
+Default: "ms".}
 
 \item{data}{A data.frame containing the modeling data.}
 }
@@ -93,10 +99,10 @@ An atypical aspect of the function is that the time and treatment factors
  In this case, the default spline model is:
  \code{ ~ spl2D(time, dose,  = c(6, 6), degree = 3, pord = 2)}.
  To enable \code{Treatment} to be treated as a factor (instead of as a
- quantitative variable), the function also generates variables with
+ quantitative variable), the function generates variables with
  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
  treatments beyond the reference treatment,
- if \code{treatment.level.as.quantity} is \code{TRUE}.
+ if \code{treatment.level.as.quantity} is \code{FALSE}.
  These variables contain the time
  since the start of the experiment for each treatment.
  An example of the formula for \code{spline}
@@ -130,24 +136,15 @@ suppressPackageStartupMessages({
   # extract design
   Design0 <- SimData[,c("A","B")]
   Design0$A <- factor(Design0$A);  Design0$B <- factor(Design0$B)
-
-
   #put levels in natural order
   Design0$A<- factor(Design0$A, levels=c(levels(Design0$A)[-2],levels(Design0$A)[2]))
-
-
-
   Y0 <- as.matrix(SimData[,-(1:3)])
-
   ids <- which(Design0$A \%in\% "A10" & Design0$B \%in\% "B5")
   #design <- "Complete" #
   design <- "Empty cell"
   if (design == "Complete"){  Design <- Design0;Y <- Y0} else {Design <-Design0[-ids,]; Y=Y0[-ids,]}
-
   print(with(Design,table(A,B)))
   names(Design)
-
-
 
 # Design and Y for Fig 1 of  ter Braak 2023 ready -------------------------------------------
 dim(Y)
@@ -168,7 +165,8 @@ smoothPRC_model$spline
 out <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(out$obj)
 cor(out$b, b_mod_prc)
-
+plot_species_scores_bk(-out$b)
+plot_species_scores_bk(b_mod_prc)
 
 newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
 names(newdat)

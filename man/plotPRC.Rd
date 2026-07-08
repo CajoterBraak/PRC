@@ -59,14 +59,16 @@ If \code{TRUE}, symbols are for the treatment, if there is one, and for the seco
 
 \item{right}{right axis text (see \code{\link[gridExtra]{arrangeGrob}}).}
 
-\item{threshold}{species with criterion (specified by \code{selectname}) higher than the \code{threshold} are displayed.
-Default: 7
-(which is the threshold F-ratio for testing a single regression coefficient
-at \code{p=0.01} with \code{60} df for the error in a multiple regression
-of each single species onto the condition and the ordination axis).
-If \code{selectname} is not in \code{species_scores}, the \code{threshold} is divided by \code{14}, so that the default is 0.5.}
+\item{threshold}{species with criterion (specified by \code{selectname})
+higher than the \code{threshold} are displayed. Default: 7 (which is the
+threshold F-ratio for testing a single regression coefficient at
+\code{p = 0.01} with \code{60} df for the error in a multiple regression
+of each single species onto the condition and the ordination axis). If
+\code{selectname} is not in \code{species_scores}, the \code{threshold} is
+divided by \code{14}, so that the default is 0.5.}
 
-\item{y_lab_interval}{interval of the y-axis ticks. A tick at no effect (0) is always included; default: 0.5.}
+\item{y_lab_interval}{interval of the y-axis ticks. A tick at no effect (0)
+is always included; default: 0.5.}
 
 \item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames in \code{object$species})}
 

@@ -56,7 +56,7 @@ becomeP-splines (penalized B-splines).
 For an initial \code{b} of species scores, the unconstrainted sites \code{Yb}
 are calculated, which are then used as response vector in
 \code{\link[LMMsolver]{LMMsolve}} to give a constrained site scores
-\code{xhat} by the P-spline model specified in \code{lmm_model}. This
+\code{x} by the P-spline model specified in \code{lmm_model}. This
 is part of a power algorithm with block and Anderson acceleration to solve
 the dominant eigen vector of the
 underlying eigen problem while optimizing simultaneously the penalties

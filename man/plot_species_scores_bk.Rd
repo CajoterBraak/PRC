@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_species_scores_bk.r
 \name{plot_species_scores_bk}
 \alias{plot_species_scores_bk}
-\title{Vertical ggplot2 line plot of species loadings in a PRC}
+\title{Vertical ggplot2 line plot of ordination scores}
 \usage{
 plot_species_scores_bk(
   species_scores,
@@ -12,76 +12,153 @@ plot_species_scores_bk(
   speciesname = NULL,
   scoresname = "RDA1",
   selectname = "Fratio1",
+  speciesgroup = NULL,
   expand = 0.2,
   verbose = TRUE
 )
 }
 \arguments{
-\item{species_scores}{a species-by-scores matrix, a data frame with rownames (species names) or a tibble
- with variable with name \code{speciesname} containing species names and
- a column or variabe with name \code{scoresname} containing the scores
-(default: \code{"RDA1"}), e.g. species scores from library \code{vegan}}
+\item{species_scores}{a species-by-scores matrix, a data frame with
+row names (species names) or a tibble with variable with name
+\code{speciesname} containing species names and a column or variable with
+name \code{scoresname} containing the scores (default: \code{"RDA1"}), e.g.
+species scores from library \code{vegan} and an optional factor with
+name specified by the argument \code{speciesgroup}.}
 
 \item{ylab}{y-axis label. Default: $b_k$.}
 
-\item{threshold}{species with criterion (specified by \code{selectname}) higher than the \code{threshold} are displayed.
-Default: 7
-(which is the threshold F-ratio for testing a single regression coefficient
-at \code{p=0.01} with \code{60} df for the error in a multiple regression
-of each single species onto the condition and the ordination axis).
-If \code{selectname} is not in \code{species_scores}, the \code{threshold} is divided by \code{14}, so that the default is 0.5.}
+\item{threshold}{species with criterion (specified by \code{selectname})
+higher than the \code{threshold} are displayed. Default: 7 (which is the
+threshold F-ratio for testing a single regression coefficient at
+\code{p = 0.01} with \code{60} df for the error in a multiple regression
+of each single species onto the condition and the ordination axis). If
+\code{selectname} is not in \code{species_scores}, the \code{threshold} is
+divided by \code{14}, so that the default is 0.5.}
 
-\item{y_lab_interval}{interval of the y-axis ticks. A tick at no effect (0) is always included; default: 0.5.}
+\item{y_lab_interval}{interval of the y-axis ticks. A tick at no effect (0)
+is always included; default: 0.5.}
 
-\item{speciesname}{name of the variable containing the species names (default \code{NULL} uses rownames)}
+\item{speciesname}{name of the variable containing the species names
+(default \code{NULL} uses row names).}
 
-\item{scoresname}{name of the column or variable containing the species scores to be plotted (default \code{"RDA1"})}
+\item{scoresname}{name of the column or variable containing the species
+scores to be plotted (default \code{"RDA1"}).}
 
-\item{selectname}{name of the column or variable containing the criterion for the selection of species to be displayed
-Default: \code{"Fratio1"}; if \code{selectname} is not found in \code{species_scores}, set to \code{scoresname}.}
+\item{selectname}{name of the column or variable containing the criterion
+for the selection of species to be displayed. Default: \code{"Fratio1"};
+if \code{selectname} is not found in \code{species_scores}, set
+to \code{scoresname}.}
 
-\item{expand}{amount of extension of the line plot (default 0.2)}
+\item{speciesgroup}{name of the factor, the levels of which
+receive different colors in the vertical plot.}
 
-\item{verbose}{logical for printing the number of species with names out of the total number (default: \code{TRUE}).}
+\item{expand}{amount of extension of the line plot (default 0.2).}
+
+\item{verbose}{logical for printing the number of species with names out of
+the total number (default: \code{TRUE}).}
 }
 \value{
 a ggplot object
 }
 \description{
-\code{plot_species_scores_bk} creates a vertical line plot of species scores for a PRC diagram with selection criterion
- for which species to plot with names.
+\code{plot_species_scores_bk} creates a vertical line plot of ordination
+scores with selection criterion for which scores to plot with names.
 }
 \details{
-The absolute value of the criterion values is taken before selection,
-so that also the species scores of the ordination can serve as a criterion (e.g. \code{selectname="RDA1"}).
+The absolute value of the criterion values is taken before selection, so
+that also the species scores of the ordination can serve as a criterion
+(e.g. \code{selectname = "RDA1"}). The function has been copied from
+the \code{PRC} package at \url{https://github.com/CajoterBraak/PRC}.
+
+The function is used in \code{\link{plot.dcca}}.
 }
 \examples{
-data(pyrifos, package = "vegan") #transformed species data from package vegan
-#the chlorpyrifos experiment from van den Brink & ter Braak 1999
-Design <- data.frame(
-  week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 19, 24)),
-  dose=factor(rep(c(0.1, 0, 0, 0.9, 0, 44, 6, 0.1, 44, 0.9, 0, 6), 11)))
+suppressPackageStartupMessages({
+  library(LMMsolver)
+  library(dplyr)
+  library(ggplot2)
+  library(PRC)
+})
 
-library(vegan)
-mod_rda <- rda( pyrifos ~ dose:week + Condition(week),  data = Design)
-species_scores= scores(mod_rda,choices =1:2, display="sp",scaling = 1)
-library(PRC)
-head(rdacca_taxon_stats(mod_rda)) # stats per species
-get_focal_and_conditioning_factors(mod_rda) # factors from the model
+# Fig.1
 
-species_scores= vegan::scores(mod_rda,choices =1:2, display="sp",scaling = 2)
-# 1-d vertical plot of species scores (a cut of RDA1-scores at 0.5)
-plot_species_scores_bk(species_scores)
-
-#  a cut of RDA1-scores at 1.0 (as scoresname is unset)
-plot_species_scores_bk(species_scores, threshold = 14)
+# Analyze example data ----------------------------------------------------
 
 
-plot_species_scores_2d(species_scores)
-plot_species_scores_2d(species_scores, label.repel = TRUE)
-plot_species_scores_2d(species_scores, max.overlaps = 30, label.repel = TRUE)
 
-}
-\seealso{
-\code{\link{doPRC}}, \code{\link{plotPRC}}
+  data(SimData)
+  # extract design
+  Design0 <- SimData[,c("A","B")]
+  Design0$A <- factor(Design0$A);  Design0$B <- factor(Design0$B)
+  #put levels in natural order
+  Design0$A<- factor(Design0$A, levels=c(levels(Design0$A)[-2],levels(Design0$A)[2]))
+  Y0 <- as.matrix(SimData[,-(1:3)])
+  ids <- which(Design0$A \%in\% "A10" & Design0$B \%in\% "B5")
+  #design <- "Complete" #
+  design <- "Empty cell"
+  if (design == "Complete"){  Design <- Design0;Y <- Y0} else {Design <-Design0[-ids,]; Y=Y0[-ids,]}
+  print(with(Design,table(A,B)))
+  names(Design)
+
+# Design and Y for Fig 1 of  ter Braak 2023 ready -------------------------------------------
+dim(Y)
+str(Design)
+names(Design) <- c("Time","Treatment")
+mod_prc <- doPRC(Y ~ Treatment:Time + Condition(Time),  data = Design)
+#Mod_prc <- vegan::prc(Y, Design$Treatment,Design$Time)
+#Mod_prc$CCA$eig# identical to doPRC
+b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
+
+x_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "lc")
+
+summary(mod_prc)
+
+
+smoothPRC_model  <- set_smoothPRC_model(data = Design)
+smoothPRC_model$spline
+out <- smoothPRC(Y, lmm_model = smoothPRC_model)
+summary(out$obj)
+cor(out$b, b_mod_prc)
+plot_species_scores_bk(-out$b)
+plot_species_scores_bk(b_mod_prc)
+
+newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
+names(newdat)
+smooth_prc_df <- newdat |>
+  mutate(
+    Time = time,
+    PRC  = -PRC,
+    Treatment = Design$Treatment
+  ) |>
+  select(Time, PRC, Treatment)
+
+
+ggplot(data = smooth_prc_df,
+       aes(Time, PRC, colour = Treatment, shape = Treatment)) +
+  geom_hline(yintercept = 0, linewidth = 0.6, colour = "black") +
+  geom_line(linewidth = 1.3 ) +
+  geom_point() +
+
+  scale_colour_brewer(palette = "Dark2") +
+  labs(
+    x = "Time",
+    y = expression(C[t]),
+    colour = "Treatment",
+    title = "smooth quantitative PRC"
+  ) +
+  theme_bw(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    axis.title = element_text(face = "bold"),
+    legend.position = "right"
+  )
+# Demonstration of the fitted model
+x1 <- scale(as.numeric(Design$Time))[,1]
+x2 <- scale(as.numeric(Design$Treatment))[,1]
+
+# with the scaling to mean square of 1 of the species scores b
+summary(lm(out$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
+
+
+plotPRC(mod_prc)
 }
