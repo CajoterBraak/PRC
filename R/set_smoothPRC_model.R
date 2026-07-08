@@ -1,5 +1,6 @@
 #' @title Define the model for smooth PRC using LMMsolver (Boer 2023)
 #' @inheritParams LMMsolver::LMMsolve
+#' @inheritParams doPRC
 #' @param splineH0 As spline but for the null model. Default: a one dimensional
 #' smooth in time.
 #' \code{~ spl1D(time, nseg = 6, degree = 3, pord = 2)}
@@ -23,13 +24,15 @@
 #' where the first two orders are used only with
 #'  \code{treatment.level.as.quantity} is \code{TRUE}
 #'  and the last two with  \code{treatment.level.as.quantity} is \code{FALSE}.
-#'@param nseg named integer vector of number of segments in P-splines,
+#' @param nseg named integer vector of number of segments in P-splines,
 #' can be large.
 #'  Default \code{ c(time = 6, dose = 6)}.
-#'@param degree degree of the B-splines. Default \code{3}.
-#'@param scaling The default gives mean square species scores of 1, otherwise
+#' @param degree degree of the B-splines. Default \code{3}.
+# @param referencelevel name of the reference treatment. Default: first level of
+#' factor(data$Treatment).
+#' @param scaling The default gives mean square species scores of 1, otherwise
 #' the sum of squares of the species scores is 1. See \link{doPRC}.
-#' Default: "ms"
+#' Default: "ms".
 #' @references
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
@@ -49,10 +52,10 @@
 #'  In this case, the default spline model is:
 #'  \code{ ~ spl2D(time, dose,  = c(6, 6), degree = 3, pord = 2)}.
 #'  To enable \code{Treatment} to be treated as a factor (instead of as a
-#'  quantitative variable), the function also generates variables with
+#'  quantitative variable), the function generates variables with
 #'  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
 #'  treatments beyond the reference treatment,
-#'  if \code{treatment.level.as.quantity} is \code{TRUE}.
+#'  if \code{treatment.level.as.quantity} is \code{FALSE}.
 #'  These variables contain the time
 #'  since the start of the experiment for each treatment.
 #'  An example of the formula for \code{spline}
@@ -83,6 +86,7 @@ set_smoothPRC_model <-
            nseg =  c(time = 6, dose = 6),
            degree =3,
            start_time = 0,
+           referencelevel = NULL,
            scaling = "ms",
            data){
     #data with Time and Treatment as factors, modified here to quantitative time and dose
@@ -91,7 +95,12 @@ set_smoothPRC_model <-
     # NB: time = 0 is treated as control (pre-treatment condition).
 
     if (!is.factor(data$Time)) data$Time <- factor(data$Time)
+
     if (!is.factor(data$Treatment)) data$Treatment <- factor(data$Treatment)
+    if (is.null(referencelevel)) referencelevel <- levels(data$Treatment)[1]
+    else if(is.numeric(referencelevel)) {
+    referencelevel <- levels(data$Treatment)[referencelevel]}
+    data$Treatment <- relevel(data$Treatment,ref = referencelevel)
     valsTime<- PRC::fvalues4levels(data, "Time")
     data$time <- valsTime[data$Time] - start_time
     valsTreatment<- PRC::fvalues4levels(data, "Treatment")

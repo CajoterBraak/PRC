@@ -38,7 +38,7 @@
 #' For an initial \code{b} of species scores, the unconstrainted sites \code{Yb}
 #' are calculated, which are then used as response vector in
 #' \code{\link[LMMsolver]{LMMsolve}} to give a constrained site scores
-#' \code{xhat} by the P-spline model specified in \code{lmm_model}. This
+#' \code{x} by the P-spline model specified in \code{lmm_model}. This
 #' is part of a power algorithm with block and Anderson acceleration to solve
 #' the dominant eigen vector of the
 #' underlying eigen problem while optimizing simultaneously the penalties
@@ -142,7 +142,9 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
   PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
   PRCstar <-  get_PRCstar(obj, dat0 = lmm_model$dat0)
   if (lmm_model$scaling =="ms") mult <- sqrt(length(b))else mult <- 1
-  out <-list(b = b*mult,
+  B <- as.matrix(b*mult);colnames(B)<- "RDA1";rownames(B) <- colnames(Y)
+
+  out <-list(b = B,
              x = xhat/mult,
              x_star = (Yb - fitted(objH0))/mult,
              PRC = PRC/mult, PRCstar = PRCstar/mult,

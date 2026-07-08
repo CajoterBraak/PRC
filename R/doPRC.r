@@ -11,7 +11,7 @@
 #' @param scale Scales species to unit variance (like correlations) if \code{method} is \code{"rda"}
 #' (default: \code{FALSE}), else void. See \code{\link[vegan]{rda}}.
 #' @param referencelevel  numeric or  character level(s) to be used as reference level or levels
-#' of the focal treatment(s); default: 1 (first level(s)).  The focal treatment is (or treatments are) given in the
+#' of the focal treatment(s); default: 1 (first level(s)).  With \code{\link{doPRC}}, the focal treatment is (or treatments are) given in the
 #' resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}
 #' @param method character rda or cca. Default: \code{"rda"}
 #' @param data  Data frame containing the variables on the right hand side of the model formula.
