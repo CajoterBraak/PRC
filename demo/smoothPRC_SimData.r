@@ -88,7 +88,9 @@ ggplot(data = smooth_prc_df,
 # Demonstration of the fitted model
 x1 <- scale(as.numeric(Design$Time))[,1]
 x2 <- scale(as.numeric(Design$Treatment))[,1]
-summary(lm(out$xhat~ x1+ x2+ x1:x2 )) # x1:0.71 x2:0.29 x1x2: 0.51
+
+# with the scaling to mean square of 1 of the species scores b
+summary(lm(out$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
 
 
 plotPRC(mod_prc)
