@@ -15,24 +15,15 @@ suppressPackageStartupMessages({
   # extract design
   Design0 <- SimData[,c("A","B")]
   Design0$A <- factor(Design0$A);  Design0$B <- factor(Design0$B)
-
-
   #put levels in natural order
   Design0$A<- factor(Design0$A, levels=c(levels(Design0$A)[-2],levels(Design0$A)[2]))
-
-
-
   Y0 <- as.matrix(SimData[,-(1:3)])
-
   ids <- which(Design0$A %in% "A10" & Design0$B %in% "B5")
   #design <- "Complete" #
   design <- "Empty cell"
   if (design == "Complete"){  Design <- Design0;Y <- Y0} else {Design <-Design0[-ids,]; Y=Y0[-ids,]}
-
   print(with(Design,table(A,B)))
   names(Design)
-
-
 
 # Design and Y for Fig 1 of  ter Braak 2023 ready -------------------------------------------
 dim(Y)
@@ -53,7 +44,8 @@ smoothPRC_model$spline
 out <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(out$obj)
 cor(out$b, b_mod_prc)
-
+plot_species_scores_bk(-out$b)
+plot_species_scores_bk(b_mod_prc)
 
 newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
 names(newdat)
