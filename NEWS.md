@@ -1,6 +1,6 @@
 # PRC 2.0.1
 
-* Correction of a bug resulting in anavo of a smooth PRC object to give 
+* Correction of a bug resulting in anova of a smooth PRC object to give 
 p-value=1.
 
 #  PRC 2.0.0
