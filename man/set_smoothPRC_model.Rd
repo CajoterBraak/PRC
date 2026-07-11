@@ -103,8 +103,9 @@ An atypical aspect of the function is that the time and treatment factors
  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
  treatments beyond the reference treatment,
  if \code{treatment.level.as.quantity} is \code{FALSE}.
- These variables contain the time
+ These variables generated in the function, contain the time
  since the start of the experiment for each treatment.
+ \code{D1, D2, ...} should therefore not be variable names in \code{data}.
  An example of the formula for \code{spline}
  when \code{treatment.level.as.quantity} is \code{FALSE}
  and the number of levels of \code{Treatment} is 4,  is
@@ -162,51 +163,24 @@ summary(mod_prc)
 
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
-out <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(out$obj)
-cor(out$b, b_mod_prc)
-plot_species_scores_bk(-out$b)
+smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+summary(smooth_PRC$obj)
+(cc <- cor(smooth_PRC$b, b_mod_prc))
+plot_species_scores_bk(-smooth_PRC$b)
 plot_species_scores_bk(b_mod_prc)
+p_cdt <- plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
+print(p_cdt)
 
-newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
-names(newdat)
-smooth_prc_df <- newdat |>
-  mutate(
-    Time = time,
-    PRC  = -PRC,
-    Treatment = Design$Treatment
-  ) |>
-  select(Time, PRC, Treatment)
-
-
-ggplot(data = smooth_prc_df,
-       aes(Time, PRC, colour = Treatment, shape = Treatment)) +
-  geom_hline(yintercept = 0, linewidth = 0.6, colour = "black") +
-  geom_line(linewidth = 1.3 ) +
-  geom_point() +
-
-  scale_colour_brewer(palette = "Dark2") +
-  labs(
-    x = "Time",
-    y = expression(C[t]),
-    colour = "Treatment",
-    title = "smooth quantitative PRC"
-  ) +
-  theme_bw(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    axis.title = element_text(face = "bold"),
-    legend.position = "right"
-  )
 # Demonstration of the fitted model
 x1 <- scale(as.numeric(Design$Time))[,1]
 x2 <- scale(as.numeric(Design$Treatment))[,1]
 
 # with the scaling to mean square of 1 of the species scores b
-summary(lm(out$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
+summary(lm(smooth_PRC$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
 
 
 plotPRC(mod_prc)
+
 
 ## ---- Packages ----
 
@@ -255,19 +229,19 @@ smoothPRC_model  <- set_smoothPRC_model(fixed = Yb ~ Block,  data= Design,
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
-out <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(out$obj)
-cor(out$b, b_mod_prc)
+smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+summary(smooth_PRC$obj)
+cor(smooth_PRC$b, b_mod_prc)
 if (test){
   cntr$nperm <- 19
 
-  an <- anova(out, permutations = cntr, verbose = TRUE)
+  an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
   an$pval
 }
 
 # Plot of smooth PRC for observed time points -----------------------------------------------
 
-newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
+newdat<- cbind(smoothPRC_model$data, PRC =smooth_PRC$PRC)
 names(newdat)
 smooth_prc_df <- newdat |>
   mutate(
@@ -297,19 +271,19 @@ ggplot(data = smooth_prc_df,
     axis.title = element_text(face = "bold"),
     legend.position = "right"
   )
-# the straight lines here are an error
 plot_sample_scores_cdt(mod_prc)
 
+#plot_smoothPRC_cdt(smooth_PRC) # does not work 11 July 2026
 
 # Plot of smooth PRC with dense time grid -----------------------------------------------
 
-time_points <- sort(unique(out$lmm_model$data$time))
+time_points <- sort(unique(smooth_PRC$lmm_model$data$time))
 tgrid_dense <- seq(min(time_points), max(time_points), length = 200)
-treatment_levels <- levels(out$lmm_model$data$Treatment)
+treatment_levels <- levels(smooth_PRC$lmm_model$data$Treatment)
 newdat00 <- expand.grid(
   Treatment = treatment_levels,
   time = c(time_points,tgrid_dense),
-  Block = levels(out$lmm_model$data$Block)
+  Block = levels(smooth_PRC$lmm_model$data$Block)
 )
 
 #newdat00$Dose <- factor(newdat00$dose)
@@ -320,11 +294,11 @@ newdat <- cbind(Block =newdat00$Block, as.data.frame(datIall))
 names(newdat)[-(1:3)] <- paste0("D", 1:(nlDose -1))
 
 newdat[newdat$time<0,2+ (1:(nlDose -1))] <- 0
-pred1 <- predict(out$obj, newdata = newdat)
+pred1 <- predict(smooth_PRC$obj, newdata = newdat)
 
 newdat0 <- newdat
 newdat0[, -(1:3)]<-0
-pred0 <- predict(out$obj, newdata = newdat0)
+pred0 <- predict(smooth_PRC$obj, newdata = newdat0)
 
 newdat0 <- newdat
 newdat <- pred1
