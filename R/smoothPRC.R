@@ -140,6 +140,7 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
       break
   }
   PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
+  obj$Yb <- Yb
   PRCstar <-  get_PRCstar(obj, dat0 = lmm_model$dat0)
   if (lmm_model$scaling =="ms") mult <- sqrt(length(b))else mult <- 1
   B <- as.matrix(b*mult);colnames(B)<- "RDA1";rownames(B) <- colnames(Y)
@@ -147,7 +148,7 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
   out <-list(b = B,
              x = xhat/mult,
              x_star = (Yb - fitted(objH0))/mult,
-             PRC = PRC/mult, PRCstar = PRCstar/mult,
+             PRC = PRC/mult, PRCstar = PRCstar/mult, mult = mult,
              obj = obj, objH0=objH0, iter = iter,Y= Y, Yb=Yb,
              lmm_model = lmm_model,options_iter = options_iter)
   class(out) <- c("smoothPRC", "list")

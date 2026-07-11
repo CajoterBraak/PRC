@@ -56,8 +56,9 @@
 #'  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
 #'  treatments beyond the reference treatment,
 #'  if \code{treatment.level.as.quantity} is \code{FALSE}.
-#'  These variables contain the time
+#'  These variables generated in the function, contain the time
 #'  since the start of the experiment for each treatment.
+#'  \code{D1, D2, ...} should therefore not be variable names in \code{data}.
 #'  An example of the formula for \code{spline}
 #'  when \code{treatment.level.as.quantity} is \code{FALSE}
 #'  and the number of levels of \code{Treatment} is 4,  is
