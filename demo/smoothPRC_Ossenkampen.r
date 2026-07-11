@@ -46,19 +46,19 @@ smoothPRC_model  <- set_smoothPRC_model(fixed = Yb ~ Block,  data= Design,
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
-out <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(out$obj)
-cor(out$b, b_mod_prc)
+smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+summary(smooth_PRC$obj)
+cor(smooth_PRC$b, b_mod_prc)
 if (test){
   cntr$nperm <- 19
 
-  an <- anova(out, permutations = cntr, verbose = TRUE)
+  an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
   an$pval
 }
 
 # Plot of smooth PRC for observed time points -----------------------------------------------
 
-newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
+newdat<- cbind(smoothPRC_model$data, PRC =smooth_PRC$PRC)
 names(newdat)
 smooth_prc_df <- newdat |>
   mutate(
@@ -88,19 +88,19 @@ ggplot(data = smooth_prc_df,
     axis.title = element_text(face = "bold"),
     legend.position = "right"
   )
-# the straight lines here are an error
 plot_sample_scores_cdt(mod_prc)
 
+#plot_smoothPRC_cdt(smooth_PRC) # does not work 11 July 2026
 
 # Plot of smooth PRC with dense time grid -----------------------------------------------
 
-time_points <- sort(unique(out$lmm_model$data$time))
+time_points <- sort(unique(smooth_PRC$lmm_model$data$time))
 tgrid_dense <- seq(min(time_points), max(time_points), length = 200)
-treatment_levels <- levels(out$lmm_model$data$Treatment)
+treatment_levels <- levels(smooth_PRC$lmm_model$data$Treatment)
 newdat00 <- expand.grid(
   Treatment = treatment_levels,
   time = c(time_points,tgrid_dense),
-  Block = levels(out$lmm_model$data$Block)
+  Block = levels(smooth_PRC$lmm_model$data$Block)
 )
 
 #newdat00$Dose <- factor(newdat00$dose)
@@ -111,11 +111,11 @@ newdat <- cbind(Block =newdat00$Block, as.data.frame(datIall))
 names(newdat)[-(1:3)] <- paste0("D", 1:(nlDose -1))
 
 newdat[newdat$time<0,2+ (1:(nlDose -1))] <- 0
-pred1 <- predict(out$obj, newdata = newdat)
+pred1 <- predict(smooth_PRC$obj, newdata = newdat)
 
 newdat0 <- newdat
 newdat0[, -(1:3)]<-0
-pred0 <- predict(out$obj, newdata = newdat0)
+pred0 <- predict(smooth_PRC$obj, newdata = newdat0)
 
 newdat0 <- newdat
 newdat <- pred1

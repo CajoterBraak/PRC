@@ -41,48 +41,21 @@ summary(mod_prc)
 
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
-out <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(out$obj)
-cor(out$b, b_mod_prc)
-plot_species_scores_bk(-out$b)
+smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+summary(smooth_PRC$obj)
+(cc <- cor(smooth_PRC$b, b_mod_prc))
+plot_species_scores_bk(-smooth_PRC$b)
 plot_species_scores_bk(b_mod_prc)
+p_cdt <- plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
+print(p_cdt)
 
-newdat<- cbind(smoothPRC_model$data, PRC =out$PRC)
-names(newdat)
-smooth_prc_df <- newdat |>
-  mutate(
-    Time = time,
-    PRC  = -PRC,
-    Treatment = Design$Treatment
-  ) |>
-  select(Time, PRC, Treatment)
-
-
-ggplot(data = smooth_prc_df,
-       aes(Time, PRC, colour = Treatment, shape = Treatment)) +
-  geom_hline(yintercept = 0, linewidth = 0.6, colour = "black") +
-  geom_line(linewidth = 1.3 ) +
-  geom_point() +
-
-  scale_colour_brewer(palette = "Dark2") +
-  labs(
-    x = "Time",
-    y = expression(C[t]),
-    colour = "Treatment",
-    title = "smooth quantitative PRC"
-  ) +
-  theme_bw(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    axis.title = element_text(face = "bold"),
-    legend.position = "right"
-  )
 # Demonstration of the fitted model
 x1 <- scale(as.numeric(Design$Time))[,1]
 x2 <- scale(as.numeric(Design$Treatment))[,1]
 
 # with the scaling to mean square of 1 of the species scores b
-summary(lm(out$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
+summary(lm(smooth_PRC$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
 
 
 plotPRC(mod_prc)
+
