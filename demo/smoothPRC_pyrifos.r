@@ -36,8 +36,8 @@ an$pval
 
 #graph
 plot_species_scores_bk(smooth_PRC$b, threshold = 14)
-plot_smoothPRC_cdt(smooth_PRC)
+plot_smoothPRC_cdt(smooth_PRC,flip = FALSE)
 
 plotPRC(mod_prc)
-plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
+plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
 
