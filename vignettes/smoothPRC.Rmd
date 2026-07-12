@@ -145,7 +145,6 @@ summary(smooth_PRC$obj)
 summary(smooth_PRC$objH0)
 ```
 
-The summary shows that the 2d spline model has effectively 132 degrees of freedom, whereas the classical model has 10*11
 
 ## Illustration that smoothPRC extends classical PRC
 
@@ -166,10 +165,16 @@ summary(classical_PRC$objH0)
 Classical PRC is obtained by:
 ```{r mod_PRC, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
 mod_prc <- doPRC(pyrifos ~ Treatment:Time + Condition(Time),  data = Design)
-plotPRC(mod_prc)
 ```
 
-The absolute correlation between the last two PRC models is `r round( abs(cor(mod_prc$PRCplus$PRC1, classical_PRC$PRC)), 6)`, whereas the correlation between the smooth and classical PRC models is `r round(abs(cor(smooth_PRC$PRC, classical_PRC$PRC)),2)`.
+The absolute correlation between the last two PRC models is `r round( abs(cor(mod_prc$PRCplus$PRC1, classical_PRC$PRC)), 6)`, whereas the correlation between the smooth and classical PRC models is `r round(abs(cor(smooth_PRC$PRC, classical_PRC$PRC)),2)`
+
+Here is the PRC diagram showing both models with species scores of the smooth version.
+
+```{r plot_smooth, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
+plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
+```
+
 
 
 
