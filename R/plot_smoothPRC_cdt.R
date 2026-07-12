@@ -1,105 +1,184 @@
-#' @title PRC diagram of treatment and plot lines or points without species loading
+#' @title smooth PRC diagram of treatment and plot lines or points without species loading
 #'
 #' @description
 #' \code{plot_smoothPRC_cdt} creates a PRC diagram of the treatments without species loadings.
 #'
 #' @param  object  a result of \code{\link{smoothPRC}}.
+#' @param mod_prc a results of \code{\link{doPRC}}, \emph{i.e.}
+#' a classical PRC with the same data and design.
+#' Default \code{NULL}, in which the classical PRC is computed using
+#' \code{\link{doPRC}} and the data in \code{object}.
+#' @param with_classical_lines logical to add or suppress classical PRC lines.
+#' Default \code{TRUE}, \emph{i.e.} with classical PRC lines.
+#' @param with_unconstrained_scores logical to add or suppress the unconstrained
+#' scores in the smooth PRC showing the scatter of the
+#' individual samples (cosms).
+#' Default \code{TRUE}, \emph{i.e.} with individual points.
+#' @param flip logical. Should the axis be reversed?
+#' Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
+#' do not reverse.
 #' @example demo/smoothPRC_pyrifos.r
 #' @importFrom stats cor relevel
+#' @importFrom ggplot2 ggplot aes geom_line geom_point
+#' @importFrom ggplot2 scale_colour_brewer scale_linetype_manual
+#' @importFrom ggplot2 guide_legend guides labs
+#' @importFrom ggplot2 theme_bw theme
+#' @importFrom ggplot2 element_blank element_text
 #' @export
 plot_smoothPRC_cdt <- function(object,
                                mod_prc = NULL,
-                               with_classical_lines= TRUE,
+                               with_classical_lines = TRUE,
                                with_unconstrained_scores = TRUE,
-                               flip = FALSE){
-
+                               flip = FALSE)
+{
   # sampled time points only-----
-  flip <- ifelse(flip, -1,1)
-  if (is.null(mod_prc)) suppressMessages(
-    mod_prc <- doPRC(object$Y ~ Treatment:Time + Condition(Time),
-                     data = object$lmm_model$data))
-  newdat<- cbind(object$lmm_model$data, PRCsmooth = object$PRC, PRCstar = object$PRCstar,
-                 PRCclassical = mod_prc$PRCplus$PRC1)
+  flip <- ifelse(flip, -1, 1)
+
+  if (is.null(mod_prc))
+    suppressMessages(
+      mod_prc <- doPRC(
+        object$Y ~ Treatment:Time + Condition(Time),
+        data = object$lmm_model$data
+      )
+    )
+  newdat <- cbind(
+    object$lmm_model$data,
+    PRCsmooth = object$PRC,
+    PRCstar = object$PRCstar,
+    PRCclassical = mod_prc$PRCplus$PRC1
+  )
   cc <- cor(newdat$PRCclassical, newdat$PRCsmooth)
-  #names(newdat)
-  smooth_prc_df <- newdat |>
-    mutate(
-      Time = time,
-      PRCsmooth  = flip* PRCsmooth,
-      PRCstar =  flip*PRCstar,
-      PRCclassical = sign(cc)*flip*PRCclassical,
-      Treatment = Design$Treatment
-    ) |>
-    select(Time, PRCsmooth, PRCstar, PRCclassical, Treatment)
+  smooth_prc_df <- data.frame(
+    Time = object$lmm_model$data$time,
+    PRCsmooth = flip * object$PRC,
+    PRCstar = flip * object$PRCstar,
+    PRCclassical = sign(cc) * flip * mod_prc$PRCplus$PRC1,
+    Treatment = object$lmm_model$data$Treatment
+  )
 
-#dense data----
-
-  #dense -----
+  # dense data-----
   time_points <- sort(unique(object$lmm_model$data$time))
-  time_first_applied <- min(time_points[time_points>0])
+  time_first_applied <- min(time_points[time_points > 0])
 
-  npos <- length(time_points[time_points>0])
+  npos <- length(time_points[time_points > 0])
   nneg <- length(time_points) - npos
 
-  tgrid_dense <- c(seq(min(time_points),0,length= 10*nneg),
-                   seq(time_first_applied, max(time_points), length = 10*npos))
+  tgrid_dense <- c(
+    seq(min(time_points), 0, length = 10 * nneg),
+    seq(time_first_applied,
+        max(time_points),
+        length = 10 * npos)
+  )
+
   dose_levels <- sort(unique(object$lmm_model$data$dose))
+
   newdat <- expand.grid(
-    time = c(time_points,tgrid_dense),
+    time = c(time_points, tgrid_dense),
     dose = dose_levels
   )
+
   newdat1 <- newdat
+
   newdat$dose[newdat$time <= 0] <- 0
+
   pred1 <- predict(object$obj, newdata = newdat)
 
   newdat0 <- newdat
-  newdat0$dose <-  0
+  newdat0$dose <- 0
+
   pred0 <- predict(object$obj, newdata = newdat0)
+
   newdat1$ypred <- (pred1$ypred - pred0$ypred) / object$mult
 
-  smooth_prc_df2 <- newdat1 |>
-    mutate(
-      Time = time,
-      PRCsmooth  = flip * ypred,
-      Treatment = factor(dose)#, levels = levels(object$lmm_model$data$Treatment))
-    ) |>
-    select(Time, PRCsmooth, Treatment)
-  levels(smooth_prc_df2$Treatment) <- levels(object$lmm_model$data$Treatment)
+  smooth_prc_df2 <- data.frame(
+    Time = newdat1$time,
+    PRCsmooth = flip * newdat1$ypred,
+    Treatment = factor(newdat1$dose)
+  )
 
+  levels(smooth_prc_df2$Treatment) <-
+    levels(object$lmm_model$data$Treatment)
 
-  p1 <- ggplot(smooth_prc_df,
-               aes(Time, colour = Treatment,shape = Treatment))+
-       geom_line(data = smooth_prc_df2,aes(y = PRCsmooth), linewidth = 1.2)
-  #  with PRCstar points and classical PRC----
+  p1 <- ggplot(
+    smooth_prc_df,
+    aes(
+      x = .data$Time,
+      colour = .data$Treatment,
+      shape = .data$Treatment
+    )
+  ) +
+    geom_line(
+      data = smooth_prc_df2,
+      aes(
+        y = .data$PRCsmooth,
+        linetype = "Smooth"
+      ),
+      linewidth = 1.2
+    )
 
+  if (with_classical_lines) {
 
-  if (with_classical_lines){
-   p1 <-
-     p1 +
-     geom_line(aes(y = PRCclassical), linewidth = 0.9,linetype = "dotted") +
-     geom_point(aes(y = PRCclassical))
-  } else{
-      p1<- p1 +geom_point(aes(y = PRCsmooth))
-    }
-
-  p1
-  if (with_unconstrained_scores)
     p1 <- p1 +
-    geom_point(aes(y = PRCstar), size = 1.8, color = "grey50") +
-    scale_colour_brewer(palette = "Dark2")
+      geom_line(
+        aes(
+          y = .data$PRCclassical,
+          linetype = "Classical"
+        ),
+        linewidth = 0.9
+      ) +
+      geom_point(
+        aes(y = .data$PRCclassical)
+      )
+
+  } else {
+
+    p1 <- p1 +
+      geom_point(
+        aes(y = .data$PRCsmooth)
+      )
+
+  }
+
+  if (with_unconstrained_scores) {
+
+    p1 <- p1 +
+      geom_point(
+        aes(y = .data$PRCstar),
+        size = 1.8,
+        colour = "grey50"
+      )
+
+  }
 
   p1 <- p1 +
+    scale_colour_brewer(palette = "Dark2") +
+    scale_linetype_manual(
+      name = "PRC",
+      values = c(
+        Smooth = "solid",
+        Classical = "dotted"
+      ),
+      guide = guide_legend(
+        override.aes = list(colour = "black")
+      )
+    ) +
     labs(
       x = "Time",
       y = expression(C[t]),
       colour = "Treatment",
       title = "smooth quantitative PRC"
     ) +
-    theme_bw(base_size = 12) +
+    guides(
+      colour = guide_legend(order = 1),
+      shape = guide_legend(order = 1),
+      linetype = guide_legend(order = 2)
+    ) +
+  theme_bw(base_size = 12) +
     theme(
       panel.grid = element_blank(),
       axis.title = element_text(face = "bold"),
       legend.position = "right"
     )
-return(p1)
+
+  return(p1)
 }
