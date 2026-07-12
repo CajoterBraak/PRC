@@ -84,11 +84,6 @@ suppressPackageStartupMessages({
   library(PRC)
 })
 
-
-
-
-
-
 #the chlorpyrifos experiment from van den Brink & ter Braak 1999
 data(pyrifos, package = "vegan") #log-transformed species data from package vegan
 Y <- pyrifos
@@ -117,6 +112,8 @@ an$pval
 #graph
 plot_species_scores_bk(smooth_PRC$b, threshold = 14)
 plot_smoothPRC_cdt(smooth_PRC)
+
 plotPRC(mod_prc)
+plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
 
 }

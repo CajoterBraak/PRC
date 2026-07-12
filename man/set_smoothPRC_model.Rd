@@ -168,8 +168,9 @@ summary(smooth_PRC$obj)
 (cc <- cor(smooth_PRC$b, b_mod_prc))
 plot_species_scores_bk(-smooth_PRC$b)
 plot_species_scores_bk(b_mod_prc)
-p_cdt <- plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
-print(p_cdt)
+plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
+plotsmoothPRC(smooth_PRC, flip= TRUE,threshold = 0)
+
 
 # Demonstration of the fitted model
 x1 <- scale(as.numeric(Design$Time))[,1]

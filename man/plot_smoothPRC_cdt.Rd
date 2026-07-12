@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_smoothPRC_cdt.R
 \name{plot_smoothPRC_cdt}
 \alias{plot_smoothPRC_cdt}
-\title{PRC diagram of treatment and plot lines or points without species loading}
+\title{smooth PRC diagram of treatment and plot lines or points without species loading}
 \usage{
 plot_smoothPRC_cdt(
   object,
@@ -14,6 +14,23 @@ plot_smoothPRC_cdt(
 }
 \arguments{
 \item{object}{a result of \code{\link{smoothPRC}}.}
+
+\item{mod_prc}{a results of \code{\link{doPRC}}, \emph{i.e.}
+a classical PRC with the same data and design.
+Default \code{NULL}, in which the classical PRC is computed using
+\code{\link{doPRC}} and the data in \code{object}.}
+
+\item{with_classical_lines}{logical to add or suppress classical PRC lines.
+Default \code{TRUE}, \emph{i.e.} with classical PRC lines.}
+
+\item{with_unconstrained_scores}{logical to add or suppress the unconstrained
+scores in the smooth PRC showing the scatter of the
+individual samples (cosms).
+Default \code{TRUE}, \emph{i.e.} with individual points.}
+
+\item{flip}{logical. Should the axis be reversed?
+Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
+do not reverse.}
 }
 \description{
 \code{plot_smoothPRC_cdt} creates a PRC diagram of the treatments without species loadings.
@@ -29,11 +46,6 @@ suppressPackageStartupMessages({
   library(permute)
   library(PRC)
 })
-
-
-
-
-
 
 #the chlorpyrifos experiment from van den Brink & ter Braak 1999
 data(pyrifos, package = "vegan") #log-transformed species data from package vegan
@@ -63,6 +75,8 @@ an$pval
 #graph
 plot_species_scores_bk(smooth_PRC$b, threshold = 14)
 plot_smoothPRC_cdt(smooth_PRC)
+
 plotPRC(mod_prc)
+plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
 
 }
