@@ -25,7 +25,8 @@ plotsmoothPRC <- function(
     selectname = "Fratio",
     verbose = TRUE)
 {
-  flip <- ifelse(flip, -1, 1)
+  axis <- 1
+  if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
   pl.cdt1 <- plot_smoothPRC_cdt(
     object = object,
     mod_prc = mod_prc,
@@ -34,7 +35,7 @@ plotsmoothPRC <- function(
     flip = flip
   )
 
-  axis <- 1
+
 
   if (is.null(title)) {
     title <- "Smooth PRC diagram"

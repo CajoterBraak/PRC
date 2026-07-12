@@ -32,7 +32,7 @@ plot_smoothPRC_cdt <- function(object,
                                flip = FALSE)
 {
   # sampled time points only-----
-  flip <- ifelse(flip, -1, 1)
+  if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
 
   if (is.null(mod_prc))
     suppressMessages(
