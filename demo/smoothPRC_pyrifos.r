@@ -41,3 +41,13 @@ plot_smoothPRC_cdt(smooth_PRC,flip = FALSE)
 plotPRC(mod_prc)
 plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
 
+# illustration that smoothPRC extends doPRC
+classical_PRC_model <- set_smoothPRC_model(
+  fixed= Yb ~ Treatment:Time,
+  fixedH0 = Yb ~Time,
+  spline = NULL,
+  splineH0 = NULL,
+  data = Design)
+classical_PRC <- smoothPRC(Y, lmm_model = classical_PRC_model)
+plotsmoothPRC(classical_PRC, flip = FALSE, threshold = 1, title ="Classical PRC via smoothPRC")
+# the dotted and solid lines overlap

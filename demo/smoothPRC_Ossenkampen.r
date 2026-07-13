@@ -41,8 +41,9 @@ if (test){
 
 b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
-smoothPRC_model  <- set_smoothPRC_model(fixed = Yb ~ Block,  data= Design,
-                                        treatment.level.as.quantity =FALSE, start_time = 1958)
+smoothPRC_model  <-
+  set_smoothPRC_model(fixed = Yb ~ Block, data= Design,
+                      treatment.level.as.quantity =FALSE, start_time = 1958)
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
@@ -56,100 +57,4 @@ if (test){
   an$pval
 }
 
-# Plot of smooth PRC for observed time points -----------------------------------------------
-
-newdat<- cbind(smoothPRC_model$data, PRC =smooth_PRC$PRC)
-names(newdat)
-smooth_prc_df <- newdat |>
-  mutate(
-    Time = time,
-    PRC  = -PRC,
-    Treatment = Design$Treatment
-  ) |>
-  select(Time, PRC, Treatment)
-
-
-ggplot(data = smooth_prc_df,
-       aes(Time, PRC, colour = Treatment, shape = Treatment)) +
-  geom_hline(yintercept = 0, linewidth = 0.6, colour = "black") +
-  geom_line(linewidth = 1.3 ) +
-  geom_point() +
-
-  scale_colour_brewer(palette = "Dark2") +
-  labs(
-    x = "Time",
-    y = expression(C[t]),
-    colour = "Treatment",
-    title = "PRC with smooth treatment line"
-  ) +
-  theme_bw(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    axis.title = element_text(face = "bold"),
-    legend.position = "right"
-  )
-plot_sample_scores_cdt(mod_prc)
-
-#plot_smoothPRC_cdt(smooth_PRC) # does not work 11 July 2026
-
-# Plot of smooth PRC with dense time grid -----------------------------------------------
-
-time_points <- sort(unique(smooth_PRC$lmm_model$data$time))
-tgrid_dense <- seq(min(time_points), max(time_points), length = 200)
-treatment_levels <- levels(smooth_PRC$lmm_model$data$Treatment)
-newdat00 <- expand.grid(
-  Treatment = treatment_levels,
-  time = c(time_points,tgrid_dense),
-  Block = levels(smooth_PRC$lmm_model$data$Block)
-)
-
-#newdat00$Dose <- factor(newdat00$dose)
-nlDose <- length(treatment_levels)
-datIall <- model.matrix(~ time + Treatment:time, data = newdat00)
-
-newdat <- cbind(Block =newdat00$Block, as.data.frame(datIall))
-names(newdat)[-(1:3)] <- paste0("D", 1:(nlDose -1))
-
-newdat[newdat$time<0,2+ (1:(nlDose -1))] <- 0
-pred1 <- predict(smooth_PRC$obj, newdata = newdat)
-
-newdat0 <- newdat
-newdat0[, -(1:3)]<-0
-pred0 <- predict(smooth_PRC$obj, newdata = newdat0)
-
-newdat0 <- newdat
-newdat <- pred1
-newdat$ypred <- pred1$ypred - pred0$ypred
-
-smooth_prc_df <- newdat |>
-  mutate(
-    Time = time,
-    PRC  = -ypred,
-    Treatment = newdat00$Treatment
-  ) |>
-  select(Time, PRC, Treatment)
-
-
-ggplot(data = smooth_prc_df,
-       aes(Time, PRC, colour = Treatment,shape = Treatment)) +
-  geom_hline(yintercept = 0, linewidth = 0.6, colour = "black") +
-  geom_vline(xintercept = 0, linewidth = 0.6, colour = "black") +
-
-  geom_line(linewidth = 1.3 ) +
-  geom_point( data = subset(smooth_prc_df,Time %in% time_points)) +
-
-  scale_colour_brewer(palette = "Dark2") +
-  labs(
-    x = "Time",
-    y = expression(C[t]),
-    colour = "Treatment",
-    title = "smooth quantitative PRC",
-    subtitle = " smooth PRC  from LMMsolver"
-  ) +
-  theme_bw(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    axis.title = element_text(face = "bold"),
-    legend.position = "right"
-  )
-
+plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
