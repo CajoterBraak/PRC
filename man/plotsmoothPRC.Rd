@@ -18,6 +18,7 @@ plotsmoothPRC(
   y_lab_interval = 0.5,
   speciesname = NULL,
   selectname = "Fratio",
+  sample_times_only = FALSE,
   verbose = TRUE
 )
 }
@@ -68,10 +69,18 @@ for the selection of species to be displayed. Default: \code{"Fratio1"};
 if \code{selectname} is not found in \code{species_scores}, set
 to \code{scoresname}.}
 
+\item{sample_times_only}{logical to plotlines based on the sampled times
+only, \emph{i.e.} without interpolation. Default \code{FALSE}.}
+
 \item{verbose}{logical for printing the number of species with names out of
 the total number (default: \code{TRUE}).}
 }
 \description{
 Creates a smooth PRC diagram with treatment curves and
 a vertical species-loading plot.
+}
+\details{
+\code{sample_times_only = TRUE} can be useful for comparison with
+classical PRC. It avoids interpolation and may work when
+the default fails to produce a plot.
 }

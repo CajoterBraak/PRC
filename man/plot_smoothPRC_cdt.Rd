@@ -9,7 +9,8 @@ plot_smoothPRC_cdt(
   mod_prc = NULL,
   with_classical_lines = TRUE,
   with_unconstrained_scores = TRUE,
-  flip = FALSE
+  flip = FALSE,
+  sample_times_only = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ Default \code{TRUE}, \emph{i.e.} with individual points.}
 \item{flip}{logical. Should the axis be reversed?
 Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
 do not reverse.}
+
+\item{sample_times_only}{logical to plotlines based on the sampled times
+only, \emph{i.e.} without interpolation. Default \code{FALSE}.}
 }
 \description{
 \code{plot_smoothPRC_cdt} creates a PRC diagram of the treatments without species loadings.
@@ -74,9 +78,19 @@ an$pval
 
 #graph
 plot_species_scores_bk(smooth_PRC$b, threshold = 14)
-plot_smoothPRC_cdt(smooth_PRC)
+plot_smoothPRC_cdt(smooth_PRC,flip = FALSE)
 
 plotPRC(mod_prc)
-plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
+plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
 
+# illustration that smoothPRC extends doPRC
+classical_PRC_model <- set_smoothPRC_model(
+  fixed= Yb ~ Treatment:Time,
+  fixedH0 = Yb ~Time,
+  spline = NULL,
+  splineH0 = NULL,
+  data = Design)
+classical_PRC <- smoothPRC(Y, lmm_model = classical_PRC_model)
+plotsmoothPRC(classical_PRC, flip = FALSE, threshold = 1, title ="Classical PRC via smoothPRC")
+# the dotted and solid lines overlap
 }
