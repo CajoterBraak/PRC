@@ -103,7 +103,7 @@ plot_smoothPRC_cdt <- function(object,
     nams <- names(object$lmm_model$data)
     idsl <- 1:(nlevels(object$lmm_model$data$Treatment)-1)
     nams <- nams[!nams %in% c("Time","Treatment","time","dose", paste0("D", idsl))]
-
+    if (length(nams)){
     n <- nrow(newdat)
 
     avdat <- as.data.frame(lapply(object$lmm_model$data[nams], function(x) {
@@ -114,6 +114,7 @@ plot_smoothPRC_cdt <- function(object,
       }
     }))
     newdat <- cbind(newdat, avdat)
+    }
     newdat1 <- newdat
     pred1 <- predict(object$obj, newdata = newdat)
     # sets LMMsolver_model with response in formulafixed and data : Design
