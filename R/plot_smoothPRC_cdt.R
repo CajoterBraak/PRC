@@ -14,6 +14,8 @@
 #' scores in the smooth PRC showing the scatter of the
 #' individual samples (cosms).
 #' Default \code{TRUE}, \emph{i.e.} with individual points.
+#' @param sample_times_only logical to plotlines based on the sampled times
+#' only, \emph{i.e.} without interpolation. Default \code{FALSE}.
 #' @param flip logical. Should the axis be reversed?
 #' Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
 #' do not reverse.
@@ -29,7 +31,9 @@ plot_smoothPRC_cdt <- function(object,
                                mod_prc = NULL,
                                with_classical_lines = TRUE,
                                with_unconstrained_scores = TRUE,
-                               flip = FALSE)
+                               flip = FALSE,
+                               sample_times_only = FALSE
+                               )
 {
   # sampled time points only-----
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
@@ -56,48 +60,83 @@ plot_smoothPRC_cdt <- function(object,
     Treatment = object$lmm_model$data$Treatment
   )
 
-  # dense data-----
-  time_points <- sort(unique(object$lmm_model$data$time))
-  time_first_applied <- min(time_points[time_points > 0])
+  if (deparse(object$lmm_model$fixedH0) == deparse(Yb ~ Time)||
+      sample_times_only) {
+    smooth_prc_df2  <- smooth_prc_df
+    } else {
+    # dense data-----
+    time_points <- sort(unique(object$lmm_model$data$time))
+    time_first_applied <- min(time_points[time_points > 0])
 
-  npos <- length(time_points[time_points > 0])
-  nneg <- length(time_points) - npos
+    npos <- length(time_points[time_points > 0])
+    nneg <- length(time_points) - npos
 
-  tgrid_dense <- c(
-    seq(min(time_points), 0, length = 10 * nneg),
-    seq(time_first_applied,
-        max(time_points),
-        length = 10 * npos)
-  )
+    tgrid_dense <- c(
+      seq(min(time_points), 0, length = 10 * nneg),
+      seq(time_first_applied,
+          max(time_points),
+          length = 10 * npos)
+    )
 
-  dose_levels <- sort(unique(object$lmm_model$data$dose))
+    #dose_levels <- sort(unique(object$lmm_model$data$dose))
 
-  newdat <- expand.grid(
-    time = c(time_points, tgrid_dense),
-    dose = dose_levels
-  )
+    newdat <- expand.grid(
+      time = c(time_points, tgrid_dense),
+      Treatment = factor(levels(object$lmm_model$data$Treatment))
+    )
 
-  newdat1 <- newdat
+    valsTreatment<- PRC::fvalues4levels(object$lmm_model$data, "Treatment")
+    if (all(valsTreatment == seq_along(valsTreatment))) valsTreatment <- valsTreatment-1
+    newdat$dose <- valsTreatment[newdat$Treatment]
+    newdat$dose  <- ifelse(newdat$time>0, newdat$dose, 0)
 
-  newdat$dose[newdat$time <= 0] <- 0
+    if ("D1" %in% names(object$lmm_model$data)) {
+      datI <- model.matrix(~ time + Treatment:time, data = newdat)[,-c(1,2)]
 
-  pred1 <- predict(object$obj, newdata = newdat)
+      datI <- as.data.frame(datI)
+      idsl <- 1:(nlevels(newdat$Treatment)-1)
+      names(datI) <- paste0("D", idsl)
+      datI[newdat$time <= 0, ] <- 0
+      newdat <- cbind(newdat,datI)
+    }
 
-  newdat0 <- newdat
-  newdat0$dose <- 0
+    nams <- names(object$lmm_model$data)
+    idsl <- 1:(nlevels(object$lmm_model$data$Treatment)-1)
+    nams <- nams[!nams %in% c("Time","Treatment","time","dose", paste0("D", idsl))]
 
-  pred0 <- predict(object$obj, newdata = newdat0)
+    n <- nrow(newdat)
 
-  newdat1$ypred <- (pred1$ypred - pred0$ypred) / object$mult
+    avdat <- as.data.frame(lapply(object$lmm_model$data[nams], function(x) {
+      if (is.factor(x)) {
+        factor(rep(levels(x)[1], n), levels = levels(x))
+      } else if (is.character(x)) x[1] else {
+        rep(mean(x, na.rm = TRUE), n)
+      }
+    }))
+    newdat <- cbind(newdat, avdat)
+    newdat1 <- newdat
+    pred1 <- predict(object$obj, newdata = newdat)
+    # sets LMMsolver_model with response in formulafixed and data : Design
+    newdat0 <- newdat
+    newdat0$dose <- 0
+    newdat0$Treatment <- levels(object$lmm_model$data$Treatment)[1]
+    if("D1" %in% names(newdat0)) {
+        id <- which(names(newdat0) %in% "D1")
+        newdat0[, id + (idsl-1)] <- 0
+      }
+    pred0 <- predict(object$obj, newdata = newdat0)
 
-  smooth_prc_df2 <- data.frame(
-    Time = newdat1$time,
-    PRCsmooth = flip * newdat1$ypred,
-    Treatment = factor(newdat1$dose)
-  )
+    newdat1$ypred <- (pred1$ypred - pred0$ypred) / object$mult
 
-  levels(smooth_prc_df2$Treatment) <-
-    levels(object$lmm_model$data$Treatment)
+    smooth_prc_df2 <- data.frame(
+      Time = newdat1$time,
+      PRCsmooth = flip * newdat1$ypred,
+      Treatment = factor(newdat1$dose)
+    )
+
+    levels(smooth_prc_df2$Treatment) <-
+      levels(object$lmm_model$data$Treatment)
+  }
 
   p1 <- ggplot(
     smooth_prc_df,
@@ -149,7 +188,6 @@ plot_smoothPRC_cdt <- function(object,
       )
 
   }
-
   p1 <- p1 +
     scale_colour_brewer(palette = "Dark2") +
     scale_linetype_manual(
