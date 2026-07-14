@@ -71,7 +71,8 @@ anova.smoothPRC <- function(object,
   pval <- (sum(Fstat > (Fstat0 + EPS), na.rm = TRUE) + 1)  / (nperm- isna.r  + 1)
   ret <- list(pval = pval, F0 = Fstat0, Fstat = Fstat, iter = iter,
               objH1.list= objH1.list, objH0.list= objH0.list )
-  return(ret)
+  if (verbose) print(pval)
+  invisible(ret)
 }
 # covariate_names <- function(formula) {
 #   all.vars(delete.response(terms(formula)))
