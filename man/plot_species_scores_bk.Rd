@@ -103,15 +103,15 @@ smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj)
-cor(smooth_PRC$b, b_mod_prc)
+cor(smooth_PRC$B[,"B1"], b_mod_prc)
 
 cntr$nperm <- 19
 an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
 an$pval
 
 #graph
-plot_species_scores_bk(smooth_PRC$b, threshold = 14)
-plot_smoothPRC_cdt(smooth_PRC,flip = FALSE)
+plot_species_scores_bk(smooth_PRC$B, threshold = 20, scoresname = "B1")
+plot_smoothPRC_cdt(smooth_PRC,flip = FALSE,sample_times_only = TRUE)
 
 plotPRC(mod_prc)
 plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)

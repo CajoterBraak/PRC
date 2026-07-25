@@ -25,4 +25,5 @@ Permutation Test for Smooth PRC
 The test takes account of additional covariates in \code{fixed} of
 the LLMsolver model. The test is approximate without permutation of whole
 time series.
+The test is based on the first axis.
 }

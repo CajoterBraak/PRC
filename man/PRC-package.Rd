@@ -31,6 +31,7 @@ vegan: Community Ecology Package. R package version 2.6-4.
 \url{https://CRAN.R-project.org/package=vegan}.
 }
 \seealso{
-\code{\link{doPRC}}, \code{\link{smoothPRC}}, \code{\link[vegan]{prc}}
+\code{\link{doPRC}}, \code{\link{smoothPRC}},
+\code{\link[vegan]{prc}}
 }
 \keyword{internal}

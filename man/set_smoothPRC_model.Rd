@@ -105,7 +105,9 @@ An atypical aspect of the function is that the time and treatment factors
  if \code{treatment.level.as.quantity} is \code{FALSE}.
  These variables generated in the function, contain the time
  since the start of the experiment for each treatment.
- \code{D1, D2, ...} should therefore not be variable names in \code{data}.
+ \code{D1, D2, ...} should therefore not be variable names in \code{data},
+ nor should \code{time} or \code{dose} be variable names
+ in \code{data}; these are reserved names in \code{smoothPRC}.
  An example of the formula for \code{spline}
  when \code{treatment.level.as.quantity} is \code{FALSE}
  and the number of levels of \code{Treatment} is 4,  is
@@ -165,8 +167,8 @@ smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj)
-(cc <- cor(smooth_PRC$b, b_mod_prc))
-plot_species_scores_bk(-smooth_PRC$b)
+(cc <- cor(smooth_PRC$B[,1], b_mod_prc))
+plot_species_scores_bk(-smooth_PRC$B, scoresname = "B1")
 plot_species_scores_bk(b_mod_prc)
 plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
 plotsmoothPRC(smooth_PRC, flip= TRUE,threshold = 0)
@@ -177,7 +179,7 @@ x1 <- scale(as.numeric(Design$Time))[,1]
 x2 <- scale(as.numeric(Design$Treatment))[,1]
 
 # with the scaling to mean square of 1 of the species scores b
-summary(lm(smooth_PRC$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
+summary(lm(smooth_PRC$X[,1]~ x1+ x2+ x1:x2 )) # R^2 ~1!
 
 
 plotPRC(mod_prc)
@@ -215,13 +217,7 @@ with(Design,table(Time,Treatment))
 # unbalanced!!! if test <- FALSE
 
 mod_prc <- doPRC(Y ~ Time:Treatment + Condition(Time+Block),  data = Design)
-if (test){
-  cntr <- how(plots = Plots(strata =Design$Plot,type = "free"),
-              within = Within(type = "none"), blocks = Design$Block, nperm = 99)
 
-  anova(mod_prc, permutations = cntr)
-
-}
 
 b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
@@ -233,13 +229,8 @@ smoothPRC_model$spline
 
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj)
-cor(smooth_PRC$b, b_mod_prc)
-if (test){
-  cntr$nperm <- 19
+cor(smooth_PRC$B[,1], b_mod_prc)
 
-  an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
-  an$pval
-}
 
 plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
 }

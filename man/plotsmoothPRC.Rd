@@ -6,6 +6,7 @@
 \usage{
 plotsmoothPRC(
   object,
+  axis = 1,
   mod_prc = NULL,
   with_classical_lines = TRUE,
   with_unconstrained_scores = TRUE,
@@ -24,6 +25,8 @@ plotsmoothPRC(
 }
 \arguments{
 \item{object}{a result of \code{\link{smoothPRC}}.}
+
+\item{axis}{the number of the axis to plot}
 
 \item{mod_prc}{a results of \code{\link{doPRC}}, \emph{i.e.}
 a classical PRC with the same data and design.
@@ -69,7 +72,7 @@ for the selection of species to be displayed. Default: \code{"Fratio1"};
 if \code{selectname} is not found in \code{species_scores}, set
 to \code{scoresname}.}
 
-\item{sample_times_only}{logical to plotlines based on the sampled times
+\item{sample_times_only}{logical to PRClines based on the sampled times
 only, \emph{i.e.} without interpolation. Default \code{FALSE}.}
 
 \item{verbose}{logical for printing the number of species with names out of

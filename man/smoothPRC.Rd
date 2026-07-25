@@ -7,7 +7,8 @@
 smoothPRC(
   Y,
   lmm_model,
-  options_iter = list(b_init = NULL, k = 3, mA = 4, tol = 1e-08, maxiter = 50)
+  options_iter = list(b_init = NULL, k = 3, mA = 4, tol = 1e-08, maxiter = 50),
+  n_axes = 2
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ the first eigen vector from the second. Default \code{NULL}.
 \item \code{tol}: stopping criterion, tolarance. Default \code{1e-8}.
 \item \code{maxiter}:maximum number of iterations. Default \code{50}.
 }}
+
+\item{n_axes}{the number of axes to extract. Default \code{2}.}
 }
 \description{
 Smooth PRC using LMMsolver (Boer, 2023)
@@ -61,6 +64,12 @@ is part of a power algorithm with block and Anderson acceleration to solve
 the dominant eigen vector of the
 underlying eigen problem while optimizing simultaneously the penalties
 using \code{\link[LMMsolver]{LMMsolve}}.
+
+If \code{lmm_model$scaling =="ms"}, then in the result \code{B} in the
+result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
+are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
+with \code{fitted(result$obj)}.
+Note that \code{Yb} is the response in \code{\link[LMMsolver]{LMMsolve}} model.
 }
 \references{
 Boer, Martin P. 2023.

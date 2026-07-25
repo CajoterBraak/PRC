@@ -6,6 +6,7 @@
 \usage{
 plot_smoothPRC_cdt(
   object,
+  axis = 1,
   mod_prc = NULL,
   with_classical_lines = TRUE,
   with_unconstrained_scores = TRUE,
@@ -15,6 +16,8 @@ plot_smoothPRC_cdt(
 }
 \arguments{
 \item{object}{a result of \code{\link{smoothPRC}}.}
+
+\item{axis}{the number of the axis to plot}
 
 \item{mod_prc}{a results of \code{\link{doPRC}}, \emph{i.e.}
 a classical PRC with the same data and design.
@@ -33,7 +36,7 @@ Default \code{TRUE}, \emph{i.e.} with individual points.}
 Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
 do not reverse.}
 
-\item{sample_times_only}{logical to plotlines based on the sampled times
+\item{sample_times_only}{logical to PRClines based on the sampled times
 only, \emph{i.e.} without interpolation. Default \code{FALSE}.}
 }
 \description{
@@ -70,15 +73,15 @@ smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj)
-cor(smooth_PRC$b, b_mod_prc)
+cor(smooth_PRC$B[,"B1"], b_mod_prc)
 
 cntr$nperm <- 19
 an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
 an$pval
 
 #graph
-plot_species_scores_bk(smooth_PRC$b, threshold = 14)
-plot_smoothPRC_cdt(smooth_PRC,flip = FALSE)
+plot_species_scores_bk(smooth_PRC$B, threshold = 20, scoresname = "B1")
+plot_smoothPRC_cdt(smooth_PRC,flip = FALSE,sample_times_only = TRUE)
 
 plotPRC(mod_prc)
 plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
