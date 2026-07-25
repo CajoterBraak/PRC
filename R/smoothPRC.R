@@ -12,6 +12,7 @@
 #' \item \code{tol}: stopping criterion, tolarance. Default \code{1e-8}.
 #' \item \code{maxiter}:maximum number of iterations. Default \code{50}.
 #' }
+#' @param n_axes the number of axes to extract. Default \code{2}.
 #' @details
 #' An atypical aspect of the function is that the time and treatment factors
 #' need to have the names Time and Treatment in \code{data}.
@@ -44,128 +45,39 @@
 #' underlying eigen problem while optimizing simultaneously the penalties
 #' using \code{\link[LMMsolver]{LMMsolve}}.
 #'
+#' If \code{lmm_model$scaling =="ms"}, then in the result \code{B} in the
+#' result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
+#' are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
+#' with \code{fitted(result$obj)}.
+#' Note that \code{Yb} is the response in \code{\link[LMMsolver]{LMMsolve}} model.
 #' @references
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
 #' Statistical Modelling 23 (5-6): 465–79.
 #' \doi{10.1177/1471082X231178591}
+#' @importFrom stats var
 #' @export
 smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
                                                         k = 3, mA = 4,
-                                                        tol = 1e-8, maxiter = 50)) {
-
-  normalizeb <- function(b){b/sqrt(sum(b^2))  }
-  if (!spam::is.spam(Y)) Y <- as.matrix(Y)
-#  TSS_Y<-sum(Y^2) - sum(nrow(Y)*colMeans(Y)^2)
-#  Y<-Y/sqrt(TSS_Y)
-  if (mean(Y>.Machine$double.eps) < 0.10 ) Y <- spam::as.spam(Y)
-  n <- nrow(Y)
-  m <- ncol(Y)
-
-  # initial b
-  if (is.null(options_iter$b_init)) b <- rnorm(m) else b <- options_iter$b_init
-  objH0 <- NULL
-  b <- normalizeb(b)
-
-  # Anderson history
-  b_hist <- list()
-  r_hist <- list()
-
-  # block-power buffer
-  Xblock <- matrix(0, n, options_iter$k)
-  Y <- as.matrix(Y)
+                                                        tol = 1e-8, maxiter = 50), n_axes = 2) {
 
 
+  smooth_PRC1 <- smoothPRC1(Y            = Y,
+                            lmm_model    = lmm_model,
+                            options_iter = options_iter,
+                            axes         = NULL)
+    iaxis = 1
+    val1  <-var(smooth_PRC1$X[,iaxis])
+    #options_iter$k <- 1.5 * options_iter$k
+    #options_iter$mA <- 0
 
-  for (iter in 1:options_iter$maxiter) {
-
-    b_old <- b
-
-    ## ---- k block-power substeps ----
-    for (j in 1:options_iter$k) {
-
-      # latent response
-      Yb <- as.numeric(Y %*% b)
-
-      # spline fit
-      obj <- LMMsolve(fixed = lmm_model$fixed,
-                           spline = lmm_model$spline,
-                           random  = lmm_model$random,
-                           residual = lmm_model$residual,
-                           data = cbind(lmm_model$data, Yb = Yb) )
-      # extract spline latent axis xhat
-        # spline fit under H0
-        objH0 <-      LMMsolve(fixed = lmm_model$fixedH0,
-                               spline = lmm_model$splineH0,
-                               random  = lmm_model$random,
-                               residual = lmm_model$residual,
-                               data = cbind(lmm_model$data, Yb = Yb))
-        xhat <- fitted(obj) - fitted(objH0)
-        xmean <-  - mean(xhat)
-        xhat <- xhat - xmean
-      Xblock[, j] <- xhat
-      # update b
-      b_vec <- as.numeric(crossprod(Y, xhat))
-      b <- normalizeb(b_vec)
+    while(iaxis < n_axes|| var(smooth_PRC1$X[,iaxis]) > 1.0e-2*val1){
+      smooth_PRC2 <- smoothPRC2(smooth_PRC_axis1 = smooth_PRC1,
+                             options_iter =  options_iter)
+      smooth_PRC1 <- smooth_PRC2
+      iaxis <- iaxis+1
     }
 
-    ## ---- block SVD ----
-    u1 <- svd(Xblock, nu=1, nv=0)$u[,1]
-    b  <- as.numeric(crossprod(Y, u1))
-    b  <- normalizeb(b)
 
-    ## ---- Anderson acceleration ----
-    r <- b - b_old
-    b_hist <- c(b_hist, list(b_old))
-    r_hist <- c(r_hist, list(r))
-
-    if (length(r_hist) > options_iter$mA) {
-      b_hist <- b_hist[(length(b_hist)-options_iter$mA+1):length(b_hist)]
-      r_hist <- r_hist[(length(r_hist)-options_iter$mA+1):length(r_hist)]
-    }
-
-    if (length(r_hist) == options_iter$mA) {
-      Rmat <- do.call(cbind, r_hist)
-      rhs  <- r_hist[[options_iter$mA]]
-      # lambda <- 1e-10
-      # alpha <- solve(crossprod(Rmat) + lambda * diag(ncol(Rmat)),
-      #                crossprod(Rmat, rhs))
-      alpha <- qr.solve(Rmat, rhs, tol = 1e-12)
-      b_new <- b - Rmat %*% alpha
-      b <-  normalizeb(b_new)
-    }
-
-    ## ---- convergence ----
-    if (sqrt(sum((b - b_old)^2)) < options_iter$tol)
-      break
-  }
-  PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
-  obj$Yb <- Yb
-  PRCstar <-  get_PRCstar(obj, dat0 = lmm_model$dat0)
-  if (lmm_model$scaling =="ms") mult <- sqrt(length(b))else mult <- 1
-  B <- as.matrix(b*mult);colnames(B)<- "RDA1";rownames(B) <- colnames(Y)
-
-  out <-list(b = B,
-             x = xhat/mult,
-             x_star = (Yb - fitted(objH0))/mult,
-             PRC = PRC/mult, PRCstar = PRCstar/mult, mult = mult,
-             obj = obj, objH0=objH0, iter = iter,Y= Y, Yb=Yb,
-             lmm_model = lmm_model,options_iter = options_iter)
-  class(out) <- c("smoothPRC", "list")
-  return(out)
-}
-get_PRC <-function(obj,dat0=NULL){
-  # full fitted values
-  xhat <- fitted(obj)
-  pred0 <- predict(obj, newdata = dat0)
-  xhat <- xhat - pred0$ypred # only the deviations from the control
-  #xmean <-  - mean(xhat)
-  return(xhat)
-}
-get_PRCstar <-function(obj,dat0=NULL){
-  # full fitted values
-  pred0 <- predict(obj, newdata = dat0)
-  xstar <- obj$Yb - pred0$ypred # only the deviations from the control
-  #xmean <-  - mean(xhat)
-  return(xstar)
+  return(smooth_PRC2)
 }

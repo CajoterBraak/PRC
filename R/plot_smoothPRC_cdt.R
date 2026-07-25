@@ -4,6 +4,7 @@
 #' \code{plot_smoothPRC_cdt} creates a PRC diagram of the treatments without species loadings.
 #'
 #' @param  object  a result of \code{\link{smoothPRC}}.
+#' @param axis the number of the axis to plot
 #' @param mod_prc a results of \code{\link{doPRC}}, \emph{i.e.}
 #' a classical PRC with the same data and design.
 #' Default \code{NULL}, in which the classical PRC is computed using
@@ -14,7 +15,7 @@
 #' scores in the smooth PRC showing the scatter of the
 #' individual samples (cosms).
 #' Default \code{TRUE}, \emph{i.e.} with individual points.
-#' @param sample_times_only logical to plotlines based on the sampled times
+#' @param sample_times_only logical to PRClines based on the sampled times
 #' only, \emph{i.e.} without interpolation. Default \code{FALSE}.
 #' @param flip logical. Should the axis be reversed?
 #' Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
@@ -28,6 +29,7 @@
 #' @importFrom ggplot2 element_blank element_text
 #' @export
 plot_smoothPRC_cdt <- function(object,
+                               axis = 1,
                                mod_prc = NULL,
                                with_classical_lines = TRUE,
                                with_unconstrained_scores = TRUE,
@@ -45,18 +47,12 @@ plot_smoothPRC_cdt <- function(object,
         data = object$lmm_model$data
       )
     )
-  newdat <- cbind(
-    object$lmm_model$data,
-    PRCsmooth = object$PRC,
-    PRCstar = object$PRCstar,
-    PRCclassical = mod_prc$PRCplus$PRC1
-  )
-  cc <- cor(newdat$PRCclassical, newdat$PRCsmooth)
+  cc <- cor(mod_prc$PRCplus[,paste0("PRC",axis)],  object$PRC[,axis])
   smooth_prc_df <- data.frame(
     Time = object$lmm_model$data$time,
-    PRCsmooth = flip * object$PRC,
-    PRCstar = flip * object$PRCstar,
-    PRCclassical = sign(cc) * flip * mod_prc$PRCplus$PRC1,
+    PRCsmooth = flip * object$PRC[,axis],
+    PRCstar = flip * object$PRCstar[,axis],
+    PRCclassical = sign(cc) * flip * mod_prc$PRCplus[,paste0("PRC",axis)],
     Treatment = object$lmm_model$data$Treatment
   )
 
@@ -87,7 +83,7 @@ plot_smoothPRC_cdt <- function(object,
 
     valsTreatment<- PRC::fvalues4levels(object$lmm_model$data, "Treatment")
     if (all(valsTreatment == seq_along(valsTreatment))) valsTreatment <- valsTreatment-1
-    newdat$dose <- valsTreatment[newdat$Treatment]
+    newdat$dose  <- valsTreatment[newdat$Treatment]
     newdat$dose  <- ifelse(newdat$time>0, newdat$dose, 0)
 
     if ("D1" %in% names(object$lmm_model$data)) {
@@ -116,16 +112,17 @@ plot_smoothPRC_cdt <- function(object,
     newdat <- cbind(newdat, avdat)
     }
     newdat1 <- newdat
-    pred1 <- predict(object$obj, newdata = newdat)
+    pred1 <- predict(object$obj[[axis]], newdata = newdat)
+
     # sets LMMsolver_model with response in formulafixed and data : Design
     newdat0 <- newdat
     newdat0$dose <- 0
     newdat0$Treatment <- levels(object$lmm_model$data$Treatment)[1]
     if("D1" %in% names(newdat0)) {
         id <- which(names(newdat0) %in% "D1")
-        newdat0[, id + (idsl-1)] <- 0
+        newdat0[, idsl + (id-1)] <- 0
       }
-    pred0 <- predict(object$obj, newdata = newdat0)
+    pred0 <- predict(object$obj[[axis]], newdata = newdat0)
 
     newdat1$ypred <- (pred1$ypred - pred0$ypred) / object$mult
 

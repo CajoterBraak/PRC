@@ -28,9 +28,13 @@
 #' vegan: Community Ecology Package. R package version 2.6-4.
 #' \url{https://CRAN.R-project.org/package=vegan}.
 #'
-#' @seealso \code{\link{doPRC}}, \code{\link{smoothPRC}}, \code{\link[vegan]{prc}}
+#' @seealso \code{\link{doPRC}}, \code{\link{smoothPRC}},
+#' \code{\link[vegan]{prc}}
 #' @keywords internal
 #' @importFrom LMMsolver LMMsolve
-#' @importFrom stats as.formula delete.response fitted formula model.matrix nobs predict rnorm terms
+#' @importFrom stats as.formula delete.response fitted formula model.matrix nobs
+#' @importFrom stats predict rnorm terms
 #' @importFrom rlang .data
+#'
 NULL
+

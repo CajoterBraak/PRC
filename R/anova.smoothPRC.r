@@ -11,6 +11,7 @@
 #' The test takes account of additional covariates in \code{fixed} of
 #' the LLMsolver model. The test is approximate without permutation of whole
 #' time series.
+#' The test is based on the first axis.
 #' @export
 anova.smoothPRC <- function(object,
                             ...,
@@ -45,7 +46,6 @@ anova.smoothPRC <- function(object,
   #cov_nams<- covariate_names(object$lmm_model$object$fixedH0)
   #adjust_for_covariates <- length(cov_nams)
   #adjust_for_covariates <- FALSE # do Manly, permutation of raw data with F stat
-  out0 <- object # with covariates
   EPS <- sqrt(.Machine$double.eps) # for permutation P-values
   Fstat <- numeric(nperm)
   iter <- numeric(nperm)
@@ -56,11 +56,11 @@ anova.smoothPRC <- function(object,
     permii <- perm.mat[ii,]
     Yii <- object$Y[permii,]
     # if(adjust_for_covariates){
-    #  out0$lmm_mode$data[,cov_nams] <-  object$lmm_mode$data[permii, cov_nams]
-    #  out0$lmm_mode$dat0[,cov_nams] <-  object$lmm_mode$dat0[permii, cov_nams]
+    #  object$lmm_mode$data[,cov_nams] <-  object$lmm_mode$data[permii, cov_nams]
+    #  object$lmm_mode$dat0[,cov_nams] <-  object$lmm_mode$dat0[permii, cov_nams]
     # }
-    outii <- smoothPRC(Yii, lmm_model= out0$lmm_model,
-                                 options_iter = out0$options_iter)
+    outii <- smoothPRC1(Yii, lmm_model= object$lmm_model,
+                                 options_iter = object$options_iter)
     objH1.list[[ii]]<- outii$obj
     objH0.list[[ii]]<- outii$objH0
     iter[ii] <- outii$iter
@@ -79,13 +79,13 @@ anova.smoothPRC <- function(object,
 # }
 #' @noRd
 #' @keywords internal
-test_stat_prc <- function(out){
-  df.resH1<-  fEDdf_res(out$obj)
+test_stat_prc <- function(out, ax = 1){
+  df.resH1<-  fEDdf_res(out$obj[[ax]])
   #SSnum <-sum(fit_H1^2) - sum(fit_H0^2)
   # RSS.H0- RSS.H1
-  RSS.H1 <- sum((out$Yb - fitted(out$obj))^2)
-  SSnum <- sum((out$Yb - fitted(out$objH0))^2) - RSS.H1
-  MSnum <- SSnum/(fEDdf_res(out$objH0)-df.resH1)
+  RSS.H1 <- sum((out$YB[,ax] - fitted(out$obj[[ax]]))^2)
+  SSnum <- sum((out$YB[,ax]- fitted(out$objH0[[ax]]))^2) - RSS.H1
+  MSnum <- SSnum/(fEDdf_res(out$objH0[[ax]])-df.resH1)
   MSden <- RSS.H1 /df.resH1
   Fratio <- MSnum/MSden
   #Fratio <- -SSnum

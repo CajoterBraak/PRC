@@ -8,9 +8,15 @@
 #' @inheritParams plot_species_scores_bk
 #' @inheritParams plotPRC
 #'
+#'@details
+#' \code{sample_times_only = TRUE} can be useful for comparison with
+#' classical PRC. It avoids interpolation and may work when
+#' the default fails to produce a plot.
+#'
 #' @export
 plotsmoothPRC <- function(
     object,
+    axis = 1,
     mod_prc = NULL,
     with_classical_lines = TRUE,
     with_unconstrained_scores = TRUE,
@@ -23,16 +29,18 @@ plotsmoothPRC <- function(
     y_lab_interval = 0.5,
     speciesname = NULL,
     selectname = "Fratio",
+    sample_times_only = FALSE,
     verbose = TRUE)
 {
-  axis <- 1
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
   pl.cdt1 <- plot_smoothPRC_cdt(
     object = object,
+    axis = axis,
     mod_prc = mod_prc,
     with_classical_lines = with_classical_lines,
     with_unconstrained_scores = with_unconstrained_scores,
-    flip = flip
+    flip = flip,
+    sample_times_only =sample_times_only
   )
 
 
@@ -41,7 +49,7 @@ plotsmoothPRC <- function(
     title <- "Smooth PRC diagram"
   }
 
-  scoresname <- "RDA"
+  scoresname <- "B"
 
   selectname <- paste0(selectname, axis) #
   scoresname <- paste0(scoresname, axis)
@@ -50,7 +58,7 @@ plotsmoothPRC <- function(
    }
 
   pl.bk1 <- plot_species_scores_bk(
-    species_scores = flip*object$b,
+    species_scores = flip*object$B,
     threshold = threshold,
     y_lab_interval = y_lab_interval,
     speciesname = speciesname,

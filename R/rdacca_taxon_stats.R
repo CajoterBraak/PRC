@@ -56,15 +56,83 @@ rdacca_taxon_stats <- function(object, rank = 1){
        if (object$method=="rda") SS_CCA_rank <- colSums((sc$sites %*% t(sc$species))^2)/(nobs(object)-1) else {
          SS_CCA_rank <- colSums(diag(object$rowsum) %*% (sc$sites %*% t(sc$species))^2 %*% diag(object$colsum))
        }
-    Cfit[,k] <- SS_CCA_rank/totspe
+      Cfit[,k] <- SS_CCA_rank/totspe
       ResidualSS_of_rank_k <- SS_CCA + colSums(vegan::ordiYbar(object, model = "CA")^2) - SS_CCA_rank
       ResidualMS_of_rank_k <- ResidualSS_of_rank_k/(nobs(object) - q - k)
       Fratio[,k] <- (SS_CCA_rank/k)/ ResidualMS_of_rank_k
-
   }
   colnames(Cfit) <- paste("Cfit", 1:ncol(Cfit),sep= "")
   colnames(Fratio) <- paste("Fratio", 1:ncol(Fratio),sep= "")
   out <- cbind(Var = totspe, FitCE, FitE,  Cfit, Fratio)
   return(out)
+}
+
+taxon_Fratio_smooth <- function(Y,  b, obj, objH0, mult, k=1){
+ # all entities in smoothPRC
+  # Y <- scale(Y, center = TRUE, scale = FALSE)
+  Y <- transformY(Y) # center_w in RDA
+  df1 <- fEDdf_res(obj)
+  df0 <- fEDdf_res(objH0) - df1
+
+  x0 <- center_w(matrix(fitted(objH0)))
+  x1 <- center_w(matrix(fitted(obj  )))
+
+  ## fitted values under H0 and H1 for all species
+  fit0 <- tcrossprod(x0, b)
+  fit1 <- tcrossprod(x1, b)
+
+  RSS0 <- colSums((Y - fit0)^2)
+  RSS1 <- colSums((Y - fit1)^2)
+
+  Fstat <- ((RSS0 - RSS1)) /(RSS1 / (fEDdf_res(objH0)-1))
+ # Fstat <- ((RSS0 - RSS1)) /(RSS1 / (nrow(Y)-1 -10 ))
+  #nobs(object) - q - k)
+  #df <- fEDdf_res(obj) -k
+  # dfs <- obj$EDdf
+  # id<- which(dfs$Term %in%"s(time)")
+  # df <- nrow(Y) - nlevels(lmm_model$data$Time)
+  # Fstat <- (RSS0 - RSS1) /(RSS1 / df1)
+
+  out <-cbind(
+    RDA1 = b*mult,
+    RSS0 = RSS0,
+    RSS1 = RSS1,
+    Fratio1 = Fstat
+  )
+  colnames(out)<- c("RDA1","RSS0","RSS1","Fratio1")
+  rownames(out) <- colnames(Y)
+  return(out)
+}
+
+#' @noRd
+#' @keywords internal
+center_w <- function(X,
+                     w = rep(1 / nrow(X), nrow(X))) {
+  X - matrix(t(w) %*% X, nrow = nrow(X), ncol= ncol(X), byrow = TRUE)
+}
+transformY <- function(Y){center_w(Y)}
+# test  function
+taxon_Fratio <- function(Y, b, obj, objH0){
+  Y <- transformY(Y) # center_w in RDA
+  df2 <- fEDdf_res(obj)
+  df1 <- fEDdf_res(objH0) - df2
+
+  x0 <- fitted(objH0)
+  x1 <- fitted(obj)
+
+  Fstat <- RSS0 <- RSS1 <- numeric(ncol(Y))
+
+  for(k in seq_len(ncol(Y))) {
+
+    fit0 <- b[k] * x0
+    fit1 <- b[k] * x1
+
+    RSS0[k] <- sum((Y[,k] - fit0)^2)
+    RSS1[k] <- sum((Y[,k] - fit1)^2)
+
+    Fstat[k] <- ((RSS0[k] - RSS1[k])/df1)/(RSS1[k]/df2)
+  }
+
+  data.frame(Fratio1 = Fstat, RSS0= RSS0, RSS1= RSS1)
 }
 
