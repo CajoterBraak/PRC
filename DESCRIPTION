@@ -1,7 +1,7 @@
 Package: PRC
 Type: Package
 Title: Principal Response Curves (PRC) For Displaying Multivariate Main Effects And Interactions
-Version: 2.0.1
+Version: 2.0.2
 Authors@R: person(given ="Cajo J.F", family = "ter Braak", email="cajo.terbraak@wur.nl", 
    role=c("aut","cre"), comment=c(ORCID="0000-0002-0414-8745"))
 Maintainer: Cajo J.F. ter Braak <cajo.terbraak@wur.nl>

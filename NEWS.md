@@ -1,3 +1,8 @@
+# PRC 2.0.2
+
+* smoothPRC can now extract more than a single axis. The names in smoothPRC 
+ object have been changed.
+
 # PRC 2.0.1
 
 * Correction of a bug resulting in anova of a smooth PRC object to give 
