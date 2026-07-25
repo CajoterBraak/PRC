@@ -136,15 +136,37 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
       r_hist <- r_hist[(length(r_hist)-options_iter$mA+1):length(r_hist)]
     }
 
+    ## ---- Anderson acceleration ----
+    r <- b - b_old
+
+    b_hist <- c(b_hist, list(b_old))
+    r_hist <- c(r_hist, list(r))
+
+    if (length(r_hist) > options_iter$mA) {
+      b_hist <- b_hist[(length(b_hist)-options_iter$mA+1):length(b_hist)]
+      r_hist <- r_hist[(length(r_hist)-options_iter$mA+1):length(r_hist)]
+    }
+
     if (length(r_hist) == options_iter$mA) {
+
       Rmat <- do.call(cbind, r_hist)
       rhs  <- r_hist[[options_iter$mA]]
-      # lambda <- 1e-10
-      # alpha <- solve(crossprod(Rmat) + lambda * diag(ncol(Rmat)),
-      #                crossprod(Rmat, rhs))
-      alpha <- qr.solve(Rmat, rhs, tol = 1e-12)
-      b_new <- b - Rmat %*% alpha
-      b <-  normalizeb(b_new)
+
+      alpha <- tryCatch(
+        qr.solve(Rmat, rhs, tol = 1e-12),
+        error = function(e) NULL
+      )
+
+      if (!is.null(alpha)) {
+
+        b_new <- as.numeric(b - Rmat %*% alpha)
+
+        if (all(is.finite(b_new)) &&
+            sum(b_new^2) > .Machine$double.eps) {
+          b <- normalizeb(b_new)
+        }
+
+      }
     }
 
     ## ---- convergence ----
