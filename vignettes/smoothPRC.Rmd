@@ -179,9 +179,10 @@ Here is the plot for classical PRC via the plotting function of `smoothPRC`:
 
 ```{r mod_PRC2, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
 plotsmoothPRC(classical_PRC, flip = TRUE, threshold = 1, title ="Classical PRC via smoothPRC")
+classical_PRC$eig/mod_prc$CCA$eig[seq_along(classical_PRC$eig)]
 ```
 
-The solid lines for smooth PRC overlay the dotted lines of classical PRC, illustrating that smooth PRC can reproduce the outcome of a classical PRC and thus is a real extension of classical PRC.
+The first two eigenvalues agree up to numerical precision and the solid lines for smooth PRC overlay the dotted lines of classical PRC, illustrating that smooth PRC can reproduce the outcome of a classical PRC and thus is a real extension of classical PRC.
 
 
 # References
