@@ -31,13 +31,7 @@ with(Design,table(Time,Treatment))
 # unbalanced!!! if test <- FALSE
 
 mod_prc <- doPRC(Y ~ Time:Treatment + Condition(Time+Block),  data = Design)
-if (test){
-  cntr <- how(plots = Plots(strata =Design$Plot,type = "free"),
-              within = Within(type = "none"), blocks = Design$Block, nperm = 99)
 
-  anova(mod_prc, permutations = cntr)
-
-}
 
 b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
@@ -49,12 +43,7 @@ smoothPRC_model$spline
 
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj)
-cor(smooth_PRC$b, b_mod_prc)
-if (test){
-  cntr$nperm <- 19
+cor(smooth_PRC$B[,1], b_mod_prc)
 
-  an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
-  an$pval
-}
 
 plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)

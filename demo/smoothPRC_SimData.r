@@ -43,8 +43,8 @@ smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj)
-(cc <- cor(smooth_PRC$b, b_mod_prc))
-plot_species_scores_bk(-smooth_PRC$b)
+(cc <- cor(smooth_PRC$B[,1], b_mod_prc))
+plot_species_scores_bk(-smooth_PRC$B, scoresname = "B1")
 plot_species_scores_bk(b_mod_prc)
 plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
 plotsmoothPRC(smooth_PRC, flip= TRUE,threshold = 0)
@@ -55,7 +55,7 @@ x1 <- scale(as.numeric(Design$Time))[,1]
 x2 <- scale(as.numeric(Design$Treatment))[,1]
 
 # with the scaling to mean square of 1 of the species scores b
-summary(lm(smooth_PRC$x~ x1+ x2+ x1:x2 )) # R^2 ~1!
+summary(lm(smooth_PRC$X[,1]~ x1+ x2+ x1:x2 )) # R^2 ~1!
 
 
 plotPRC(mod_prc)
