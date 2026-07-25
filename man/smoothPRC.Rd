@@ -30,6 +30,10 @@ the first eigen vector from the second. Default \code{NULL}.
 
 \item{n_axes}{the number of axes to extract. Default \code{2}.}
 }
+\value{
+A list.
+The eigenvalues are in \code{result$eig}.
+}
 \description{
 Smooth PRC using LMMsolver (Boer, 2023)
 }
@@ -69,7 +73,8 @@ If \code{lmm_model$scaling =="ms"}, then in the result \code{B} in the
 result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
 are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
 with \code{fitted(result$obj)}.
-Note that \code{Yb} is the response in \code{\link[LMMsolver]{LMMsolve}} model.
+Note that \code{Yb} is the response in
+\code{\link[LMMsolver]{LMMsolve}} model.
 }
 \references{
 Boer, Martin P. 2023.
