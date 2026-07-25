@@ -80,6 +80,6 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
       smooth_PRC1 <- smooth_PRC2
       iaxis <- iaxis+1
     }
-    smooth_PRC2$eig <- ncol(Y)* apply(smooth_PRC2$X,2, var)
-  return(smooth_PRC2)
+    smooth_PRC1$eig <- ncol(Y)* apply(smooth_PRC1$X,2, var)
+  return(smooth_PRC1)
 }

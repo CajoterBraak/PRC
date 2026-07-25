@@ -25,7 +25,7 @@ plotsmoothPRC <- function(
     title = NULL,
     left = "Treatment curves",
     right = "taxon scores",
-    threshold = 0,
+    threshold = 14,
     y_lab_interval = 0.5,
     speciesname = NULL,
     selectname = "Fratio",
@@ -45,11 +45,9 @@ plotsmoothPRC <- function(
 
 
 
-  if (is.null(title)) {
-    title <- "Smooth PRC diagram"
-  }
 
-  scoresname <- "B"
+
+  scoresname <- "PRC"
 
   selectname <- paste0(selectname, axis) #
   scoresname <- paste0(scoresname, axis)
@@ -57,12 +55,38 @@ plotsmoothPRC <- function(
     selectname <- scoresname
    }
 
+
+  #library(grid)
+  #library(gridExtra)
+
+  if (is.null(title)) {
+    title <- paste0("Smooth ", scoresname, "-diagram ")
+
+
+    if (length(object$eig) >= axis + 1){
+      subtitle <- paste0(
+        "ratio to next axis: ",
+        round(object$eig[axis] /  object$eig[axis + 1], 1))
+        title <- paste0(title,"(", subtitle, ")")
+    }
+    title <- grid::textGrob(
+      title,
+      x = 0,           # left edge
+      hjust = 0,       # left justification
+      gp = grid::gpar(fontsize = 12, fontface = "bold"))
+  }
+
+
+
+
+
+
   pl.bk1 <- plot_species_scores_bk(
     species_scores = flip*object$B,
     threshold = threshold,
     y_lab_interval = y_lab_interval,
     speciesname = speciesname,
-    scoresname = scoresname,
+    scoresname = paste0("B", axis),
     selectname = selectname,
     verbose = verbose
   )
