@@ -49,7 +49,10 @@
 #' result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
 #' are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
 #' with \code{fitted(result$obj)}.
-#' Note that \code{Yb} is the response in \code{\link[LMMsolver]{LMMsolve}} model.
+#' Note that \code{Yb} is the response in
+#' \code{\link[LMMsolver]{LMMsolve}} model.
+#' @return A list.
+#' The eigenvalues are in \code{result$eig}.
 #' @references
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
@@ -71,13 +74,12 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
     #options_iter$k <- 1.5 * options_iter$k
     #options_iter$mA <- 0
 
-    while(iaxis < n_axes|| var(smooth_PRC1$X[,iaxis]) > 1.0e-2*val1){
+    while(iaxis < n_axes && var(smooth_PRC1$X[,iaxis]) > 1.0e-2*val1){
       smooth_PRC2 <- smoothPRC2(smooth_PRC_axis1 = smooth_PRC1,
                              options_iter =  options_iter)
       smooth_PRC1 <- smooth_PRC2
       iaxis <- iaxis+1
     }
-
-
+    smooth_PRC2$eig <- ncol(Y)* apply(smooth_PRC2$X,2, var)
   return(smooth_PRC2)
 }
