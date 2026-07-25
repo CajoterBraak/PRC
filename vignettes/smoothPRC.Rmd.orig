@@ -12,10 +12,14 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
 
-
-
-``` r
+```{r setup}
 library(PRC)
 ```
 
@@ -110,8 +114,7 @@ By default, all scores are rescaled such that the mean square of the species sco
 
 The example uses the data from the chlorpyrifos experiment [@vandenBrink1999PRC] available in the `vegan` package, with the design of the expriment: 12 cosms with 5 treatments inclusing the control (no chlorpyrifos) measured at 11 time points. The names `Time` and `Treatment` are expected in `smoothPRC`.
 
-
-``` r
+```{r pyrifosdata}
 #the chlorpyrifos experiment from van den Brink & ter Braak 1999
 data(pyrifos, package = "vegan") #log-transformed species data from package vegan
 Y <- pyrifos
@@ -122,50 +125,24 @@ Design <- data.frame(Time=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 1
 
 The default model is set up by:
 
-
-``` r
+```{r setup2}
 library(LMMsolver)
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 ```
 
 The model specifications for the null model and alternative models are: 
 
-
-``` r
+```{r models}
 smoothPRC_model$splineH0
-#> ~spl1D(time, nseg = 6, degree = 3, pord = 2)
-#> <environment: 0x0000015a6e220e78>
 smoothPRC_model$spline
-#> ~spl2D(time, dose, nseg = c(6, 6), degree = 3, pord = 2)
-#> <environment: 0x0000015a6e220e78>
 ```
 
 The null model is a spline function of time only, whereas the alternative model uses a two-dimensional spline model in `time` and `dose`. The `time` variable is the quantitative version of the variable `Time` in the `Design`.The `dose` variable the quantitative version of the variable `Treatment` with `dose` is set to 0 pre-application (negative times by default and, in general, times before `start_time`.
 
-
-``` r
+```{r run}
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj[[1]])
-#> Table with effective dimensions and penalties: 
-#> 
-#>             Term Effective Model Nominal Ratio Penalty
-#>      (Intercept)      1.00     1       1  1.00    0.00
-#>  lin(time, dose)      3.00     3       3  1.00    0.00
-#>          s(time)     11.38    81      77  0.15    0.24
-#>          s(dose)      4.43    81      77  0.06    0.05
-#>         residual    112.19   132     128  0.88    0.30
-#> 
-#>  Total Effective Dimension: 132
 summary(smooth_PRC$objH0[[1]])
-#> Table with effective dimensions and penalties: 
-#> 
-#>         Term Effective Model Nominal Ratio Penalty
-#>  (Intercept)      1.00     1       1  1.00    0.00
-#>    lin(time)      1.00     1       1  1.00    0.00
-#>      s(time)      0.86     9       7  0.12  121.17
-#>     residual    129.14   132     130  0.99    0.03
-#> 
-#>  Total Effective Dimension: 132
 ```
 
 
@@ -173,8 +150,7 @@ summary(smooth_PRC$objH0[[1]])
 
 
 
-
-``` r
+```{r classicalPRC}
 classical_PRC_model <- set_smoothPRC_model(
   fixed= Yb ~ Treatment:Time,
   fixedH0 = Yb ~Time,
@@ -183,70 +159,27 @@ classical_PRC_model <- set_smoothPRC_model(
   data = Design)
 classical_PRC <- smoothPRC(Y, lmm_model = classical_PRC_model, n_axes = 1)
 summary(classical_PRC$obj[[1]])
-#> Table with effective dimensions and penalties: 
-#> 
-#>            Term Effective Model Nominal Ratio Penalty
-#>     (Intercept)         1     1       1     1    0.00
-#>  Treatment:Time        54    54      54     1    0.00
-#>        residual        77   132      77     1    0.32
-#> 
-#>  Total Effective Dimension: 132
 summary(classical_PRC$objH0[[1]])
-#> Table with effective dimensions and penalties: 
-#> 
-#>         Term Effective Model Nominal Ratio Penalty
-#>  (Intercept)         1     1       1     1    0.00
-#>         Time        10    10      10     1    0.00
-#>     residual       121   132     121     1    0.03
-#> 
-#>  Total Effective Dimension: 132
 ```
 
 Classical PRC is obtained by:
-
-``` r
+```{r mod_PRC, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
 mod_prc <- doPRC(pyrifos ~ Treatment:Time + Condition(Time),  data = Design)
-#> 
-#> Some constraints or conditions were aliased because they were redundant. This can
-#> happen if terms are constant or linearly dependent (collinear):
-#> 'Treatment44:Time-4', 'Treatment44:Time-1', 'Treatment44:Time0.1',
-#> 'Treatment44:Time1', 'Treatment44:Time2', 'Treatment44:Time4',
-#> 'Treatment44:Time8', 'Treatment44:Time12', 'Treatment44:Time15',
-#> 'Treatment44:Time19', 'Treatment44:Time24'
 ```
 
-The absolute correlation between the last two PRC models is 1, whereas the correlation between the smooth and classical PRC models is 0.97, 0.12
+The absolute correlation between the last two PRC models is `r round( abs(cor(mod_prc$PRCplus$PRC1, classical_PRC$PRC)), 6)`, whereas the correlation between the smooth and classical PRC models is `r round(abs(cor(smooth_PRC$PRC, classical_PRC$PRC)),2)`
 
 Here is the PRC diagram showing both models with species scores of the smooth version.
 
-
-``` r
+```{r plot_smooth, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
 plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
-#> 122  species with names out of 178 species
 ```
-
-<div class="figure" style="text-align: center">
-<img src="figure/plot_smooth-1.png" alt="plot of chunk plot_smooth" width="100%" />
-<p class="caption">plot of chunk plot_smooth</p>
-</div>
 
 Here is the plot for classical PRC via the plotting function of `smoothPRC`:
 
-
-``` r
+```{r mod_PRC2, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
 plotsmoothPRC(classical_PRC, flip = TRUE, title ="Classical PRC via smoothPRC")
-#> 28  species with names out of 178 species
-```
-
-<div class="figure" style="text-align: center">
-<img src="figure/mod_PRC2-1.png" alt="plot of chunk mod_PRC2" width="100%" />
-<p class="caption">plot of chunk mod_PRC2</p>
-</div>
-
-``` r
 classical_PRC$eig/mod_prc$CCA$eig[seq_along(classical_PRC$eig)]
-#> X1 
-#>  1
 ```
 
 The first two eigenvalues agree up to numerical precision and the solid lines for smooth PRC overlay the dotted lines of classical PRC, illustrating that smooth PRC can reproduce the outcome of a classical PRC and thus is a real extension of classical PRC.
