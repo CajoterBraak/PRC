@@ -141,8 +141,8 @@ The null model is a spline function of time only, whereas the alternative model 
 
 ```{r run}
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(smooth_PRC$obj)
-summary(smooth_PRC$objH0)
+summary(smooth_PRC$obj[[1]])
+summary(smooth_PRC$objH0[[1]])
 ```
 
 
@@ -157,9 +157,9 @@ classical_PRC_model <- set_smoothPRC_model(
   spline = NULL,
   splineH0 = NULL,
   data = Design)
-classical_PRC <- smoothPRC(Y, lmm_model = classical_PRC_model)
-summary(classical_PRC$obj)
-summary(classical_PRC$objH0)
+classical_PRC <- smoothPRC(Y, lmm_model = classical_PRC_model, n_axes = 1)
+summary(classical_PRC$obj[[1]])
+summary(classical_PRC$objH0[[1]])
 ```
 
 Classical PRC is obtained by:
@@ -175,8 +175,13 @@ Here is the PRC diagram showing both models with species scores of the smooth ve
 plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
 ```
 
+Here is the plot for classical PRC via the plotting function of `smoothPRC`:
 
+```{r mod_PRC2, fig.width=10, fig.height=5, out.width='100%', fig.align='center'}
+plotsmoothPRC(classical_PRC, flip = TRUE, threshold = 1, title ="Classical PRC via smoothPRC")
+```
 
+The solid lines for smooth PRC overlay the dotted lines of classical PRC, illustrating that smooth PRC can reproduce the outcome of a classical PRC and thus is a real extension of classical PRC.
 
 
 # References
