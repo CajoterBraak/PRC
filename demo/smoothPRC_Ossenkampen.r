@@ -42,8 +42,8 @@ smoothPRC_model$fixed
 smoothPRC_model$spline
 
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(smooth_PRC$obj)
+summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,1], b_mod_prc)
 
 
-plotsmoothPRC(smooth_PRC, flip = TRUE, threshold = 1)
+plotsmoothPRC(smooth_PRC, flip = TRUE)

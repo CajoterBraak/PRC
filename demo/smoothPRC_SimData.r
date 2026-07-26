@@ -42,7 +42,7 @@ summary(mod_prc)
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
 smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
-summary(smooth_PRC$obj)
+summary(smooth_PRC$obj[[1]])
 (cc <- cor(smooth_PRC$B[,1], b_mod_prc))
 plot_species_scores_bk(-smooth_PRC$B, scoresname = "B1")
 plot_species_scores_bk(b_mod_prc)
