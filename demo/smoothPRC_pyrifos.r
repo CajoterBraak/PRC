@@ -16,11 +16,6 @@ Design <- data.frame(Time=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 1
                      Treatment=factor(rep(c(0.1, 0, 0, 0.9, 0, 44, 6, 0.1, 44, 0.9, 0, 6), 11)),
                      cosm = gl(12, 1, length=132))
 mod_prc <- doPRC(pyrifos ~ Treatment:Time + Condition(Time),  data = Design)
-cntr <- how(plots = Plots(strata =Design$cosm,type = "free"),
-            within = Within(type = "none"), nperm = 99)
-
-anova(mod_prc, permutations = cntr)
-
 
 b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
@@ -30,24 +25,19 @@ smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
 summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,"B1"], b_mod_prc)
 
-cntr$nperm <- 19
-an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
-an$pval
-
 #graph
-plot_species_scores_bk(smooth_PRC$B, threshold = 20, scoresname = "B1")
-plot_smoothPRC_cdt(smooth_PRC,flip = FALSE,sample_times_only = TRUE)
-
 plotPRC(mod_prc)
-plotsmoothPRC(smooth_PRC, flip = FALSE, threshold = 1)
+plotsmoothPRC(smooth_PRC, flip = FALSE)
 
-# illustration that smoothPRC extends doPRC
-classical_PRC_model <- set_smoothPRC_model(
-  fixed= Yb ~ Treatment:Time,
-  fixedH0 = Yb ~Time,
-  spline = NULL,
-  splineH0 = NULL,
-  data = Design)
-classical_PRC <- smoothPRC(Y, lmm_model = classical_PRC_model)
-plotsmoothPRC(classical_PRC, flip = FALSE, threshold = 1, title ="Classical PRC via smoothPRC")
-# the dotted and solid lines overlap
+# the anova of a smoothPRC takes some time to run,
+# replace 0 to 1 in the next line to run it:
+if (0){
+  cntr <- how(plots = Plots(strata =Design$cosm,type = "free"),
+              within = Within(type = "none"), nperm = 19)
+  set.seed(123)
+  anova(mod_prc, permutations = cntr)
+  set.seed(123)
+  an <- anova(smooth_PRC, permutations = cntr, verbose = TRUE)
+  # the warning is from LMMsolve on a permuted data set
+}
+
