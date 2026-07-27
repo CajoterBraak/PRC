@@ -20,7 +20,7 @@
 #' @param flip logical. Should the axis be reversed?
 #' Default \code{FALSE}. Can be numeric with -1 meaning: reverse, and 1 meaning
 #' do not reverse.
-#' @example demo/smoothPRC_pyrifos.r
+#' @example demo/smoothPRC_SimData.r
 #' @importFrom stats cor relevel
 #' @importFrom ggplot2 ggplot aes geom_line geom_point
 #' @importFrom ggplot2 scale_colour_brewer scale_linetype_manual
@@ -51,7 +51,7 @@ plot_smoothPRC_cdt <- function(object,
   smooth_prc_df <- data.frame(
     Time = object$lmm_model$data$time,
     PRCsmooth = flip * object$PRC[,axis],
-    PRCstar = flip * object$PRCstar[,axis],
+    PRC_star = flip * object$PRC_star[,axis],
     PRCclassical = sign(cc) * flip * mod_prc$PRCplus[,paste0("PRC",axis)],
     Treatment = object$lmm_model$data$Treatment
   )
@@ -180,7 +180,7 @@ plot_smoothPRC_cdt <- function(object,
 
     p1 <- p1 +
       geom_point(
-        aes(y = .data$PRCstar),
+        aes(y = .data$PRC_star),
         size = 1.8,
         colour = "grey50"
       )

@@ -25,7 +25,7 @@ plotsmoothPRC <- function(
     title = NULL,
     left = "Treatment curves",
     right = "taxon scores",
-    threshold = 14,
+    threshold = 7,
     y_lab_interval = 0.5,
     speciesname = NULL,
     selectname = "Fratio",

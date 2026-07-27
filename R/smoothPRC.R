@@ -49,10 +49,49 @@
 #' result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
 #' are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
 #' with \code{fitted(result$obj)}.
-#' Note that \code{Yb} is the response in
+#' Note that \code{Yb}, a column in \code{YB}, is the response in
 #' \code{\link[LMMsolver]{LMMsolve}} model.
+#' The \code{Fratio1},\code{Fratio2}, etc. in the species scores matrix
+#' \code{result$B} are computed with linear model \code{y~Time +X}, with
+#' \code{y}  a species response in \code{Y},
+#' \code{Time} the factor in \code{data} in
+#' \code{\link{set_smoothPRC_model}} and
+#' \code{X} the smooth eigenvectors
+#' of which the first \emph{r} are used for calculating \code{Fratio}\emph{r}.
 #' @return A list.
-#' The eigenvalues are in \code{result$eig}.
+#' \describe{
+#' \item{eig}{eigenvalues.}
+#' \item{B}{matrix with response variable (species) scores \code{B}'s
+#' with \code{Fratio}'s with attached axis number, e.g. \code{B1}.}
+#' \item{X}{matrix with the eigen vectors
+#' (i.e. the constrained sample scores) in columns.}
+#' \item{X_star}{matrix with the unconstrained sample scores.}
+#' \item{PRC}{obtained from \code{X}, by subtraction of the score for
+#' the reference treatment, so that all scores for the reference
+#' treatment are 0.}
+#' \item{PRC_star}{obtained from \code{X_star} as \code{PRC} is from \code{X}.
+#' These are the sample points in the PRC diagram.}
+#' \item{mult}{multiplier for re-scaling the species and sample scores.
+#' The value is \code{sqrt(ncol(Y))} as the default, giving a mean square of 1
+#' of the species scores.}
+#' \item{eig}{eigenvalues.}
+#' \item{obj}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects,
+#'  one for each axis.}
+#' \item{objH0}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects
+#'  of the null model, one for each axis.}
+#' \item{iter}{the number of iterations of the accelerated power algorithm.}
+#' \item{Y}{the response matrix.}
+#' \item{YB}{matrix with the response vectors, one for each axis.
+#' These are the response \code{Yb} in the call to
+#' \code{\link[LMMsolver]{LMMsolve}}.}
+#' \item{lmm_model}{copy of the \code{lmm_model} argument to the
+#' \code{smoothPRC}.}
+#' \item{options_iter}{copy of the \code{opions_iter} argument
+#'  to the \code{smoothPRC}.}
+#' \item{axes}{an internal matrix: previous axes and optionally covariates,
+#' but with an extra constant vector.}
+#' \item{eig}{eigenvalues.}
+#' }
 #' @references
 #' Boer, Martin P. 2023.
 #' Tensor Product P-Splines Using a Sparse Mixed Model Formulation.
@@ -81,5 +120,8 @@ smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
       iaxis <- iaxis+1
     }
     smooth_PRC1$eig <- ncol(Y)* apply(smooth_PRC1$X,2, var)
+    names(smooth_PRC1$obj) <-names(smooth_PRC1$objH0) <-
+      paste0("axis",seq_along(smooth_PRC1$obj))
+    smooth_PRC1$B <- cbind(smooth_PRC1$B,fFratios_Time_X(smooth_PRC1))
   return(smooth_PRC1)
 }

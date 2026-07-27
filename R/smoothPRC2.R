@@ -34,7 +34,7 @@ smoothPRC2 <- function(smooth_PRC_axis1,
     colnames(axes) <- paste0(nam, 1:ncol(axes))
     return(axes)
   }
-  for (nam in c("B", "X",   "X_star", "PRC", "PRCstar", "YB")) {
+  for (nam in c("B", "X",   "X_star", "PRC", "PRC_star", "YB")) {
     smooth_PRC2[[nam]] <- addaxis(nam)
   }
   smooth_PRC2$obj <- c(smooth_PRC_axis1$obj,  smooth_PRC2$obj)

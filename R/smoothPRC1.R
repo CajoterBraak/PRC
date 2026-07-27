@@ -175,19 +175,19 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
   }
   PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
   obj$Yb <- Yb
-  PRCstar <-  get_PRCstar(obj, dat0 = lmm_model$dat0)
+  PRC_star <-  get_PRC_star(obj, dat0 = lmm_model$dat0)
   if (lmm_model$scaling =="ms") mult <- sqrt(length(b))else mult <- 1
-  B <- as.matrix(b);colnames(B)<- "RDA1";rownames(B) <- colnames(Y)
+  B <- as.matrix(b);colnames(B)<- "B1";rownames(B) <- colnames(Y)
   axes <- cbind(axes, xhat);
   colnames(axes)[ncol(axes)] <- paste0("RDA", ncol(axes)-1)
   out <-list(B = B*mult,
              X = xhat/mult,
              X_star = qr.resid(qr_prev_axes, (Yb - fitted(objH0)) )/mult,
-             PRC = PRC/mult, PRCstar = PRCstar/mult, mult = mult,
+             PRC = PRC/mult, PRC_star = PRC_star/mult, mult = mult,
              obj = obj, objH0=objH0, iter = iter, Y= Y, YB=Yb,
              lmm_model = lmm_model,options_iter = options_iter,
              axes = axes)
-  for (nam in c("B", "X",   "X_star", "PRC", "PRCstar", "YB")) {
+  for (nam in c("B", "X",   "X_star", "PRC", "PRC_star", "YB")) {
     out[[nam]] <- as.matrix(out[[nam]])
     colnames(out[[nam]]) <- paste0(nam,1:ncol(out[[nam]]))
   }
@@ -208,10 +208,10 @@ get_PRC <-function(obj,dat0=NULL){
 }
 #' @noRd
 #' @keywords internal
-get_PRCstar <-function(obj,dat0=NULL){
+get_PRC_star <-function(obj,dat0=NULL){
   # full fitted values
   pred0 <- predict(obj, newdata = dat0)
-  PRCstar <- obj$Yb - pred0$ypred # only the deviations from the control
+  PRC_star <- obj$Yb - pred0$ypred # only the deviations from the control
   #xmean <-  - mean(xhat)
-  return(PRCstar)
+  return(PRC_star)
 }

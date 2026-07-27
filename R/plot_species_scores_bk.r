@@ -38,13 +38,15 @@
 #' The absolute value of the criterion values is taken before selection, so
 #' that also the species scores of the ordination can serve as a criterion
 #' (e.g. \code{selectname = "RDA1"}). The function has been copied from
-#' the \code{PRC} package at \url{https://github.com/CajoterBraak/PRC}.
+#' the \code{douconca } package at
+#' \url{https://cran.r-project.org/web/packages/douconca}.
 #'
-#' The function is used in \code{\link{plotPRC}}.
+#' The function is used in \code{\link{plotPRC}}
+#' and \code{\link{plotsmoothPRC}}.
 #'
 #' @returns a ggplot object
 #'
-#' @example demo/smoothPRC_pyrifos.r
+#' @example demo/smoothPRC_SimData.r
 #'
 #' @export
 plot_species_scores_bk <- function(species_scores,
