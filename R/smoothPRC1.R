@@ -97,7 +97,7 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
 
       # latent response
       Yb <- as.numeric(Y %*% b)
-
+      Yb <- qr.resid(qr_prev_axes, Yb)
       # spline fit
       obj <- LMMsolve(fixed = lmm_model$fixed,
                            spline = lmm_model$spline,
