@@ -74,7 +74,6 @@
 #' \item{mult}{multiplier for re-scaling the species and sample scores.
 #' The value is \code{sqrt(ncol(Y))} as the default, giving a mean square of 1
 #' of the species scores.}
-#' \item{eig}{eigenvalues.}
 #' \item{obj}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects,
 #'  one for each axis.}
 #' \item{objH0}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects
@@ -90,7 +89,6 @@
 #'  to the \code{smoothPRC}.}
 #' \item{axes}{an internal matrix: previous axes and optionally covariates,
 #' but with an extra constant vector.}
-#' \item{eig}{eigenvalues.}
 #' }
 #' @references
 #' Boer, Martin P. 2023.
