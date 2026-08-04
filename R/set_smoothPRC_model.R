@@ -106,7 +106,7 @@ set_smoothPRC_model <-
     data$Treatment <- relevel(data$Treatment,ref = referencelevel)
     valsTime<- PRC::fvalues4levels(data, "Time")
     data$time <- valsTime[data$Time] - start_time
-    valsTreatment<- PRC::fvalues4levels(data, "Treatment")
+    valsTreatment<- fvalues4levels(data, "Treatment")
     if (all(valsTreatment == seq_along(valsTreatment))) valsTreatment <- valsTreatment-1
     data$dose <- valsTreatment[data$Treatment]
     data$dose  <- ifelse(data$time>0, data$dose, 0)
@@ -140,9 +140,11 @@ set_smoothPRC_model <-
     }
 
     out <- list(spline,splineH0,fixed, fixedH0, random, residual,
-                weights, scaling, as.data.frame(dat0), as.data.frame(data))
+                weights, scaling, as.data.frame(dat0), as.data.frame(data),
+                treatment.level.as.quantity)
     names(out) = c("spline","splineH0","fixed","fixedH0", "random", "residual",
-                   "weights","scaling", "dat0","data")
+                   "weights","scaling", "dat0","data",
+                   "treatment.level.as.quantity")
     return(out)
   }
 

@@ -39,7 +39,14 @@ plot_smoothPRC_cdt <- function(object,
 {
   # sampled time points only-----
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
-
+  if (object$lmm_model$treatment.level.as.quantity){
+    ldose <- fvalues4levels(object$lmm_model$data, "Treatment")
+    if (any((1000*ldose - floor(1000*ldose))>0)){
+      # more than 3 decimals in ldose
+      #ldose <-
+      levels(object$lmm_model$data$Treatment) <-signif(ldose, digits = 2)
+    }
+  }
   if (is.null(mod_prc))
     suppressMessages(
       mod_prc <- doPRC(
