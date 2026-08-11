@@ -1,3 +1,10 @@
+# PRC 2.0.3 
+
+* Adds the CCA-based version to smoothPRC.
+
+* Adds an option to smoothPRC for user-defined covariates.
+
+
 # PRC 2.0.2
 
 * smoothPRC can now extract more than a single axis. The names in smoothPRC 
