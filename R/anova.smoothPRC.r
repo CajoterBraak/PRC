@@ -15,8 +15,10 @@
 #' @export
 anova.smoothPRC <- function(object,
                             ...,
-                            permutations = 19, verbose = FALSE) {
+                            permutations = 19, verbose = TRUE) {
   #object from smoothPRC
+  axes <- object$axes[,1:object$n_,drop = FALSE] # all covariates with intercept
+  qr_prev_axes <- qr(axes*object$weights$sqrtR)
   Fstat0 <- test_stat_prc(object)
   # code
   if (inherits(permutations, c("numeric", "how", "matrix"))) {
@@ -60,7 +62,11 @@ anova.smoothPRC <- function(object,
     #  object$lmm_mode$dat0[,cov_nams] <-  object$lmm_mode$dat0[permii, cov_nams]
     # }
     outii <- smoothPRC1(Yii, lmm_model= object$lmm_model,
-                                 options_iter = object$options_iter)
+                            options_iter = object$options_iter,
+                            weights = object$weights,
+                            axes = NULL,
+                            qr_prev_axes = qr_prev_axes
+                        )
     objH1.list[[ii]]<- outii$obj
     objH0.list[[ii]]<- outii$objH0
     iter[ii] <- outii$iter
@@ -83,8 +89,8 @@ test_stat_prc <- function(out, ax = 1){
   df.resH1<-  fEDdf_res(out$obj[[ax]])
   #SSnum <-sum(fit_H1^2) - sum(fit_H0^2)
   # RSS.H0- RSS.H1
-  RSS.H1 <- sum((out$YB[,ax] - fitted(out$obj[[ax]]))^2)
-  SSnum <- sum((out$YB[,ax]- fitted(out$objH0[[ax]]))^2) - RSS.H1
+  RSS.H1 <- sum(out$weights$R*(out$YB[,ax] - fitted(out$obj[[ax]]))^2)
+  SSnum <- sum(out$weights$R*(out$YB[,ax]- fitted(out$objH0[[ax]]))^2) - RSS.H1
   MSnum <- SSnum/(fEDdf_res(out$objH0[[ax]])-df.resH1)
   MSden <- RSS.H1 /df.resH1
   Fratio <- MSnum/MSden

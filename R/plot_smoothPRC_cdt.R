@@ -39,18 +39,11 @@ plot_smoothPRC_cdt <- function(object,
 {
   # sampled time points only-----
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
-  if (object$lmm_model$treatment.level.as.quantity){
-    ldose <- fvalues4levels(object$lmm_model$data, "Treatment")
-    if (any((1000*ldose - floor(1000*ldose))>0)){
-      # more than 3 decimals in ldose
-      #ldose <-
-      levels(object$lmm_model$data$Treatment) <-signif(ldose, digits = 2)
-    }
-  }
   if (is.null(mod_prc))
     suppressMessages(
       mod_prc <- doPRC(
         object$Y ~ Treatment:Time + Condition(Time),
+        method = object$lmm_model$method,
         data = object$lmm_model$data
       )
     )
@@ -119,6 +112,7 @@ plot_smoothPRC_cdt <- function(object,
     newdat <- cbind(newdat, avdat)
     }
     newdat1 <- newdat
+
     pred1 <- predict(object$obj[[axis]], newdata = newdat)
 
     # sets LMMsolver_model with response in formulafixed and data : Design

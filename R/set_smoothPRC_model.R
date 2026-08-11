@@ -14,16 +14,16 @@
 #' The default is \code{Yb~1}.
 #' @param start_time numeric time of the start of the treatment application.
 #' Default: \code{0}.
-#' @param treatment.level.as.quantity logical. Default \code{TRUE} for an
-#' analysis using a 2d spline. If \code{FALSE}, the default spline model is
-#' replaced by default to one containing 1d splines, one 1d-spline for each
-#' level.
+#' @param treatment.coding logical. Default \code{TRUE} for a quantitative
+#' analysis using a 2d spline. If \code{FALSE}, for a qualitative analysis in
+#' in which the default spline model is replaced by default to one
+#' containing 1d splines, one 1d-spline for each level.
 #' @param pord named integer vector of the difference order of the
 #' spline penalty.
 #' Default: \code{c(time =2, dose= 2, time.overall= 3, Treatment = 2)},
 #' where the first two orders are used only with
-#'  \code{treatment.level.as.quantity} is \code{TRUE}
-#'  and the last two with  \code{treatment.level.as.quantity} is \code{FALSE}.
+#'  \code{treatment.coding} is \code{TRUE}
+#'  and the last two with  \code{treatment.coding} is \code{FALSE}.
 #' @param nseg named integer vector of number of segments in P-splines,
 #' can be large.
 #'  Default \code{ c(time = 6, dose = 6)}.
@@ -55,21 +55,21 @@
 #'  quantitative variable), the function generates variables with
 #'  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
 #'  treatments beyond the reference treatment,
-#'  if \code{treatment.level.as.quantity} is \code{FALSE}.
+#'  if \code{treatment.coding} is \code{FALSE}.
 #'  These variables generated in the function, contain the time
 #'  since the start of the experiment for each treatment.
 #'  \code{D1, D2, ...} should therefore not be variable names in \code{data},
 #'  nor should \code{time} or \code{dose} be variable names
 #'  in \code{data}; these are reserved names in \code{smoothPRC}.
 #'  An example of the formula for \code{spline}
-#'  when \code{treatment.level.as.quantity} is \code{FALSE}
+#'  when \code{treatment.coding} is \code{FALSE}
 #'  and the number of levels of \code{Treatment} is 4,  is
 #'  \code{spl1D(time, nseg =6, degree = 3, pord = 3)+
 #'  spl1D(D1, nseg = 6, degree = 3, pord = 2)+
 #'  spl1D(D2, nseg = 6, degree = 3, pord = 2)+
 #'  spl1D(D3, nseg = 6, degree = 3, pord = 2)}.
 #'  This is the default model
-#'  if \code{treatment.level.as.quantity} is \code{FALSE}.
+#'  if \code{treatment.coding} is \code{FALSE}.
 #' The default spline model assumes that the Treatment factor has a quantitative
 #' basis, so that the response to Time and Treatment can be analyzed using a
 #' 2D spline model.
@@ -84,12 +84,13 @@ set_smoothPRC_model <-
            fixed = Yb ~ 1,
            fixedH0= fixed,
            random = NULL, residual = NULL, weights= NULL,
-           treatment.level.as.quantity = TRUE,
+           treatment.coding = TRUE,
            pord = c(time = 2, dose = 2, time.overall = 3, Treatment = 2),
            nseg =  c(time = 6, dose = 6),
            degree =3,
            start_time = 0,
            referencelevel = NULL,
+           method = "rda",
            scaling = "ms",
            data){
     #data with Time and Treatment as factors, modified here to quantitative time and dose
@@ -108,9 +109,16 @@ set_smoothPRC_model <-
     data$time <- valsTime[data$Time] - start_time
     valsTreatment<- fvalues4levels(data, "Treatment")
     if (all(valsTreatment == seq_along(valsTreatment))) valsTreatment <- valsTreatment-1
+
+    if (any((100000*valsTreatment - floor(100000*valsTreatment))>0)){
+      # more than 5 decimals in dose (valsTreatment); truncate to 3
+      valsTreatment<-signif(valsTreatment, digits = 3)
+      levels(data$Treatment) <-valsTreatment
+    }
+
     data$dose <- valsTreatment[data$Treatment]
     data$dose  <- ifelse(data$time>0, data$dose, 0)
-    if (!treatment.level.as.quantity) {
+    if (!treatment.coding) {
       datI <- model.matrix(~ time + Treatment:time, data = data)[,-c(1,2)]
 
       datI <- as.data.frame(datI)
@@ -141,10 +149,10 @@ set_smoothPRC_model <-
 
     out <- list(spline,splineH0,fixed, fixedH0, random, residual,
                 weights, scaling, as.data.frame(dat0), as.data.frame(data),
-                treatment.level.as.quantity)
+                treatment.coding, method)
     names(out) = c("spline","splineH0","fixed","fixedH0", "random", "residual",
                    "weights","scaling", "dat0","data",
-                   "treatment.level.as.quantity")
+                   "treatment.coding", "method")
     return(out)
   }
 

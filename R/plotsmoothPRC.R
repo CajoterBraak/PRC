@@ -33,7 +33,7 @@ plotsmoothPRC <- function(
     verbose = TRUE)
 {
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
-  if (object$lmm_model$treatment.level.as.quantity){
+  if (object$lmm_model$treatment.coding){
 
   }
   pl.cdt1 <- plot_smoothPRC_cdt(

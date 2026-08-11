@@ -12,7 +12,14 @@
 #' \item \code{tol}: stopping criterion, tolarance. Default \code{1e-8}.
 #' \item \code{maxiter}:maximum number of iterations. Default \code{50}.
 #' }
+#' @param formula_covariates one-sided formula with covariates that the model needs to
+#' adjust for. Default \code{NULL}, resulting in \code{~1}.
+#' The formula specifies what is called  the \code{Condition}in \code{vegan},
+#' covariates in \code{Canoco} and covariables in ter Braak & Prentice (1988).
 #' @param n_axes the number of axes to extract. Default \code{2}.
+#' @param weights a list of user-defined weights for columns (species) first
+#'  and, second, rows (sites) Default \code{NULL} for method-defined weights,
+#'  e.g. row totals of \code{Y} in CCA, and uniform weights in RDA.
 #' @details
 #' An atypical aspect of the function is that the time and treatment factors
 #' need to have the names Time and Treatment in \code{data}.
@@ -72,8 +79,12 @@
 #' \item{PRC_star}{obtained from \code{X_star} as \code{PRC} is from \code{X}.
 #' These are the sample points in the PRC diagram.}
 #' \item{mult}{multiplier for re-scaling the species and sample scores.
-#' The value is \code{sqrt(ncol(Y))} as the default, giving a mean square of 1
+#' The value is 1 as the default currently, giving a mean square of 1
 #' of the species scores.}
+#' \item{weights}{names list of columns weights and row weights. Names are
+#' \code{K}, \code{R}, \code{sqrtK}, \code{sqrtR}. The first two are
+#' column (species) and row (site)totals in with \code{method != "rda"}.
+#' They not normalized; none sums to 1. All 1 in \code{method =="rda"}}.
 #' \item{obj}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects,
 #'  one for each axis.}
 #' \item{objH0}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects
@@ -87,8 +98,10 @@
 #' \code{smoothPRC}.}
 #' \item{options_iter}{copy of the \code{opions_iter} argument
 #'  to the \code{smoothPRC}.}
-#' \item{axes}{an internal matrix: previous axes and optionally covariates,
-#' but with an extra constant vector.}
+#' \item{axes}{an internal matrix: Intercept, optionally covariates and
+#'  previous axes.}
+#' \item{n_covariates}{the number of user-defined covariates using
+#' \code{formula_covariates} with one for the \code{"(Intercept)"}.}
 #' }
 #' @references
 #' Boer, Martin P. 2023.
@@ -97,29 +110,60 @@
 #' \doi{10.1177/1471082X231178591}
 #' @importFrom stats var
 #' @export
-smoothPRC <- function(Y, lmm_model, options_iter = list(b_init =NULL,
-                                                        k = 3, mA = 4,
-                                                        tol = 1e-8, maxiter = 50), n_axes = 2) {
+smoothPRC <- function(Y, lmm_model,
+                      options_iter = list(b_init =NULL,
+                                          k = 3, mA = 4,
+                                          tol = 1e-8, maxiter = 50),
+                      n_axes = 2,
+                      formula_covariates = NULL,
+                      weights = NULL) {
 
 
-  smooth_PRC1 <- smoothPRC1(Y            = Y,
+   if (is.null(formula_covariates)) formula_covariates <- ~1
+   covariate_data <- model.matrix(formula_covariates, data = lmm_model$data)
+   n_covariates <- ncol(covariate_data)
+   axes<- covariate_data # cbind(covariate_data ,axes)
+   weights1 <- set_weights(Y, lmm_model$method)
+   if (is.null(weights)){
+     weights <- weights1
+   } else {
+     if (length(weights)<2)stop("ERROR: weights must be a list of species and",
+    "site weigths")
+     weights <- c(weights, vector("list",2))
+     for (k in 1:2){
+       if (!is.null(weights[[k]])) {
+         if (!length(weights[[k]])==length(weights1[[k]])) stop(
+           c("species", "sites")[k], "-weights must",
+         " be of the same length as the number of ",  c("species", "sites")[k],
+         ".\nwhich is ", c(rev(dim(Y)))[k],
+         ".\n Note that, in the weights list, species weights come first,",
+         " site weights second.")
+         weights[[k]]<-  weights[[k+2]] <- weights[[k]]*weights1[[k]]
+         weights[[k+2]]<- sqrt(weights[[k+2]]/ sum(weights[[k+2]]))
+       }
+     }
+     names(weights)<- names(weights1)
+   }
+   smooth_PRC1 <- smoothPRC1(Y            = Y,
                             lmm_model    = lmm_model,
                             options_iter = options_iter,
-                            axes         = NULL)
-    iaxis = 1
-    val1  <-var(smooth_PRC1$X[,iaxis])
-    #options_iter$k <- 1.5 * options_iter$k
-    #options_iter$mA <- 0
+                            weights = weights,
+                            axes         = axes,
+                            n_covariates =  n_covariates )
 
-    while(iaxis < n_axes && var(smooth_PRC1$X[,iaxis]) > 1.0e-2*val1){
+    iaxis = 1
+
+    while(iaxis < n_axes && smooth_PRC1[iaxis] > 1.0e-2*smooth_PRC1$eig[1]){
       smooth_PRC2 <- smoothPRC2(smooth_PRC_axis1 = smooth_PRC1,
                              options_iter =  options_iter)
       smooth_PRC1 <- smooth_PRC2
       iaxis <- iaxis+1
     }
-    smooth_PRC1$eig <- ncol(Y)* apply(smooth_PRC1$X,2, var)
+    #smooth_PRC1$eig <- ncol(Y)* apply(smooth_PRC1$X,2, var)
     names(smooth_PRC1$obj) <-names(smooth_PRC1$objH0) <-
       paste0("axis",seq_along(smooth_PRC1$obj))
-    smooth_PRC1$B <- cbind(smooth_PRC1$B,fFratios_Time_X(smooth_PRC1))
+    if(smooth_PRC1$lmm_model$method == "rda"){
+      smooth_PRC1$B <- cbind(smooth_PRC1$B,fFratios_Time_X(smooth_PRC1))
+    }
   return(smooth_PRC1)
 }

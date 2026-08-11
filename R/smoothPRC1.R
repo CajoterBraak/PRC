@@ -62,21 +62,26 @@
 smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
                                                         k = 3, mA = 4,
                                                         tol = 1e-8, maxiter = 50),
-                       axes=NULL) {
-  normalizeb <- function(b){b/sqrt(sum(b^2))  }
-  if (is.null(axes)) axes <- rep(1,nrow(Y))
-  qr_prev_axes <- qr(axes)
+                       weights= NULL,
+                       qr_prev_axes = NULL,
+                       axes=NULL,
+                       n_covariates = 1
+                       ) {
   if (!spam::is.spam(Y)) Y <- as.matrix(Y)
-#  TSS_Y<-sum(Y^2) - sum(nrow(Y)*colMeans(Y)^2)
-#  Y<-Y/sqrt(TSS_Y)
-  if (mean(Y>.Machine$double.eps) < 0.10 ) Y <- spam::as.spam(Y)
   n <- nrow(Y)
   m <- ncol(Y)
+  if (is.null(weights)) weights <- set_weights(Y, lmm_model$method)
+  #sqrtR <- weights$sqrtR; sqrtK <- weights$sqrtK
+  if (mean(Y>.Machine$double.eps) < 0.10 ) Y <- spam::as.spam(Y)
+
+  if (is.null(qr_prev_axes)) qr_prev_axes <- qr(axes*weights$sqrtR)
+
+  normalizeb <- function(b, sqrtw=1){b/sqrt(sum((sqrtw*b)^2))  }
 
   # initial b
   if (is.null(options_iter$b_init)) b <- rnorm(m) else b <- options_iter$b_init
   objH0 <- NULL
-  b <- normalizeb(b)
+  b <- normalizeb(b, sqrtw = weights$sqrtK)
 
   # Anderson history
   b_hist <- list()
@@ -84,10 +89,6 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
 
   # block-power buffer
   Xblock <- matrix(0, n, options_iter$k)
-  Y <- as.matrix(Y)
-
-
-
   for (iter in 1:options_iter$maxiter) {
 
     b_old <- b
@@ -96,35 +97,47 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
     for (j in 1:options_iter$k) {
 
       # latent response
-      Yb <- as.numeric(Y %*% b)
-      Yb <- qr.resid(qr_prev_axes, Yb)
+      Yb <- (Y %*% b) / weights$R
+      Yb <- qr.resid(qr_prev_axes, weights$sqrtR * Yb) / weights$sqrtR
       # spline fit
       obj <- LMMsolve(fixed = lmm_model$fixed,
-                           spline = lmm_model$spline,
-                           random  = lmm_model$random,
-                           residual = lmm_model$residual,
-                           data = cbind(lmm_model$data, Yb = Yb) )
+                      spline = lmm_model$spline,
+                      random  = lmm_model$random,
+                      residual = lmm_model$residual,
+                      weights = "wrows",
+                      data =
+                        cbind(lmm_model$data, Yb = Yb, wrows =weights$R) )
       # extract spline latent axis xhat
         # spline fit under H0
-        objH0 <-      LMMsolve(fixed = lmm_model$fixedH0,
-                               spline = lmm_model$splineH0,
-                               random  = lmm_model$random,
-                               residual = lmm_model$residual,
-                               data = cbind(lmm_model$data, Yb = Yb))
+        objH0 <-  LMMsolve(fixed = lmm_model$fixedH0,
+                          spline = lmm_model$splineH0,
+                          random  = lmm_model$random,
+                          residual = lmm_model$residual,
+                          weights = "wrows",
+                          data =
+                            cbind(lmm_model$data, Yb = Yb, wrows =weights$R))
         xhat <- fitted(obj) - fitted(objH0)
        # xmean <-  - mean(xhat)
        # xhat <- xhat - xmean
-        xhat <- qr.resid(qr_prev_axes, xhat)
+        #xhat <- qr.resid(qr_prev_axes, xhat) # todo
+        # if (lmm_model$method =="rda") Yb <- qr.resid(qr_prev_axes, xhat) else {
+        #   # NB: axis 1 only! todo: more general
+        #   #xhat <- douconca:::center_w(as.matrix(xhat), sqrtw= wrows)[,1]
+          xhat <- qr.resid(qr_prev_axes, weights$sqrtR*xhat)/weights$sqrtR
+        #}
       Xblock[, j] <- xhat
       # update b
-      b_vec <- as.numeric(crossprod(Y, xhat))
-      b <- normalizeb(b_vec)
+      b_vec <- crossprod(Y, xhat)/ weights$K
+      b <- normalizeb(b_vec, sqrtw = weights$sqrtK)
     }
 
-    ## ---- block SVD ----
-    u1 <- svd(Xblock, nu=1, nv=0)$u[,1]
-    b  <- as.numeric(crossprod(Y, u1))
-    b  <- normalizeb(b)
+   # ---- block SVD ----
+   #u1 <- svd(Xblock, nu=1, nv=0)$u[,1]
+   #u1 <- wSVD(Xblock, nu=1, nv=0, sqrtw=Y_transf$sWn)[,1]# in wSVD:/sWn then wrows*u1 works
+   u1 <- svd(Xblock*weights$sqrtR, nu=1, nv=0)$u[,1]
+   #print(sum((Y_transf$sWn*u1)^2))
+   b  <- crossprod(Y,u1/weights$sqrtR)/weights$K
+   b  <- normalizeb(b, sqrtw = weights$sqrtK)
 
     ## ---- Anderson acceleration ----
     r <- b - b_old
@@ -163,7 +176,7 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
 
         if (all(is.finite(b_new)) &&
             sum(b_new^2) > .Machine$double.eps) {
-          b <- normalizeb(b_new)
+          b <- normalizeb(b_new, sqrtw = weights$sqrtK)
         }
 
       }
@@ -173,20 +186,25 @@ smoothPRC1 <- function(Y, lmm_model, options_iter = list(b_init =NULL,
     if (sqrt(sum((b - b_old)^2)) < options_iter$tol)
       break
   }
+  eig <- sum( (weights$sqrtR*xhat)^2)
+  eig <- if(lmm_model$method == "rda") eig/(n-1) else eig
   PRC <-  get_PRC(obj, dat0 = lmm_model$dat0)
   obj$Yb <- Yb
   PRC_star <-  get_PRC_star(obj, dat0 = lmm_model$dat0)
-  if (lmm_model$scaling =="ms") mult <- sqrt(length(b))else mult <- 1
+  mult <-if (lmm_model$scaling =="ms"&&lmm_model$method == "rda") sqrt(length(b))else 1
   B <- as.matrix(b);colnames(B)<- "B1";rownames(B) <- colnames(Y)
   axes <- cbind(axes, xhat);
-  colnames(axes)[ncol(axes)] <- paste0("RDA", ncol(axes)-1)
-  out <-list(B = B*mult,
+  colnames(axes)[ncol(axes)] <- paste0("RDA", ncol(axes)-n_covariates)
+  out <-list(eig=eig, B = B*mult,
              X = xhat/mult,
-             X_star = qr.resid(qr_prev_axes, (Yb - fitted(objH0)) )/mult,
+             X_star = qr.resid(qr_prev_axes,
+                            weights$sqrtR*(Yb - fitted(objH0)) )/
+               (weights$sqrtR*mult),
              PRC = PRC/mult, PRC_star = PRC_star/mult, mult = mult,
+             weights = weights,
              obj = obj, objH0=objH0, iter = iter, Y= Y, YB=Yb,
              lmm_model = lmm_model,options_iter = options_iter,
-             axes = axes)
+             axes = axes,  n_covariates =  n_covariates)
   for (nam in c("B", "X",   "X_star", "PRC", "PRC_star", "YB")) {
     out[[nam]] <- as.matrix(out[[nam]])
     colnames(out[[nam]]) <- paste0(nam,1:ncol(out[[nam]]))
@@ -214,4 +232,25 @@ get_PRC_star <-function(obj,dat0=NULL){
   PRC_star <- obj$Yb - pred0$ypred # only the deviations from the control
   #xmean <-  - mean(xhat)
   return(PRC_star)
+}
+#' @noRd
+#' @keywords internal
+#'
+set_weights <- function(Y, method){
+  if (method =="rda") {
+    # rda
+    n <- nrow(Y); m <- ncol(Y)
+    R <-rep(1, n); K <-  rep(1, m)
+    sqrtR = R
+    #rep(sqrt(1/n), n);
+    sqrtK=  K
+    #rep(sqrt(1/m), m)
+  } else {
+    # cca
+    R <-  rowSums(Y); K <- colSums(Y)
+    sumY <- sum(R);
+    sqrtR <- sqrt(R/sumY); sqrtK<- sqrt(K/sumY)
+  }
+weights = list(K = K, R = R, sqrtK = sqrtK, sqrtR = sqrtR)
+return(weights)
 }

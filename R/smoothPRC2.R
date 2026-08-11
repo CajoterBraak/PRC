@@ -27,14 +27,16 @@ smoothPRC2 <- function(smooth_PRC_axis1,
   smooth_PRC2 <- smoothPRC1(Y            = smooth_PRC_axis1$Y,
                             lmm_model    = smooth_PRC_axis1$lmm_model,
                             options_iter = options_iter,
-                            axes         = smooth_PRC_axis1$axes)
+                            weights      = smooth_PRC_axis1$weights,
+                            axes         = smooth_PRC_axis1$axes,
+                            n_covariates = smooth_PRC_axis1$n_covariates)
   # help function
   addaxis <- function(nam){
-    axes <- cbind(smooth_PRC_axis1[[nam]], smooth_PRC2[[nam]]);
-    colnames(axes) <- paste0(nam, 1:ncol(axes))
-    return(axes)
+    axs <- cbind(smooth_PRC_axis1[[nam]], smooth_PRC2[[nam]]);
+    colnames(axs) <- paste0(nam, 1:ncol(axs))
+    return(axs)
   }
-  for (nam in c("B", "X",   "X_star", "PRC", "PRC_star", "YB")) {
+  for (nam in c("eig","B", "X",   "X_star", "PRC", "PRC_star", "YB")) {
     smooth_PRC2[[nam]] <- addaxis(nam)
   }
   smooth_PRC2$obj <- c(smooth_PRC_axis1$obj,  smooth_PRC2$obj)
