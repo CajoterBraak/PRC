@@ -8,7 +8,9 @@ smoothPRC(
   Y,
   lmm_model,
   options_iter = list(b_init = NULL, k = 3, mA = 4, tol = 1e-08, maxiter = 50),
-  n_axes = 2
+  n_axes = 2,
+  formula_covariates = NULL,
+  weights = NULL
 )
 }
 \arguments{
@@ -29,6 +31,15 @@ the first eigen vector from the second. Default \code{NULL}.
 }}
 
 \item{n_axes}{the number of axes to extract. Default \code{2}.}
+
+\item{formula_covariates}{one-sided formula with covariates that the model needs to
+adjust for. Default \code{NULL}, resulting in \code{~1}.
+The formula specifies what is called  the \code{Condition}in \code{vegan},
+covariates in \code{Canoco} and covariables in ter Braak & Prentice (1988).}
+
+\item{weights}{a list of user-defined weights for columns (species) first
+and, second, rows (sites) Default \code{NULL} for method-defined weights,
+e.g. row totals of \code{Y} in CCA, and uniform weights in RDA.}
 }
 \value{
 A list.
@@ -45,9 +56,12 @@ treatment are 0.}
 \item{PRC_star}{obtained from \code{X_star} as \code{PRC} is from \code{X}.
 These are the sample points in the PRC diagram.}
 \item{mult}{multiplier for re-scaling the species and sample scores.
-The value is \code{sqrt(ncol(Y))} as the default, giving a mean square of 1
+The value is 1 as the default currently, giving a mean square of 1
 of the species scores.}
-\item{eig}{eigenvalues.}
+\item{weights}{names list of columns weights and row weights. Names are
+\code{K}, \code{R}, \code{sqrtK}, \code{sqrtR}. The first two are
+column (species) and row (site)totals in with \code{method != "rda"}.
+They not normalized; none sums to 1. All 1 in \code{method =="rda"}}.
 \item{obj}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects,
  one for each axis.}
 \item{objH0}{a named list of \code{\link[LMMsolver]{LMMsolve}} objects
@@ -61,9 +75,10 @@ These are the response \code{Yb} in the call to
 \code{smoothPRC}.}
 \item{options_iter}{copy of the \code{opions_iter} argument
  to the \code{smoothPRC}.}
-\item{axes}{an internal matrix: previous axes and optionally covariates,
-but with an extra constant vector.}
-\item{eig}{eigenvalues.}
+\item{axes}{an internal matrix: Intercept, optionally covariates and
+ previous axes.}
+\item{n_covariates}{the number of user-defined covariates using
+\code{formula_covariates} with one for the \code{"(Intercept)"}.}
 }
 }
 \description{

@@ -4,7 +4,7 @@
 \alias{anova.smoothPRC}
 \title{Permutation Test for Smooth PRC}
 \usage{
-\method{anova}{smoothPRC}(object, ..., permutations = 19, verbose = FALSE)
+\method{anova}{smoothPRC}(object, ..., permutations = 19, verbose = TRUE)
 }
 \arguments{
 \item{object}{an object from \code{\link{smoothPRC}}.}

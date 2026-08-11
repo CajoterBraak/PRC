@@ -12,12 +12,13 @@ set_smoothPRC_model(
   random = NULL,
   residual = NULL,
   weights = NULL,
-  treatment.level.as.quantity = TRUE,
+  treatment.coding = TRUE,
   pord = c(time = 2, dose = 2, time.overall = 3, Treatment = 2),
   nseg = c(time = 6, dose = 6),
   degree = 3,
   start_time = 0,
   referencelevel = NULL,
+  method = "rda",
   scaling = "ms",
   data
 )
@@ -51,17 +52,17 @@ the form "~ pred".}
 of data to use as relative weights in the fit. Default value NULL, weights are
 all equal to one.}
 
-\item{treatment.level.as.quantity}{logical. Default \code{TRUE} for an
-analysis using a 2d spline. If \code{FALSE}, the default spline model is
-replaced by default to one containing 1d splines, one 1d-spline for each
-level.}
+\item{treatment.coding}{logical. Default \code{TRUE} for a quantitative
+analysis using a 2d spline. If \code{FALSE}, for a qualitative analysis in
+in which the default spline model is replaced by default to one
+containing 1d splines, one 1d-spline for each level.}
 
 \item{pord}{named integer vector of the difference order of the
 spline penalty.
 Default: \code{c(time =2, dose= 2, time.overall= 3, Treatment = 2)},
 where the first two orders are used only with
- \code{treatment.level.as.quantity} is \code{TRUE}
- and the last two with  \code{treatment.level.as.quantity} is \code{FALSE}.}
+ \code{treatment.coding} is \code{TRUE}
+ and the last two with  \code{treatment.coding} is \code{FALSE}.}
 
 \item{nseg}{named integer vector of number of segments in P-splines,
 can be large.
@@ -76,6 +77,8 @@ Default: \code{0}.}
 \item{referencelevel}{numeric or  character level(s) to be used as reference level or levels
 of the focal treatment(s); default: 1 (first level(s)).  With \code{\link{doPRC}}, the focal treatment is (or treatments are) given in the
 resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}}
+
+\item{method}{character rda or cca. Default: \code{"rda"}}
 
 \item{scaling}{The default gives mean square species scores of 1, otherwise
 the sum of squares of the species scores is 1. See \link{doPRC}.
@@ -102,21 +105,21 @@ An atypical aspect of the function is that the time and treatment factors
  quantitative variable), the function generates variables with
  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
  treatments beyond the reference treatment,
- if \code{treatment.level.as.quantity} is \code{FALSE}.
+ if \code{treatment.coding} is \code{FALSE}.
  These variables generated in the function, contain the time
  since the start of the experiment for each treatment.
  \code{D1, D2, ...} should therefore not be variable names in \code{data},
  nor should \code{time} or \code{dose} be variable names
  in \code{data}; these are reserved names in \code{smoothPRC}.
  An example of the formula for \code{spline}
- when \code{treatment.level.as.quantity} is \code{FALSE}
+ when \code{treatment.coding} is \code{FALSE}
  and the number of levels of \code{Treatment} is 4,  is
  \code{spl1D(time, nseg =6, degree = 3, pord = 3)+
  spl1D(D1, nseg = 6, degree = 3, pord = 2)+
  spl1D(D2, nseg = 6, degree = 3, pord = 2)+
  spl1D(D3, nseg = 6, degree = 3, pord = 2)}.
  This is the default model
- if \code{treatment.level.as.quantity} is \code{FALSE}.
+ if \code{treatment.coding} is \code{FALSE}.
 The default spline model assumes that the Treatment factor has a quantitative
 basis, so that the response to Time and Treatment can be analyzed using a
 2D spline model.
@@ -223,7 +226,7 @@ b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <-
   set_smoothPRC_model(fixed = Yb ~ Block, data= Design,
-                      treatment.level.as.quantity =FALSE, start_time = 1958)
+                      treatment.coding =FALSE, start_time = 1958)
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
