@@ -233,24 +233,4 @@ get_PRC_star <-function(obj,dat0=NULL){
   #xmean <-  - mean(xhat)
   return(PRC_star)
 }
-#' @noRd
-#' @keywords internal
-#'
-set_weights <- function(Y, method){
-  if (method =="rda") {
-    # rda
-    n <- nrow(Y); m <- ncol(Y)
-    R <-rep(1, n); K <-  rep(1, m)
-    sqrtR = R
-    #rep(sqrt(1/n), n);
-    sqrtK=  K
-    #rep(sqrt(1/m), m)
-  } else {
-    # cca
-    R <-  rowSums(Y); K <- colSums(Y)
-    sumY <- sum(R);
-    sqrtR <- sqrt(R/sumY); sqrtK<- sqrt(K/sumY)
-  }
-weights = list(K = K, R = R, sqrtK = sqrtK, sqrtR = sqrtR)
-return(weights)
-}
+

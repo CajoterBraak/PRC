@@ -123,27 +123,28 @@ smoothPRC <- function(Y, lmm_model,
    covariate_data <- model.matrix(formula_covariates, data = lmm_model$data)
    n_covariates <- ncol(covariate_data)
    axes<- covariate_data # cbind(covariate_data ,axes)
-   weights1 <- set_weights(Y, lmm_model$method)
-   if (is.null(weights)){
-     weights <- weights1
-   } else {
+   if (!is.null(weights)){
      if (length(weights)<2)stop("ERROR: weights must be a list of species and",
     "site weigths")
-     weights <- c(weights, vector("list",2))
      for (k in 1:2){
        if (!is.null(weights[[k]])) {
-         if (!length(weights[[k]])==length(weights1[[k]])) stop(
+         if (!length(weights[[k]])==length(weights[[k]])) stop(
            c("species", "sites")[k], "-weights must",
          " be of the same length as the number of ",  c("species", "sites")[k],
          ".\nwhich is ", c(rev(dim(Y)))[k],
          ".\n Note that, in the weights list, species weights come first,",
          " site weights second.")
-         weights[[k]]<-  weights[[k+2]] <- weights[[k]]*weights1[[k]]
-         weights[[k+2]]<- sqrt(weights[[k+2]]/ sum(weights[[k+2]]))
+          Y<- if (k==1) {
+              Mk <- matrix(weights[[1]], nrow = nrow(Y), ncol= ncol(Y), byrow = TRUE)
+              Y * Mk
+          } else {
+              Y*weights[[2]]
+          }
+
        }
      }
-     names(weights)<- names(weights1)
    }
+   weights <- set_weights(Y, lmm_model$method, user_weights= weights)
    smooth_PRC1 <- smoothPRC1(Y            = Y,
                             lmm_model    = lmm_model,
                             options_iter = options_iter,
@@ -166,4 +167,32 @@ smoothPRC <- function(Y, lmm_model,
       smooth_PRC1$B <- cbind(smooth_PRC1$B,fFratios_Time_X(smooth_PRC1))
     }
   return(smooth_PRC1)
+}
+#' @noRd
+#' @keywords internal
+#'
+set_weights <- function(Y, method, user_weights =NULL){
+  if (method =="rda") {
+    # rda
+    if(is.null(user_weights)){
+    n <- nrow(Y); m <- ncol(Y)
+    R <-rep(1, n); K <-  rep(1, m)
+    sqrtR = R
+    #rep(sqrt(1/n), n);
+    sqrtK=  K
+    #rep(sqrt(1/m), m)
+    } else {
+      K <- weights[[1]]
+      R<- weights[[2]]
+      sqrtK <- sqrt(K)
+      sqrtR <- sqrt(R)
+    }
+  } else {
+    # cca
+    R <-  rowSums(Y); K <- colSums(Y)
+    sumY <- sum(R);
+    sqrtR <- sqrt(R/sumY); sqrtK<- sqrt(K/sumY)
+  }
+  weights = list(K = K, R = R, sqrtK = sqrtK, sqrtR = sqrtR)
+  return(weights)
 }
