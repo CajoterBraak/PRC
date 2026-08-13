@@ -20,6 +20,8 @@
 #' @param weights a list of user-defined weights for columns (species) first
 #'  and, second, rows (sites) Default \code{NULL} for method-defined weights,
 #'  e.g. row totals of \code{Y} in CCA, and uniform weights in RDA.
+#'  Zero weights are not allowed; near zero weigths may lead to instability;
+#'   this is unchecked currently.
 #' @details
 #' An atypical aspect of the function is that the time and treatment factors
 #' need to have the names Time and Treatment in \code{data}.
@@ -134,9 +136,8 @@ smoothPRC <- function(Y, lmm_model,
          ".\nwhich is ", c(rev(dim(Y)))[k],
          ".\n Note that, in the weights list, species weights come first,",
          " site weights second.")
-          Y<- if (k==1) {
-              Mk <- matrix(weights[[1]], nrow = nrow(Y), ncol= ncol(Y), byrow = TRUE)
-              Y * Mk
+      Y<- if (k==1) {
+          Y * matrix(weights[[1]], nrow = nrow(Y), ncol= ncol(Y), byrow = TRUE)
           } else {
               Y*weights[[2]]
           }
@@ -144,7 +145,7 @@ smoothPRC <- function(Y, lmm_model,
        }
      }
    }
-   weights <- set_weights(Y, lmm_model$method, user_weights= weights)
+   weights <- set_weights(Y, lmm_model$method, user_weights = weights)
    smooth_PRC1 <- smoothPRC1(Y            = Y,
                             lmm_model    = lmm_model,
                             options_iter = options_iter,
@@ -182,10 +183,10 @@ set_weights <- function(Y, method, user_weights =NULL){
     sqrtK=  K
     #rep(sqrt(1/m), m)
     } else {
-      K <- weights[[1]]
-      R<- weights[[2]]
-      sqrtK <- sqrt(K)
-      sqrtR <- sqrt(R)
+      K <- user_weights[[1]]
+      R <- user_weights[[2]]
+      sqrtK <- sqrt(K* (length(K)/sum(K)))
+      sqrtR <- sqrt(R* (length(R)/sum(R)))
     }
   } else {
     # cca
