@@ -1,5 +1,5 @@
-#' Principal Response Curves (PRC) for displaying multivariate main effects and
-#' interactions
+#' Principal Response Curves (PRC) for displaying (smooth)
+#' multivariate main effects and interactions
 #' @aliases PRC-package
 #' @name PRC-package
 #' @description
@@ -10,6 +10,8 @@
 #' The easiest example is the code demo \code{PRC_pyrifos}.
 #' The function \code{\link{doPRC}} is more general
 #' than and replaces \code{vegan::}\code{\link[vegan]{prc}}.
+#' This version includes smooth PRC (\code{\link{smoothPRC}} using
+#'  \code{\link{set_smoothPRC_model}}).
 #'
 #' @references
 #' ter Braak, C.J.F. (2023) Redundancy analysis includes analysis of

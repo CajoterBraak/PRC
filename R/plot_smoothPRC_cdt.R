@@ -37,31 +37,43 @@ plot_smoothPRC_cdt <- function(object,
                                sample_times_only = FALSE
                                )
 {
+
+  if (is.null(mod_prc) && inherits(object, "powerEig")) with_classical_lines <- FALSE
   # sampled time points only-----
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
-  if (is.null(mod_prc))
+  if (is.null(mod_prc) && inherits(object, "powerSVD"))
     suppressMessages(
-      mod_prc <- doPRC(
+      mod_prc <- PRC::doPRC(
         object$Y ~ Treatment:Time + Condition(Time),
-        method = object$lmm_model$method,
-        data = object$lmm_model$data
+        method = object$model$method,
+        data = object$model$data,
+        rank = axis
       )
     )
-  cc <- cor(mod_prc$PRCplus[,paste0("PRC",axis)],  object$PRC[,axis])
+  if (!is.null(mod_prc)){
+   cc <- sign(cor(mod_prc$PRCplus[,paste0("PRC",axis)],
+            object$PRC[,axis]))
   smooth_prc_df <- data.frame(
-    Time = object$lmm_model$data$time,
+    Time = object$model$data$time,
     PRCsmooth = flip * object$PRC[,axis],
     PRC_star = flip * object$PRC_star[,axis],
-    PRCclassical = sign(cc) * flip * mod_prc$PRCplus[,paste0("PRC",axis)],
-    Treatment = object$lmm_model$data$Treatment
+    PRCclassical = cc * flip * mod_prc$PRCplus[,paste0("PRC",axis)],
+    Treatment = object$model$data$Treatment
   )
-
-  if (deparse(object$lmm_model$fixedH0) == deparse(Yb ~ Time)||
+  } else {
+    smooth_prc_df <- data.frame(
+      Time = object$model$data$time,
+      PRCsmooth = flip * object$PRC[,axis],
+      PRC_star = flip * object$PRC_star[,axis],
+      Treatment = object$model$data$Treatment
+    )
+  }
+  if (deparse(object$model$fixedH0) == deparse(y ~ Time)||
       sample_times_only) {
     smooth_prc_df2  <- smooth_prc_df
     } else {
     # dense data-----
-    time_points <- sort(unique(object$lmm_model$data$time))
+    time_points <- sort(unique(object$model$data$time))
     time_first_applied <- min(time_points[time_points > 0])
 
     npos <- length(time_points[time_points > 0])
@@ -74,19 +86,19 @@ plot_smoothPRC_cdt <- function(object,
           length = 10 * npos)
     )
 
-    #dose_levels <- sort(unique(object$lmm_model$data$dose))
+    #dose_levels <- sort(unique(object$model$data$dose))
 
     newdat <- expand.grid(
       time = c(time_points, tgrid_dense),
-      Treatment = factor(levels(object$lmm_model$data$Treatment))
+      Treatment = factor(levels(object$model$data$Treatment))
     )
 
-    valsTreatment<- PRC::fvalues4levels(object$lmm_model$data, "Treatment")
+    valsTreatment<- PRC::fvalues4levels(object$model$data, "Treatment")
     if (all(valsTreatment == seq_along(valsTreatment))) valsTreatment <- valsTreatment-1
     newdat$dose  <- valsTreatment[newdat$Treatment]
     newdat$dose  <- ifelse(newdat$time>0, newdat$dose, 0)
 
-    if ("D1" %in% names(object$lmm_model$data)) {
+    if ("D1" %in% names(object$model$data)) {
       datI <- model.matrix(~ time + Treatment:time, data = newdat)[,-c(1,2)]
 
       datI <- as.data.frame(datI)
@@ -96,13 +108,13 @@ plot_smoothPRC_cdt <- function(object,
       newdat <- cbind(newdat,datI)
     }
 
-    nams <- names(object$lmm_model$data)
-    idsl <- 1:(nlevels(object$lmm_model$data$Treatment)-1)
+    nams <- names(object$model$data)
+    idsl <- 1:(nlevels(object$model$data$Treatment)-1)
     nams <- nams[!nams %in% c("Time","Treatment","time","dose", paste0("D", idsl))]
     if (length(nams)){
     n <- nrow(newdat)
 
-    avdat <- as.data.frame(lapply(object$lmm_model$data[nams], function(x) {
+    avdat <- as.data.frame(lapply(object$model$data[nams], function(x) {
       if (is.factor(x)) {
         factor(rep(levels(x)[1], n), levels = levels(x))
       } else if (is.character(x)) x[1] else {
@@ -118,7 +130,7 @@ plot_smoothPRC_cdt <- function(object,
     # sets LMMsolver_model with response in formulafixed and data : Design
     newdat0 <- newdat
     newdat0$dose <- 0
-    newdat0$Treatment <- levels(object$lmm_model$data$Treatment)[1]
+    newdat0$Treatment <- levels(object$model$data$Treatment)[1]
     if("D1" %in% names(newdat0)) {
         id <- which(names(newdat0) %in% "D1")
         newdat0[, idsl + (id-1)] <- 0
@@ -134,7 +146,7 @@ plot_smoothPRC_cdt <- function(object,
     )
 
     levels(smooth_prc_df2$Treatment) <-
-      levels(object$lmm_model$data$Treatment)
+      levels(object$model$data$Treatment)
   }
 
   p1 <- ggplot(
@@ -219,3 +231,19 @@ plot_smoothPRC_cdt <- function(object,
 
   return(p1)
 }
+
+#' @noRd
+#' @keywords internal
+get_PRC <-function(object,dat0=NULL, k = 1){
+  # full fitted values
+  xhat <- fitted(object$obj[[k]])
+  pred0 <- predict(object$obj[[k]] , newdata = dat0)
+  PRC <- xhat - pred0$ypred # only the deviations from the control
+  #xmean <-  - mean(xhat)
+  return(PRC)
+}
+
+
+
+
+
