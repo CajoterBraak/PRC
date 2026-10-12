@@ -1,7 +1,7 @@
 Package: PRC
 Type: Package
 Title: Principal Response Curves (PRC) For Displaying Multivariate Main Effects And Interactions
-Version: 2.0.3
+Version: 2.0.4
 Authors@R: person(given ="Cajo J.F", family = "ter Braak", email="cajo.terbraak@wur.nl", 
    role=c("aut","cre"), comment=c(ORCID="0000-0002-0414-8745"))
 Maintainer: Cajo J.F. ter Braak <cajo.terbraak@wur.nl>
@@ -17,13 +17,15 @@ Description: PRC is a small \code{vegan}- and \code{LMMsolver}-based package
   The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}},
   \code{\link{plotPRC2d}} and \code{\link{smoothPRC}}.
   The easiest example is the code demo \code{PRC_pyrifos}.
+  This version includes smoothPRC (\code{\link{smoothPRC}} using
+  \code{\link{set_smoothPRC_model}}).
 URL: https://doi.org/10.1002/etc.5620180207, https://doi.org/10.1016/j.chemolab.2023.104898
 BugReports: https://github.com/CajoterBraak/PRC/issues
 Depends: R (>= 4.1.0)
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports:   LMMsolver(>= 1.0.13),
+Imports: LMMsolver(>= 1.0.13),
            permute, 
            vegan (>= 2.6-8),
            spam,
@@ -32,11 +34,14 @@ Imports:   LMMsolver(>= 1.0.13),
            latex2exp,
            ggrepel,
            gridExtra,
-           rlang
+           rlang,
+           Rcpp
+LinkingTo:
+    Rcpp
 Suggests: 
     rmarkdown,
     knitr
-NeedsCompilation: no
+NeedsCompilation: yes
 VignetteBuilder: knitr
 Packaged: 2024-01-17 15:15:02 UTC; braak008
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.1
