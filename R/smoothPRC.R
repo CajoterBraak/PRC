@@ -190,18 +190,18 @@ smoothPRC <- function(response, model,
     n1<- sqrt((nrow(pwr$X) - 1)/n_species)
     pwr$X <- pwr$X*n1
     pwr$X_star <- pwr$X_star*n1
-    for (axis in 1:n_axes){
-      PRC[, axis] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k= axis)/
-        sqrt(pwr$eig[axis])
-      PRC[, axis] <- PRC[, axis] * n1
-      PRC_star[, axis] <- PRC[, axis] +
-        (pwr$X_star[,axis]- pwr$X[,axis])
+    for (ax in 1:n_axes){
+      PRC[, ax] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k = ax)/
+        sqrt(pwr$eig[ax])
+      PRC[, ax] <- PRC[, ax] * n1
+      PRC_star[, ax] <- PRC[, ax] +
+        (pwr$X_star[,ax]- pwr$X[,ax])
     }
   } else {
-    for (axis in 1:n_axes){
-      PRC[,axis] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k= axis)/
+    for (ax in 1:n_axes){
+      PRC[,ax] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k = ax)/
         sqrt(ncol(pwr$Y))
-      PRC_star[,axis] <- PRC[,axis] + (pwr$X_star[,axis]- pwr$X[,axis])
+      PRC_star[,ax] <- PRC[,ax] + (pwr$X_star[,ax]- pwr$X[,ax])
     }
   }
   colnames(PRC)<- paste0("PRC",1:n_axes)
@@ -241,4 +241,14 @@ fFratios_Time_X <- function(smooth_PRC){
   Fratio <- t(apply(smooth_PRC$Y,2,fseq))
   colnames(Fratio)<- paste0("Fratio", 1:ncol(Fratio))
   return(Fratio)
+}
+#' @noRd
+#' @keywords internal
+get_PRC <-function(object, dat0=NULL, k = 1){
+  # full fitted values
+  xhat <- fitted(object$obj[[k]])
+  pred0 <- predict(object$obj[[k]] , newdata = dat0)
+  PRC <- xhat - pred0$ypred # only the deviations from the control
+  #xmean <-  - mean(xhat)
+  return(PRC)
 }

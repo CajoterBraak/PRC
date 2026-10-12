@@ -232,16 +232,6 @@ plot_smoothPRC_cdt <- function(object,
   return(p1)
 }
 
-#' @noRd
-#' @keywords internal
-get_PRC <-function(object,dat0=NULL, k = 1){
-  # full fitted values
-  xhat <- fitted(object$obj[[k]])
-  pred0 <- predict(object$obj[[k]] , newdata = dat0)
-  PRC <- xhat - pred0$ypred # only the deviations from the control
-  #xmean <-  - mean(xhat)
-  return(PRC)
-}
 
 
 
