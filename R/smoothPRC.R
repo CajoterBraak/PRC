@@ -1,34 +1,66 @@
 #' @title Smooth PRC using LMMsolver (Boer, 2023)
-#' @param Y matrix, data frame of the abundance data
-#' (dimension \emph{sites} x \emph{species})
-#' @param lmm_model The result of \code{\link{set_smoothPRC_model}}.
+#' @param response matrix or data frame of the abundance data or a distance
+#' matrix or object of class \code{\link[stats:dist]{dist}}
+#' The abundance data has dimension \emph{sites} x \emph{species}.
+#' @param model a named list.
+#' Usually the  result of \code{\link{set_smoothPRC_model}}
+#' The model contains at least one element and one or
+#' more optional elements used for fitting the model using the
+#' functions \code{fit_full_model} and \code{fit_null_model}) (see Details):
+#' \itemize{
+#' \item \code{method}: character. Default: \code{"dbrda"} for
+#' distance-based smooth PRC, when \code{response} is a distance-like object.
+#' The default is  \code{"rda"} for rda-based smooth PRC, when \code{response}
+#' is an abundance matrix, leading to
+#' models of the principal components family (pca, princomp, rda, dc-pca).
+#' Any other string then leads to CCA-based smooth PRC.
+#' \item \code{data}: an object,
+#' usually a data frame with the predictor data for rows (sites)
+#' \item \code{formula}: one or more optional formulas specifying the model
+#' of the predictor data (if any) to
+#' be fitted to a response vector.
+#' }
+#'
 #' @param options_iter list of five elements
 #' \itemize{
-#' \item \code{b_init}: initial values of the species loadings.
-#' Default \code{NULL}.
+#' \item \code{init}: initial values of sample scores if  \code{response}
+#' is a distance and of species loadings otherwise, a vector of the appropriate
+#' length or a matrix with axis-specific initial values in columns.
+#' Default \code{NULL} for solver and model specific initialization.
+#' Default \code{NULL}, resulting in a start for each eigenvector from the model
+#' \code{Treatment*Time + Condition(Time)}.
 #' \item \code{k}: number of cycles in block-power updating to  better separate
-#' the first eigen vector from the second. Default \code{NULL}.
-#' \item \code{mA}: number of vectors in Anderson acceleration. Default \code{3}.
-#' \item \code{tol}: stopping criterion, tolarance. Default \code{1e-8}.
-#' \item \code{maxiter}:maximum number of iterations. Default \code{50}.
+#' the first eigen vector from the second. Default \code{2}.
+#' \item \code{mA}: number of vectors in Anderson acceleration. Default \code{4}.
+#' \item \code{tol}: stopping criterion, tolarance. Default \code{1e-4}.
+#' \item \code{maxiter}:maximum number of iterations. Default \code{20}.
 #' }
-#' @param formula_covariates one-sided formula with covariates that the model needs to
-#' adjust for. Default \code{NULL}, resulting in \code{~1}.
-#' The formula specifies what is called  the \code{Condition}in \code{vegan},
+#' @param formula_covariates one-sided formula with row covariates
+#' (sample-specific predictors) that the model needs to adjust for.
+#' Default \code{NULL}, resulting in \code{~1}.
+#' The formula specifies what is called  the \code{Condition} in \code{vegan},
 #' covariates in \code{Canoco} and covariables in ter Braak & Prentice (1988).
+#' The covariates must be in \code{model$data}.
 #' @param n_axes the number of axes to extract. Default \code{2}.
 #' @param weights a list of user-defined weights for columns (species) first
 #'  and, second, rows (sites) Default \code{NULL} for method-defined weights,
-#'  e.g. row totals of \code{Y} in CCA, and uniform weights in RDA.
+#'  e.g. row totals of \code{response} in CCA, and uniform weights in RDA.
 #'  Zero weights are not allowed; near zero weigths may lead to instability;
 #'   this is unchecked currently.
+#'   Ignored when \code{response} is a distance.
+#' @param n_species number of species in \code{response}. Default 1.
+#' Ignored if \code{response} is an abundance matrix.
+#' For testing purposes, to get same scaling irrespectively when \code{response}
+#' is an abundance matrix or a Euclidean distance matrix
+#' of that abundance matrix.
 #' @details
 #' An atypical aspect of the function is that the time and treatment factors
-#' need to have the names Time and Treatment in \code{data}.
+#' need to have the names \code{Time} and \code{Treatment} in \code{data}.
 #'
 #' Classical PRC is a reduced rank model of rank 1 (or 2) with model
-#' Treatment*Time with the Time factor is a concomitant variable.
-#' In smoothPRC the factor Time is taken quantitatively and the main effect
+#' \code{~Treatment*Time} with the \code{Time} factor is a concomitant variable.
+#' In smoothPRC the factor \code{Time} is taken quantitatively and
+#' the main effect
 #' of time is not an un-ordered set of values but a smooth P-spline model.
 #' Also, the time-dependent effects of the treatments are smooth P-splines.
 #' As the main and interaction effects are splines, the main effect of time
@@ -44,29 +76,39 @@
 #' The model is linear in, possibly tensor, B-splines,
 #' but through the B-splines non-linear from the perspective of the user. With
 #' quadratic ridge-type difference penalties on the coefficients the B-splines
-#' becomeP-splines (penalized B-splines).
-#' For an initial \code{b} of species scores, the unconstrainted sites \code{Yb}
+#' become P-splines (penalized B-splines).
+#' For an initial vector \code{b} of species scores,
+#' the unconstrained sites
 #' are calculated, which are then used as response vector in
 #' \code{\link[LMMsolver]{LMMsolve}} to give a constrained site scores
-#' \code{x} by the P-spline model specified in \code{lmm_model}. This
+#' \code{x} by the P-spline model specified in \code{model}. This
 #' is part of a power algorithm with block and Anderson acceleration to solve
 #' the dominant eigen vector of the
 #' underlying eigen problem while optimizing simultaneously the penalties
 #' using \code{\link[LMMsolver]{LMMsolve}}.
 #'
-#' If \code{lmm_model$scaling =="ms"}, then in the result \code{B} in the
-#' result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
-#' are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
-#' with \code{fitted(result$obj)}.
-#' Note that \code{Yb}, a column in \code{YB}, is the response in
-#' \code{\link[LMMsolver]{LMMsolve}} model.
-#' The \code{Fratio1},\code{Fratio2}, etc. in the species scores matrix
-#' \code{result$B} are computed with linear model \code{y~Time +X}, with
-#' \code{y}  a species response in \code{Y},
-#' \code{Time} the factor in \code{data} in
-#' \code{\link{set_smoothPRC_model}} and
-#' \code{X} the smooth eigenvectors
-#' of which the first \emph{r} are used for calculating \code{Fratio}\emph{r}.
+#' The \code{smoothPRC} algorithm uses one and two-sided power iterations.
+#' It thus iterates through the transition formulas of the method with
+#' (P-spline) regression fits.
+#' It uses two acceleration methods:
+#' blocking and Anderson iteration.
+#'
+#' The \code{response} is taken as a distance object if
+#' it inherits class  \link[stats:dist]{dist} or if it a matrix-like object with
+#' equal dimensions using \code{\link[=dim]{dim}} and all zero diagonal using
+#' \code{sum(}\code{\link[=diag]{diag}}\code{(response))==0}.
+#' Initialization of the power algorithm expands the
+#'  \link[stats:dist]{dist} object in \code{response}
+#' to a square symmetrix matrix.
+#' This expansion can be avoided by explicit initialization
+#' using \code{options_iter$init}.
+#'
+#' If \code{response} is a distance object and the maximum distance exceeds 4
+#' then the distance is divided by n-1 with n the number of samples.
+#' This choice is taken from vegan::dbrda and usually makes the eigenvalues
+#' equal to those of vegan::rda if the distance is 'euclidean'.
+#'
+#'
 #' @return A list.
 #' \describe{
 #' \item{eig}{eigenvalues.}
@@ -75,14 +117,9 @@
 #' \item{X}{matrix with the eigen vectors
 #' (i.e. the constrained sample scores) in columns.}
 #' \item{X_star}{matrix with the unconstrained sample scores.}
-#' \item{PRC}{obtained from \code{X}, by subtraction of the score for
-#' the reference treatment, so that all scores for the reference
-#' treatment are 0.}
-#' \item{PRC_star}{obtained from \code{X_star} as \code{PRC} is from \code{X}.
-#' These are the sample points in the PRC diagram.}
-#' \item{mult}{multiplier for re-scaling the species and sample scores.
-#' The value is 1 as the default currently, giving a mean square of 1
-#' of the species scores.}
+#' \item{PRC}{matrix with the PRC scores, X scores compared to the X-scores of
+#' the reference level in \code{Treatment} in \code{data}}
+#' \item{PRC_star}{matrix with the unconstrained PRC scores.}
 #' \item{weights}{names list of columns weights and row weights. Names are
 #' \code{K}, \code{R}, \code{sqrtK}, \code{sqrtR}. The first two are
 #' column (species) and row (site)totals in with \code{method != "rda"}.
@@ -93,16 +130,13 @@
 #'  of the null model, one for each axis.}
 #' \item{iter}{the number of iterations of the accelerated power algorithm.}
 #' \item{Y}{the response matrix.}
-#' \item{YB}{matrix with the response vectors, one for each axis.
-#' These are the response \code{Yb} in the call to
-#' \code{\link[LMMsolver]{LMMsolve}}.}
-#' \item{lmm_model}{copy of the \code{lmm_model} argument to the
-#' \code{smoothPRC}.}
+#' \item{model}{copy of the \code{model} argument to the
+#' \code{powerSVD}.}
 #' \item{options_iter}{copy of the \code{opions_iter} argument
 #'  to the \code{smoothPRC}.}
 #' \item{axes}{an internal matrix: Intercept, optionally covariates and
 #'  previous axes.}
-#' \item{n_covariates}{the number of user-defined covariates using
+#' \item{n_covariates}{the number of user-defined row covariates using
 #' \code{formula_covariates} with one for the \code{"(Intercept)"}.}
 #' }
 #' @references
@@ -112,88 +146,99 @@
 #' \doi{10.1177/1471082X231178591}
 #' @importFrom stats var
 #' @export
-smoothPRC <- function(Y, lmm_model,
-                      options_iter = list(b_init =NULL,
-                                          k = 3, mA = 4,
-                                          tol = 1e-8, maxiter = 50),
+smoothPRC <- function(response, model,
+                      options_iter = list(init =NULL,
+                                          k = 2, mA = 4,
+                                          tol = 1e-8, maxiter = 20),
                       n_axes = 2,
                       formula_covariates = NULL,
-                      weights = NULL) {
+                      weights = NULL,
+                      n_species = 1) {
+  formula_covariates_columns = NULL
+  options_fit <- list(
+    maxIter = NULL, tol = NULL, warm_start = TRUE,
+    rows = NULL,rows0 = NULL,
+    columns = NULL, columns0 = NULL
+  )
+  #if (!spam::is.spam(response)) response <- as.matrix(response)
+  # if(inherits(response, "matrix")) {
+  #   d <- dim(response); dd <- diag(response)
+  # } else {d <-c(1,2); dd <-0}
+  # if (n == (1 + sqrt(1 + 8 * length(response))) / 2 ||
+  #     (d[1]==d[2] && sum(dd)==0) )
+   if(inherits(response,"dist")|| (diff(dim(response))==0)&&
+               sum(diag(as.matrix(response)))==0){
+    pwr <- powerEig(D = response, model = model,
+                    options_iter = options_iter,
+                    options_fit = options_fit ,
+                    n_axes = n_axes,
+                    formula_covariates = formula_covariates)
+  } else { # method = "rda" or "cca"
+    pwr <- powerSVD(Y = response, model = model,
+                    options_iter = options_iter,
+                    options_fit = options_fit ,
+                    n_axes = n_axes,
+                    formula_covariates_rows = formula_covariates,
+                    formula_covariates_columns = formula_covariates_columns,
+                    weights =weights)
+    Fratio <-fFratios_Time_X(pwr)
+    pwr$B<- cbind(pwr$B, Fratio)
+  }
 
-
-   if (is.null(formula_covariates)) formula_covariates <- ~1
-   covariate_data <- model.matrix(formula_covariates, data = lmm_model$data)
-   n_covariates <- ncol(covariate_data)
-   axes<- covariate_data # cbind(covariate_data ,axes)
-   if (!is.null(weights)){
-     if (length(weights)<2)stop("ERROR: weights must be a list of species and",
-    "site weigths")
-     for (k in 1:2){
-       if (!is.null(weights[[k]])) {
-         if (!length(weights[[k]])==length(weights[[k]])) stop(
-           c("species", "sites")[k], "-weights must",
-         " be of the same length as the number of ",  c("species", "sites")[k],
-         ".\nwhich is ", c(rev(dim(Y)))[k],
-         ".\n Note that, in the weights list, species weights come first,",
-         " site weights second.")
-      Y<- if (k==1) {
-          Y * matrix(weights[[1]], nrow = nrow(Y), ncol= ncol(Y), byrow = TRUE)
-          } else {
-              Y*weights[[2]]
-          }
-
-       }
-     }
-   }
-   weights <- set_weights(Y, lmm_model$method, user_weights = weights)
-   smooth_PRC1 <- smoothPRC1(Y            = Y,
-                            lmm_model    = lmm_model,
-                            options_iter = options_iter,
-                            weights = weights,
-                            axes         = axes,
-                            n_covariates =  n_covariates )
-
-    iaxis = 1
-
-    while(iaxis < n_axes && smooth_PRC1[iaxis] > 1.0e-2*smooth_PRC1$eig[1]){
-      smooth_PRC2 <- smoothPRC2(smooth_PRC_axis1 = smooth_PRC1,
-                             options_iter =  options_iter)
-      smooth_PRC1 <- smooth_PRC2
-      iaxis <- iaxis+1
+  PRC<-  PRC_star <- matrix(NA, nrow = nrow(pwr$X), ncol= n_axes)
+  if(inherits(pwr,"powerEig")) {
+    n1<- sqrt((nrow(pwr$X) - 1)/n_species)
+    pwr$X <- pwr$X*n1
+    pwr$X_star <- pwr$X_star*n1
+    for (axis in 1:n_axes){
+      PRC[, axis] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k= axis)/
+        sqrt(pwr$eig[axis])
+      PRC[, axis] <- PRC[, axis] * n1
+      PRC_star[, axis] <- PRC[, axis] +
+        (pwr$X_star[,axis]- pwr$X[,axis])
     }
-    #smooth_PRC1$eig <- ncol(Y)* apply(smooth_PRC1$X,2, var)
-    names(smooth_PRC1$obj) <-names(smooth_PRC1$objH0) <-
-      paste0("axis",seq_along(smooth_PRC1$obj))
-    if(smooth_PRC1$lmm_model$method == "rda"){
-      smooth_PRC1$B <- cbind(smooth_PRC1$B,fFratios_Time_X(smooth_PRC1))
+  } else {
+    for (axis in 1:n_axes){
+      PRC[,axis] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k= axis)/
+        sqrt(ncol(pwr$Y))
+      PRC_star[,axis] <- PRC[,axis] + (pwr$X_star[,axis]- pwr$X[,axis])
     }
-  return(smooth_PRC1)
+  }
+  colnames(PRC)<- paste0("PRC",1:n_axes)
+  colnames(PRC_star)<- paste0("PRC_star",1:n_axes)
+  rownames(PRC)<- rownames(PRC_star)<-rownames(pwr$X)
+  pwr$PRC <- PRC
+  pwr$PRC_star <- PRC_star
+
+  return(pwr)
 }
 #' @noRd
 #' @keywords internal
-#'
-set_weights <- function(Y, method, user_weights =NULL){
-  if (method =="rda") {
-    # rda
-    if(is.null(user_weights)){
-    n <- nrow(Y); m <- ncol(Y)
-    R <-rep(1, n); K <-  rep(1, m)
-    sqrtR = R
-    #rep(sqrt(1/n), n);
-    sqrtK=  K
-    #rep(sqrt(1/m), m)
-    } else {
-      K <- user_weights[[1]]
-      R <- user_weights[[2]]
-      sqrtK <- sqrt(K* (length(K)/sum(K)))
-      sqrtR <- sqrt(R* (length(R)/sum(R)))
-    }
-  } else {
-    # cca
-    R <-  rowSums(Y); K <- colSums(Y)
-    sumY <- sum(R);
-    sqrtR <- sqrt(R/sumY); sqrtK<- sqrt(K/sumY)
+fFratios_Time_X <- function(smooth_PRC){
+  # initialize
+  Z <- model.matrix(~ smooth_PRC$model$data$Time)
+  # residualize X on Time
+  qrT <- qr(Z)
+  X0 <- qr.resid(qrT, smooth_PRC$X)
+  qrx <- qr(X0) # QR of residualized X
+  Q   <- qr.Q(qrx)
+  # local function
+  fseq <- function(y) {
+    # sequential SS
+    ## needs qrT and Q as above
+    # X: matrix of orthogonal columns x1,...,xm
+    # residualize y on Time
+    y0 <- qr.resid(qrT, y)
+    a  <- crossprod(Q, y0)
+    ss <- cumsum(drop(a^2))
+    rss0 <- sum(y0^2)
+    n  <- length(y)
+    pT <- qrT$rank
+    k  <- seq_along(ss)
+    Fratio <- (ss / k) / ((rss0 - ss) / (n - pT - k))
+    return(Fratio)
   }
-  weights = list(K = K, R = R, sqrtK = sqrtK, sqrtR = sqrtR)
-  return(weights)
+  Fratio <- t(apply(smooth_PRC$Y,2,fseq))
+  colnames(Fratio)<- paste0("Fratio", 1:ncol(Fratio))
+  return(Fratio)
 }
