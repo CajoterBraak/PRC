@@ -1,14 +1,4 @@
 
-## ---- Packages ----
-
-suppressPackageStartupMessages({
-  library(LMMsolver)
-  library(dplyr)
-  library(ggplot2)
-  library(permute)
-  library(PRC)
-})
-
 #the chlorpyrifos experiment from van den Brink & ter Braak 1999
 data(pyrifos, package = "vegan") #log-transformed species data from package vegan
 Y <- pyrifos
@@ -21,7 +11,7 @@ b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
-smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+smooth_PRC <- smoothPRC(Y, model = smoothPRC_model)
 summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,"B1"], b_mod_prc)
 

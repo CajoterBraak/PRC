@@ -1,15 +1,4 @@
 
-## ---- Packages ----
-
-suppressPackageStartupMessages({
-  library(LMMsolver)
-  library(dplyr)
-  library(ggplot2)
-  library(PRC)
-})
-
-
-
 data("Ossenkampen")
 names(Ossenkampen)[4:5]
 names(Ossenkampen)[4:5] <- c("Time", "Treatment")
@@ -25,7 +14,7 @@ if (test){
 Y <- Ossenkampen[ids,-(1:5)]
 Design <- Ossenkampen[ids,1:5]
 Design$Block <- factor(Design$Block)
-# in doPRC Time must be a factor, not a quantative variable
+# in doPRC and smoothPRC Time must be a factor, not a quantitative variable
 Design$Time <- factor(Design$Time)
 with(Design,table(Time,Treatment))
 # unbalanced!!! if test <- FALSE
@@ -36,12 +25,12 @@ mod_prc <- doPRC(Y ~ Time:Treatment + Condition(Time+Block),  data = Design)
 b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <-
-  set_smoothPRC_model(fixed = Yb ~ Block, data= Design,
+  set_smoothPRC_model(data= Design,
                       treatment.coding =FALSE, start_time = 1958)
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
-smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+smooth_PRC <- smoothPRC(Y, model = smoothPRC_model, formula_covariates = ~Block)
 summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,1], b_mod_prc)
 
