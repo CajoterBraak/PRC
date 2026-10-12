@@ -60,7 +60,7 @@ doPRC <- function(formula, scale =  FALSE,  referencelevel = NULL, rank = 2,
     mod_rda <- vegan::rda( formula= formula,  data = data, scale= scale)
   } else      mod_rda <- vegan::cca( formula= formula,  data = data)
 
-  Design_w_PRCs <- PRC_scores(object = mod_rda,
+  Design_w_PRCs <- PRC::PRC_scores(object = mod_rda,
                     focal_factor_name = NULL, referencelevel = referencelevel,
                     rank = rank, scaling = scaling,flip = flip, data = data)
   Design_w_PRCs$terms <- NULL;   Design_w_PRCs$terminfo <- NULL; Design_w_PRCs$method <- NULL

@@ -5,8 +5,8 @@
 #' a vertical species-loading plot.
 #'
 #' @inheritParams plot_smoothPRC_cdt
-#' @inheritParams plot_species_scores_bk
-#' @inheritParams plotPRC
+#' @inheritParams PRC::plot_species_scores_bk
+#' @inheritParams PRC::plotPRC
 #'
 #'@details
 #' \code{sample_times_only = TRUE} can be useful for comparison with
@@ -33,7 +33,7 @@ plotsmoothPRC <- function(
     verbose = TRUE)
 {
   if(is.logical(flip)) flip <- ifelse(flip, -1, 1)
-  if (object$lmm_model$treatment.coding){
+  if (object$model$treatment.coding){
 
   }
   pl.cdt1 <- plot_smoothPRC_cdt(
@@ -80,11 +80,8 @@ plotsmoothPRC <- function(
   }
 
 
-
-
-
-
-  pl.bk1 <- plot_species_scores_bk(
+  if( !is.null(object$B)){
+   pl.bk1 <- PRC::plot_species_scores_bk(
     species_scores = flip*object$B,
     threshold = threshold,
     y_lab_interval = y_lab_interval,
@@ -92,9 +89,8 @@ plotsmoothPRC <- function(
     scoresname = paste0("B", axis),
     selectname = selectname,
     verbose = verbose
-  )
-
-  gg_object <- gridExtra::arrangeGrob(
+   )
+   gg_object <- gridExtra::arrangeGrob(
     pl.cdt1 +
       ggplot2::ylab(NULL) +
       ggplot2::ggtitle(""),
@@ -104,7 +100,22 @@ plotsmoothPRC <- function(
     top = title,
     left = left,
     right = right
-  )
+   )
+
+   } else {
+     pl.bk1 <- NULL
+    gg_object <- gridExtra::arrangeGrob(
+      pl.cdt1 +
+        ggplot2::ylab(NULL) +
+        ggplot2::ggtitle(""),
+      ncol = 2,
+      widths = widths,
+      top = title,
+      left = left,
+      right = right
+    )
+
+  }
 
   if (verbose) {
     gridExtra::grid.arrange(gg_object)
