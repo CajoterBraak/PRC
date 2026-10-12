@@ -1,9 +1,13 @@
+# PRC 2.0.4
+* Adds distance-based smooth PRC.
+
+* Makes the analysis an order faster using warm initialization.
+
 # PRC 2.0.3 
 
 * Adds the CCA-based version to smoothPRC.
 
 * Adds an option to smoothPRC for user-defined covariates.
-
 
 # PRC 2.0.2
 
