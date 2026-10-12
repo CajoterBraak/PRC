@@ -2,8 +2,8 @@
 % Please edit documentation in R/PRC-package.R
 \name{PRC-package}
 \alias{PRC-package}
-\title{Principal Response Curves (PRC) for displaying multivariate main effects and
-interactions}
+\title{Principal Response Curves (PRC) for displaying (smooth)
+multivariate main effects and interactions}
 \description{
 PRC creates 1d and 2d PRC-diagrams using Principal Response Curves analysis
 (van den Brink & ter Braak 1999).
@@ -12,6 +12,8 @@ The main user functions are \code{\link{doPRC}}, \code{\link{plotPRC}} and
 The easiest example is the code demo \code{PRC_pyrifos}.
 The function \code{\link{doPRC}} is more general
 than and replaces \code{vegan::}\code{\link[vegan]{prc}}.
+This version includes smooth PRC (\code{\link{smoothPRC}} using
+ \code{\link{set_smoothPRC_model}}).
 }
 \references{
 ter Braak, C.J.F. (2023) Redundancy analysis includes analysis of

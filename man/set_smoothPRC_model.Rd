@@ -2,16 +2,18 @@
 % Please edit documentation in R/set_smoothPRC_model.R
 \name{set_smoothPRC_model}
 \alias{set_smoothPRC_model}
-\title{Define the model for smooth PRC using LMMsolver (Boer 2023)}
+\title{Define the model for smooth PRC using LMMsolver (Boer 2023) and
+powerSVD}
 \usage{
 set_smoothPRC_model(
   spline = NULL,
   splineH0 = ~spl1D(time, nseg = 6, degree = 3, pord = 2),
-  fixed = Yb ~ 1,
+  fixed = y ~ 1,
   fixedH0 = fixed,
   random = NULL,
   residual = NULL,
   weights = NULL,
+  randomH0 = random,
   treatment.coding = TRUE,
   pord = c(time = 2, dose = 2, time.overall = 3, Treatment = 2),
   nseg = c(time = 6, dose = 6),
@@ -36,11 +38,12 @@ See \code{\link[LMMsolver]{LMMsolve}}.}
 \item{fixed}{A formula for the fixed part of the model. Should be of the
 form "response ~ pred"}
 
-\item{fixedH0}{The default is \code{Yb~1}. Usually
-equal to fixed. NB: the response variable needs to be \code{Yb}, a
+\item{fixedH0}{Formula for the null model.
+The default is equal to \code{fixed}, \emph{i.e.}
+ \code{xstar~1}. NB: the response variable needs to be \code{xstar}, a
 variable internally generated from the abundance table \code{Y} and
-loading vector that is optimized.
-The default is \code{Yb~1}.}
+loading vector, that is optimized.
+The default is \code{xstar~1}.}
 
 \item{random}{A formula for the random part of the model. Should be of the
 form "~ pred".}
@@ -51,6 +54,9 @@ the form "~ pred".}
 \item{weights}{A character string identifying the column
 of data to use as relative weights in the fit. Default value NULL, weights are
 all equal to one.}
+
+\item{randomH0}{The default is equal to \code{random}, \emph{i.e.}
+\code{NULL}. Formula for the null model fit.}
 
 \item{treatment.coding}{logical. Default \code{TRUE} for a quantitative
 analysis using a 2d spline. If \code{FALSE}, for a qualitative analysis in
@@ -75,7 +81,7 @@ factor(data$Treatment).}
 Default: \code{0}.}
 
 \item{referencelevel}{numeric or  character level(s) to be used as reference level or levels
-of the focal treatment(s); default: 1 (first level(s)).  With \code{\link{doPRC}}, the focal treatment is (or treatments are) given in the
+of the focal treatment(s); default: 1 (first level(s)).  With \code{\link[PRC]{doPRC}}, the focal treatment is (or treatments are) given in the
 resulting list at \code{result$focal_and_conditioning_factors$`focal factor`}}
 
 \item{method}{character rda or cca. Default: \code{"rda"}}
@@ -87,7 +93,8 @@ Default: "ms".}
 \item{data}{A data.frame containing the modeling data.}
 }
 \description{
-Define the model for smooth PRC using LMMsolver (Boer 2023)
+Define the model for smooth PRC using LMMsolver (Boer 2023) and
+powerSVD
 }
 \details{
 An atypical aspect of the function is that the time and treatment factors
@@ -96,11 +103,11 @@ An atypical aspect of the function is that the time and treatment factors
   character variables
  \code{Time} and \code{Treatment} that can be converted to  the numeric
   variables \code{time} and \code{dose}, respectively, using
- \code{\link{fvalues4levels}}. The values of \code{dose} are set to 0 for
+ \code{\link[PRC]{fvalues4levels}}. The values of \code{dose} are set to 0 for
  negative values of \code{time} and \code{time ==0},
  after subtraction of \code{start_time}.
  In this case, the default spline model is:
- \code{ ~ spl2D(time, dose,  = c(6, 6), degree = 3, pord = 2)}.
+ \code{ ~ spl2D(time, dose, seg = c(6, 6), degree = 3, pord = 2)}.
  To enable \code{Treatment} to be treated as a factor (instead of as a
  quantitative variable), the function generates variables with
  names \code{D1}, ..., \code{D}\emph{k}, with \emph{k} the number of
@@ -114,10 +121,12 @@ An atypical aspect of the function is that the time and treatment factors
  An example of the formula for \code{spline}
  when \code{treatment.coding} is \code{FALSE}
  and the number of levels of \code{Treatment} is 4,  is
- \code{spl1D(time, nseg =6, degree = 3, pord = 3)+
- spl1D(D1, nseg = 6, degree = 3, pord = 2)+
- spl1D(D2, nseg = 6, degree = 3, pord = 2)+
- spl1D(D3, nseg = 6, degree = 3, pord = 2)}.
+\preformatted{
+spl1D(time, nseg = 6, degree = 3, pord = 3) +
+spl1D(D1,   nseg = 6, degree = 3, pord = 2) +
+spl1D(D2,   nseg = 6, degree = 3, pord = 2) +
+spl1D(D3,   nseg = 6, degree = 3, pord = 2)
+}
  This is the default model
  if \code{treatment.coding} is \code{FALSE}.
 The default spline model assumes that the Treatment factor has a quantitative
@@ -125,18 +134,8 @@ basis, so that the response to Time and Treatment can be analyzed using a
 2D spline model.
 }
 \examples{
-suppressPackageStartupMessages({
-  library(LMMsolver)
-  library(dplyr)
-  library(ggplot2)
-  library(PRC)
-})
-
-# Fig.1
 
 # Analyze example data ----------------------------------------------------
-
-
 
   data(SimData)
   # extract design
@@ -168,12 +167,14 @@ summary(mod_prc)
 
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
-smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+smooth_PRC <- smoothPRC(Y, model = smoothPRC_model)
+
 summary(smooth_PRC$obj[[1]])
 (cc <- cor(smooth_PRC$B[,1], b_mod_prc))
 plot_species_scores_bk(-smooth_PRC$B, scoresname = "B1")
 plot_species_scores_bk(b_mod_prc)
 plot_smoothPRC_cdt(smooth_PRC, flip= TRUE)
+
 plotsmoothPRC(smooth_PRC, flip= TRUE,threshold = 0)
 
 
@@ -186,17 +187,6 @@ summary(lm(smooth_PRC$X[,1]~ x1+ x2+ x1:x2 )) # R^2 ~1!
 
 
 plotPRC(mod_prc)
-
-
-## ---- Packages ----
-
-suppressPackageStartupMessages({
-  library(LMMsolver)
-  library(dplyr)
-  library(ggplot2)
-  library(PRC)
-})
-
 
 
 data("Ossenkampen")
@@ -214,7 +204,7 @@ if (test){
 Y <- Ossenkampen[ids,-(1:5)]
 Design <- Ossenkampen[ids,1:5]
 Design$Block <- factor(Design$Block)
-# in doPRC Time must be a factor, not a quantative variable
+# in doPRC and smoothPRC Time must be a factor, not a quantitative variable
 Design$Time <- factor(Design$Time)
 with(Design,table(Time,Treatment))
 # unbalanced!!! if test <- FALSE
@@ -225,12 +215,12 @@ mod_prc <- doPRC(Y ~ Time:Treatment + Condition(Time+Block),  data = Design)
 b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <-
-  set_smoothPRC_model(fixed = Yb ~ Block, data= Design,
+  set_smoothPRC_model(data= Design,
                       treatment.coding =FALSE, start_time = 1958)
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
-smooth_PRC <- smoothPRC(Y, lmm_model = smoothPRC_model)
+smooth_PRC <- smoothPRC(Y, model = smoothPRC_model, formula_covariates = ~Block)
 summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,1], b_mod_prc)
 

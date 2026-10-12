@@ -5,41 +5,75 @@
 \title{Smooth PRC using LMMsolver (Boer, 2023)}
 \usage{
 smoothPRC(
-  Y,
-  lmm_model,
-  options_iter = list(b_init = NULL, k = 3, mA = 4, tol = 1e-08, maxiter = 50),
+  response,
+  model,
+  options_iter = list(init = NULL, k = 2, mA = 4, tol = 1e-08, maxiter = 20),
   n_axes = 2,
   formula_covariates = NULL,
-  weights = NULL
+  weights = NULL,
+  n_species = 1
 )
 }
 \arguments{
-\item{Y}{matrix, data frame of the abundance data
-(dimension \emph{sites} x \emph{species})}
+\item{response}{matrix or data frame of the abundance data or a distance
+matrix or object of class \code{\link[stats:dist]{dist}}
+The abundance data has dimension \emph{sites} x \emph{species}.}
 
-\item{lmm_model}{The result of \code{\link{set_smoothPRC_model}}.}
+\item{model}{a named list.
+Usually the  result of \code{\link{set_smoothPRC_model}}
+The model contains at least one element and one or
+more optional elements used for fitting the model using the
+functions \code{fit_full_model} and \code{fit_null_model}) (see Details):
+\itemize{
+\item \code{method}: character. Default: \code{"dbrda"} for
+distance-based smooth PRC, when \code{response} is a distance-like object.
+The default is  \code{"rda"} for rda-based smooth PRC, when \code{response}
+is an abundance matrix, leading to
+models of the principal components family (pca, princomp, rda, dc-pca).
+Any other string then leads to CCA-based smooth PRC.
+\item \code{data}: an object,
+usually a data frame with the predictor data for rows (sites)
+\item \code{formula}: one or more optional formulas specifying the model
+of the predictor data (if any) to
+be fitted to a response vector.
+}}
 
 \item{options_iter}{list of five elements
 \itemize{
-\item \code{b_init}: initial values of the species loadings.
-Default \code{NULL}.
+\item \code{init}: initial values of sample scores if  \code{response}
+is a distance and of species loadings otherwise, a vector of the appropriate
+length or a matrix with axis-specific initial values in columns.
+Default \code{NULL} for solver and model specific initialization.
+Default \code{NULL}, resulting in a start for each eigenvector from the model
+\code{Treatment*Time + Condition(Time)}.
 \item \code{k}: number of cycles in block-power updating to  better separate
-the first eigen vector from the second. Default \code{NULL}.
-\item \code{mA}: number of vectors in Anderson acceleration. Default \code{3}.
-\item \code{tol}: stopping criterion, tolarance. Default \code{1e-8}.
-\item \code{maxiter}:maximum number of iterations. Default \code{50}.
+the first eigen vector from the second. Default \code{2}.
+\item \code{mA}: number of vectors in Anderson acceleration. Default \code{4}.
+\item \code{tol}: stopping criterion, tolarance. Default \code{1e-4}.
+\item \code{maxiter}:maximum number of iterations. Default \code{20}.
 }}
 
 \item{n_axes}{the number of axes to extract. Default \code{2}.}
 
-\item{formula_covariates}{one-sided formula with covariates that the model needs to
-adjust for. Default \code{NULL}, resulting in \code{~1}.
-The formula specifies what is called  the \code{Condition}in \code{vegan},
-covariates in \code{Canoco} and covariables in ter Braak & Prentice (1988).}
+\item{formula_covariates}{one-sided formula with row covariates
+(sample-specific predictors) that the model needs to adjust for.
+Default \code{NULL}, resulting in \code{~1}.
+The formula specifies what is called  the \code{Condition} in \code{vegan},
+covariates in \code{Canoco} and covariables in ter Braak & Prentice (1988).
+The covariates must be in \code{model$data}.}
 
 \item{weights}{a list of user-defined weights for columns (species) first
 and, second, rows (sites) Default \code{NULL} for method-defined weights,
-e.g. row totals of \code{Y} in CCA, and uniform weights in RDA.}
+e.g. row totals of \code{response} in CCA, and uniform weights in RDA.
+Zero weights are not allowed; near zero weigths may lead to instability;
+ this is unchecked currently.
+ Ignored when \code{response} is a distance.}
+
+\item{n_species}{number of species in \code{response}. Default 1.
+Ignored if \code{response} is an abundance matrix.
+For testing purposes, to get same scaling irrespectively when \code{response}
+is an abundance matrix or a Euclidean distance matrix
+of that abundance matrix.}
 }
 \value{
 A list.
@@ -50,14 +84,9 @@ with \code{Fratio}'s with attached axis number, e.g. \code{B1}.}
 \item{X}{matrix with the eigen vectors
 (i.e. the constrained sample scores) in columns.}
 \item{X_star}{matrix with the unconstrained sample scores.}
-\item{PRC}{obtained from \code{X}, by subtraction of the score for
-the reference treatment, so that all scores for the reference
-treatment are 0.}
-\item{PRC_star}{obtained from \code{X_star} as \code{PRC} is from \code{X}.
-These are the sample points in the PRC diagram.}
-\item{mult}{multiplier for re-scaling the species and sample scores.
-The value is 1 as the default currently, giving a mean square of 1
-of the species scores.}
+\item{PRC}{matrix with the PRC scores, X scores compared to the X-scores of
+the reference level in \code{Treatment} in \code{data}}
+\item{PRC_star}{matrix with the unconstrained PRC scores.}
 \item{weights}{names list of columns weights and row weights. Names are
 \code{K}, \code{R}, \code{sqrtK}, \code{sqrtR}. The first two are
 column (species) and row (site)totals in with \code{method != "rda"}.
@@ -68,16 +97,13 @@ They not normalized; none sums to 1. All 1 in \code{method =="rda"}}.
  of the null model, one for each axis.}
 \item{iter}{the number of iterations of the accelerated power algorithm.}
 \item{Y}{the response matrix.}
-\item{YB}{matrix with the response vectors, one for each axis.
-These are the response \code{Yb} in the call to
-\code{\link[LMMsolver]{LMMsolve}}.}
-\item{lmm_model}{copy of the \code{lmm_model} argument to the
-\code{smoothPRC}.}
+\item{model}{copy of the \code{model} argument to the
+\code{powerSVD}.}
 \item{options_iter}{copy of the \code{opions_iter} argument
  to the \code{smoothPRC}.}
 \item{axes}{an internal matrix: Intercept, optionally covariates and
  previous axes.}
-\item{n_covariates}{the number of user-defined covariates using
+\item{n_covariates}{the number of user-defined row covariates using
 \code{formula_covariates} with one for the \code{"(Intercept)"}.}
 }
 }
@@ -86,11 +112,12 @@ Smooth PRC using LMMsolver (Boer, 2023)
 }
 \details{
 An atypical aspect of the function is that the time and treatment factors
-need to have the names Time and Treatment in \code{data}.
+need to have the names \code{Time} and \code{Treatment} in \code{data}.
 
 Classical PRC is a reduced rank model of rank 1 (or 2) with model
-Treatment*Time with the Time factor is a concomitant variable.
-In smoothPRC the factor Time is taken quantitatively and the main effect
+\code{~Treatment*Time} with the \code{Time} factor is a concomitant variable.
+In smoothPRC the factor \code{Time} is taken quantitatively and
+the main effect
 of time is not an un-ordered set of values but a smooth P-spline model.
 Also, the time-dependent effects of the treatments are smooth P-splines.
 As the main and interaction effects are splines, the main effect of time
@@ -106,29 +133,37 @@ the penalty parameters are obtained by REML using
 The model is linear in, possibly tensor, B-splines,
 but through the B-splines non-linear from the perspective of the user. With
 quadratic ridge-type difference penalties on the coefficients the B-splines
-becomeP-splines (penalized B-splines).
-For an initial \code{b} of species scores, the unconstrainted sites \code{Yb}
+become P-splines (penalized B-splines).
+For an initial vector \code{b} of species scores,
+the unconstrained sites
 are calculated, which are then used as response vector in
 \code{\link[LMMsolver]{LMMsolve}} to give a constrained site scores
-\code{x} by the P-spline model specified in \code{lmm_model}. This
+\code{x} by the P-spline model specified in \code{model}. This
 is part of a power algorithm with block and Anderson acceleration to solve
 the dominant eigen vector of the
 underlying eigen problem while optimizing simultaneously the penalties
 using \code{\link[LMMsolver]{LMMsolve}}.
 
-If \code{lmm_model$scaling =="ms"}, then in the result \code{B} in the
-result is multiplied by \code{mult = sqrt(ncol(Y))} and all other items are
-are divided by \code{mult = sqrt(ncol(Y))}, except \code{Yb} to be inline
-with \code{fitted(result$obj)}.
-Note that \code{Yb}, a column in \code{YB}, is the response in
-\code{\link[LMMsolver]{LMMsolve}} model.
-The \code{Fratio1},\code{Fratio2}, etc. in the species scores matrix
-\code{result$B} are computed with linear model \code{y~Time +X}, with
-\code{y}  a species response in \code{Y},
-\code{Time} the factor in \code{data} in
-\code{\link{set_smoothPRC_model}} and
-\code{X} the smooth eigenvectors
-of which the first \emph{r} are used for calculating \code{Fratio}\emph{r}.
+The \code{smoothPRC} algorithm uses one and two-sided power iterations.
+It thus iterates through the transition formulas of the method with
+(P-spline) regression fits.
+It uses two acceleration methods:
+blocking and Anderson iteration.
+
+The \code{response} is taken as a distance object if
+it inherits class  \link[stats:dist]{dist} or if it a matrix-like object with
+equal dimensions using \code{\link[=dim]{dim}} and all zero diagonal using
+\code{sum(}\code{\link[=diag]{diag}}\code{(response))==0}.
+Initialization of the power algorithm expands the
+ \link[stats:dist]{dist} object in \code{response}
+to a square symmetrix matrix.
+This expansion can be avoided by explicit initialization
+using \code{options_iter$init}.
+
+If \code{response} is a distance object and the maximum distance exceeds 4
+then the distance is divided by n-1 with n the number of samples.
+This choice is taken from vegan::dbrda and usually makes the eigenvalues
+equal to those of vegan::rda if the distance is 'euclidean'.
 }
 \references{
 Boer, Martin P. 2023.
