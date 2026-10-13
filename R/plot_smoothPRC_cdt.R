@@ -137,7 +137,7 @@ plot_smoothPRC_cdt <- function(object,
       }
     pred0 <- predict(object$obj[[axis]], newdata = newdat0)
 
-    newdat1$ypred <- (pred1$ypred - pred0$ypred) / object$mult
+    newdat1$ypred <- (pred1$ypred - pred0$ypred)* object$mult
 
     smooth_prc_df2 <- data.frame(
       Time = newdat1$time,
@@ -230,6 +230,7 @@ plot_smoothPRC_cdt <- function(object,
     )
 
   return(p1)
+ # return(list(p1= p1, PRC = ))
 }
 
 

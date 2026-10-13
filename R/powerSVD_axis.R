@@ -150,15 +150,15 @@ powerSVD_axis <- function(Y, model,
   }
   eig <- sum( (weights$sqrtR*xhat)^2)
   eig <- if(model$method == "rda") eig/(n-1) else eig
-  mult <-if ( model$method == "rda") sqrt(length(b)) else 1
+  mult <-if ( model$method == "rda") 1/sqrt(length(b)) else 1
   B <- as.matrix(b);colnames(B)<- "B1";rownames(B) <- colnames(Y)
   axes <- cbind(axes, xhat);
   colnames(axes)[ncol(axes)] <- paste0(model$method, ncol(axes)-n_covariates)
-  out <-list(eig=eig, B = B*mult,
-             X = xhat/mult,
+  out <-list(eig=eig, B = B/mult,
+             X = xhat*mult,
              X_star = qr.resid(qr_prev_axes,
                 weights$sqrtR*(xstar - get_fitted_H0(objH0, length(xstar)) ))/
-               (weights$sqrtR*mult),
+               (weights$sqrtR/mult),
              #YB=xstar,
              mult = mult,
              weights = weights,

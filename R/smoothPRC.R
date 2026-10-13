@@ -188,6 +188,7 @@ smoothPRC <- function(response, model,
   PRC<-  PRC_star <- matrix(NA, nrow = nrow(pwr$X), ncol= n_axes)
   if(inherits(pwr,"powerEig")) {
     n1<- sqrt((nrow(pwr$X) - 1)/n_species)
+    pwr$mult <- n1/sqrt(pwr$eig[1])
     pwr$X <- pwr$X*n1
     pwr$X_star <- pwr$X_star*n1
     for (ax in 1:n_axes){
@@ -239,6 +240,7 @@ fFratios_Time_X <- function(smooth_PRC){
     return(Fratio)
   }
   Fratio <- t(apply(smooth_PRC$Y,2,fseq))
+  if (nrow(Fratio)==1)Fratio<-t(Fratio)
   colnames(Fratio)<- paste0("Fratio", 1:ncol(Fratio))
   return(Fratio)
 }
