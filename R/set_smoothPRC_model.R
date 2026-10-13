@@ -79,7 +79,6 @@
 #' The default spline model assumes that the Treatment factor has a quantitative
 #' basis, so that the response to Time and Treatment can be analyzed using a
 #' 2D spline model.
-#' @example demo/smoothPRC_SimData.r
 #' @example demo/smoothPRC_Ossenkampen.r
 #' @seealso \code{\link{smoothPRC}}
 #' @export

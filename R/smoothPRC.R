@@ -210,7 +210,7 @@ smoothPRC <- function(response, model,
   rownames(PRC)<- rownames(PRC_star)<-rownames(pwr$X)
   pwr$PRC <- PRC
   pwr$PRC_star <- PRC_star
-
+  class(pwr) <- c("smoothPRC",class(pwr))
   return(pwr)
 }
 #' @noRd
