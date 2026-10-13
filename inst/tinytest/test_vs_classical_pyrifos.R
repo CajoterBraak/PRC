@@ -71,6 +71,12 @@ model_clas2 <- set_smoothPRC_model(
 
 
 out_1<- smoothPRC(resp, model = model_clas1, n_axes = n_axes)
+out_1_ax1<- smoothPRC(resp, model = model_clas1, n_axes = 1)
+
+expect_equivalent(
+  out_1$B[,c(1,3)],
+  out_1_ax1$B
+)
 
 expect_equivalent(
   vegan::eigenvals(mod,"constrained" )[1:n_axes],
@@ -134,6 +140,13 @@ D <- vegan::vegdist(resp, method = "euclidean") # distance
 
 out_D1<- smoothPRC(D, model = model_clas1, n_axes = n_axes,
                    n_species = ncol(resp))
+out_D1_ax1<- smoothPRC(D, model = model_clas1, n_axes = 1,
+                   n_species = ncol(resp))
+expect_equivalent(
+  out_D1$X[,1,drop = FALSE],
+  out_D1_ax1$X
+)
+
 out_D2<- smoothPRC(as.matrix(D), model = model_clas1, n_axes = n_axes,
                    n_species = ncol(resp))
 expect_equivalent(abs(out_D1$X),abs(out_D2$X))
@@ -153,6 +166,12 @@ expect_equivalent(abs(x_mod_prc),abs(out_D2$X))
 all.equal(out_D1[-8],out_D2[-8])
 x_mod_prc/out_D1$X
 }
+
+expect_equivalent(abs(x_mod_prc),abs(out_D1$X), tol = tol)
+expect_equivalent(abs(x_mod_prc),abs(out_D1$X), tol = tol)
+expect_equivalent(abs(x_star_mod_prc),abs(out_D1$X_star),tol =tol)
+expect_equivalent(abs(PRCmod),abs(out_D1$PRC),tol=tol)
+expect_equivalent(abs(PRCmodE),abs(out_D1$PRC_star),tol=tol)
 
 
 
