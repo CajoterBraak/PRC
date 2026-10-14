@@ -15,7 +15,9 @@ fvalues4levels(object, fctr)
 a numeric named vector (names are levels)
 }
 \description{
-\code{fvalues4levels} changes levels of a factor to numeric variable for plotting of the PRC diagram
+\code{fvalues4levels} changes levels of a factor to numeric variable
+in \code{\link{set_smoothPRC_model}} and
+for plotting of the PRC diagram.
 }
 \examples{
 Design <- data.frame(week=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 19, 24)),

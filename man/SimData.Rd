@@ -25,5 +25,5 @@ The data has 100 unit and 10 colums as follows:
 ter Braak, C.J.F. (2023)
  Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
  and outperforms its extensions. Chemometrics and Intelligent Laboratory Systems, 104898.
- https://doi.org/10.1016/j.chemolab.2023.104898
+ \doi{10.1016/10.1016/j.chemolab.2023.104898}
 }

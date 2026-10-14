@@ -7,7 +7,7 @@
 smoothPRC(
   response,
   model,
-  options_iter = list(init = NULL, k = 2, mA = 4, tol = 1e-08, maxiter = 20),
+  options_iter = list(init = NULL, k = 2, mA = 4, tol = 1e-08, maxiter = 50),
   n_axes = 2,
   formula_covariates = NULL,
   weights = NULL,
@@ -40,12 +40,15 @@ be fitted to a response vector.
 
 \item{options_iter}{list of five elements
 \itemize{
-\item \code{init}: initial values of sample scores if  \code{response}
-is a distance and of species loadings otherwise, a vector of the appropriate
-length or a matrix with axis-specific initial values in columns.
-Default \code{NULL} for solver and model specific initialization.
+\item \code{init}: initial values of sample scores.
+It must be a vector of
+length the number of samples
+or a matrix with axis-specific initial values in columns.
+If  \code{response} is an abundance matrix, initialization can be via
+species loadings.
 Default \code{NULL}, resulting in a start for each eigenvector from the model
-\code{Treatment*Time + Condition(Time)}.
+\code{Treatment*Time + Condition(Time)} with (if any) the current covariables
+and (smooth) axes that are already extracted.
 \item \code{k}: number of cycles in block-power updating to  better separate
 the first eigen vector from the second. Default \code{2}.
 \item \code{mA}: number of vectors in Anderson acceleration. Default \code{4}.
@@ -71,8 +74,9 @@ Zero weights are not allowed; near zero weigths may lead to instability;
 
 \item{n_species}{number of species in \code{response}. Default 1.
 Ignored if \code{response} is an abundance matrix.
-For testing purposes, to get same scaling irrespectively when \code{response}
-is an abundance matrix or a Euclidean distance matrix
+This parameter is included for testing purposes,
+in particular,to get same scaling irrespective when \code{response}
+is an abundance matrix or a 'euclidean' distance matrix
 of that abundance matrix.}
 }
 \value{
@@ -131,9 +135,11 @@ The model is a P-spline model and
 the penalty parameters are obtained by REML using
 \code{\link[LMMsolver]{LMMsolve}} (Boer 2023).
 The model is linear in, possibly tensor, B-splines,
-but through the B-splines non-linear from the perspective of the user. With
-quadratic ridge-type difference penalties on the coefficients the B-splines
-become P-splines (penalized B-splines).
+but through the B-splines non-linear in the original quantitative variables,
+here \code{time} or \code{dose}
+and thus non-linear from the perspective of the user.
+With  quadratic ridge-type difference penalties on the coefficients,
+the B-splines become P-splines (penalized B-splines).
 For an initial vector \code{b} of species scores,
 the unconstrained sites
 are calculated, which are then used as response vector in

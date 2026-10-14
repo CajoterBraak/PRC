@@ -37,15 +37,16 @@ Berendse, F., Geerts, R.H.E.M., Elberse, W.T., Bezemer, T.M.,
  Goedhart, P.W., Xue, W., Noordijk, E., ter Braak, C.J.F. & Korevaar, H. (2021)
  A matter of time: Recovery of plant species diversity in wild plant communities
  at declining nitrogen deposition. Diversity and Distributions, 27, 1180-1193.
- https://doi.org/10.1111/ddi.13266
+ \doi{10.1111/ddi.13266}
 
  Geerts, R.H.E.M., Bufe, C., Schils, P.C., Korevaar, H., Berendse, F. & Struik, P.C. (2021)
   The Ossekampen Grassland Experiment: Data underlying the publication:
   A matter of time: recovery of plant species diversity in wild plant communities
-  at declining nitrogen deposition. https://doi.org/10.4121/13200398
+  at declining nitrogen deposition.
+  \doi{10.4121/13200398}
 
 ter Braak, C.J.F. (2023)
  Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
  and outperforms its extensions. Chemometrics and Intelligent Laboratory Systems, 104898.
- https://doi.org/10.1016/j.chemolab.2023.104898
+ \doi{10.1016/j.chemolab.2023.104898}
 }
