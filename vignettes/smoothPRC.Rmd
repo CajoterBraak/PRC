@@ -30,7 +30,7 @@ The aim of the `PRC` package is to help ecologists unravel time-dependent treatm
 # Theory of PRC and smooth PRC
 
 PRC is is least-squares reduced rank regression with $Time$ as concomitant factor variable [@vandenBrink1999PRC; @Braak2023redundancy]. In smooth PRC, a ridge-type penalty is applied to the coefficients forming the ordination axes, also called latent variables. With such a penalty the penalized least-square solutiuon is still an eigen problem. The eigen problem in smoothPRC includes  penalty paramaters (smoothness parameters), which thus need to estimated also. In `smoothPRC` this is achieved using the `LMMsolver` package [@Boer2023]. All eigen vectors can be computed simultaneously in classical PRC using a singular value decomposition. In smoothPRC different eigen vectors may need different smoothness parameters, so that it is natural to calculated them in turn. This note focuses on the first (dominant) eigen vector. Subsequent eigen vectors can be obtained by adding previous vectors to the existing covariables specified by `formula_covariates`. Distance-based smooth PRC
-is obtained similarly by adding smooth fits to its transition formula for the sample scores,that is, applied directly to the distance matrix [@Braak1992Dist; @McArdleAnderson2001], without prior principal coordinates analysis.
+is obtained similarly by adding smooth fits to its transition formulas for the sample scores,that is, applied directly to the () distance matrix [@Braak1992Dist; @McArdleAnderson2001], without prior principal coordinates analysis.
 
 ## From multivariate regression to partial redundancy analysis
 
@@ -42,12 +42,12 @@ with **Y** the response matrix, **Q** a matrix with concomitant variables, **Z**
 
 In partial RDA, the focus lies on a low-dimensional representation of the effects of **Z**${_0}$ on the response, that is on **M**, with the effects of **Q** partial out. To this aim and with $\Pi_{Q}$ the orthogonal projector on **Q**, define **Z** = **Z**$_{0}$ - $\Pi_{Q}$**Z**$_{0}$, the matrix of residuals of the regression of **Z**$_{0}$ on to **Q**. Now, **Q** and **Z** are orthogonal and span the same space as **Q** and **Z**$_{0}$. Moreover, the regression coefficients associated with **Z** are the same as those with **Z**$_{0}$, while the regression coefficients associated with **Q** change. The original model can thus be rewritten to
 
-**Y** = **QA** + **ZM** + **E** 
+**Y** = **QB** + **ZM** + **E** 
 
 The low-dimensional representation is obtained by a rank-restriction on **M**. With the rank-1 restriction **M** = **cb**$^T$, where **c** is a vector of canonical coefficients and **b** is a vector of loadings (species scores),
 
 **ZM** = **Zcb**$^T$ = **xb**$^T$, which is a partial PCA model with constraint **x** = **Zc** with **x** the constrained site scores. Partial redundancy analysis is thus both reduced rank regression with concomitant variables and a partial PCA with constraints.
-Note that **A** in the rewritten formula can be obtained by regression **Y** on **Q** only.
+Note that the matrix of regression coefficient **B** in the rewritten formula can be obtained by regression **Y** on **Q** only. Note also that the F- or LR-test on nullity of **M** is also a comparison of the full model with both **Q** and **Z0** and the null model with **Q** only.
 
 ## The transition formulas of classical partial redundancy analysis
 
@@ -105,7 +105,7 @@ After convergence, **x**$^*$ is replaced by **x**$^*$ - fitted(smooth of time),
 so a to remove the time effect from the 'unconstrained' site scores.
 This is the $x\_star$ entry in the output of smoothPRC.
 
-Also, the PRC graph takes one level or value of the treatment a reference level or value. After convergence, the values of the PRC curves are obtained from the full model by subtracting from the fitted values the predictions for the data set derived from the original data with all treatment levels or values replaced by the reference level or value (0). This is the $PRC$ entry in the output of smoothPRC.
+Also, the PRC graph takes one level or value of the treatment as reference level or value. After convergence, the values of the PRC curves are obtained from the full model by subtracting from the fitted values the predictions for the data set derived from the original data with all treatment levels or values replaced by the reference level or value (0). This is the $PRC$ entry in the output of smoothPRC.
 
 By default, all scores are rescaled such that the mean square of the species scores $b$ is 1. This makes smoothPRC behave as `doPRC` with `scaling = "ms"`.
 
@@ -125,7 +125,7 @@ Design <- data.frame(Time=gl(11, 12, labels=c(-4, -1, 0.1, 1, 2, 4, 8, 12, 15, 1
 The default model is set up by:
 
 ```{r setup2}
-library(LMMsolver)
+library(PRC)
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 ```
 
@@ -136,7 +136,7 @@ smoothPRC_model$splineH0
 smoothPRC_model$spline
 ```
 
-The null model is a spline function of time only, whereas the alternative model uses a two-dimensional spline model in `time` and `dose`. The `time` variable is the quantitative version of the variable `Time` in the `Design`.The `dose` variable the quantitative version of the variable `Treatment` with `dose` is set to 0 pre-application (negative times by default and, in general, times before `start_time`.
+The null model is a spline function of time only, whereas the alternative model uses a two-dimensional spline model in `time` and `dose`. The `time` variable is the quantitative version of the variable `Time` in the `Design`.The `dose` variable is the quantitative version of the variable `Treatment` with `dose` set to 0 for pre-application times (negative times by default and, in general, times before `start_time`. The warnings are from `LMMsolve` and are expected in early iterations of the power algorithm when the number of `LMMsolve` iterations is then limited. In `smoothPRC`, the maximum number of `LMMsolve` iterations is set to 50. If the number of power iterations exceeds 50 a warning is issued such as `No convergence of the power algorithm for axis  2 `. Such non-convergence is expected when the eigenvalue is close in value to the next one, in the example `axis 3`.
 
 ```{r run}
 smooth_PRC <- smoothPRC(Y, model = smoothPRC_model)
@@ -193,7 +193,7 @@ out_D$eig/mod_prc$CCA$eig[seq_along(classical_PRC$eig)]
 ```
 
 
-Distance-based smooth PRC generalized smooth PRC on **Y** by allowing other choices of distance.
+Distance-based smooth PRC generalizes smooth PRC on **Y** by allowing other choices of distance.
 
 
 
