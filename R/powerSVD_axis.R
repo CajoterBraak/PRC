@@ -43,9 +43,13 @@ powerSVD_axis <- function(Y, model,
   if (is.null(options_iter$init)) b <- drop(initialize_pwr_alg(model, Y = Y,
                                       weights =weights, axes = axes)) else {
     b <- as.matrix(options_iter$init)[,iaxis]
-    if (!length(b)== ncol(Y) )
-      stop("wrong length of initial values in options_iter$init")
+    if (!length(b)== ncol(Y) ){
+      x <- b
+      if(length(x)== nrow(Y)&& !nrow(Y)==ncol(Y)){
+      b <- crossprod(Y, x)/ weights$K
+      }  else stop("wrong length of initial values in options_iter$init")
     }
+                                      }
 
   b <- normalizeb(b, sqrtw = weights$sqrtK)
 
@@ -259,11 +263,11 @@ update_fit_state.default <- function(object, state = NULL)
 {
   state
 }
-#' initializes the power algorthm (internal)
+#' initializes the power algorithm to solve the eigen vector problem (internal)
 #' @param model Model specification.
-#' @param Y response
-#' @param weights optional weights
-#' @param axes prior axes and covariable data
+#' @param Y response.
+#' @param weights optional weights.
+#' @param axes prior axes and covariable data.
 #' @export
 initialize_pwr_alg <- function(model, Y, weights, axes)
 UseMethod("initialize_pwr_alg", model)

@@ -1,7 +1,24 @@
 #' @title Define the model for smooth PRC using LMMsolver (Boer 2023) and
-#' powerSVD
+#' smoothPRC
 #' @inheritParams LMMsolver::LMMsolve
 #' @inheritParams PRC::doPRC
+#' @param spline A formula for the spline part of the model.
+#' Should be of the form "~ spl1D()", ~ spl2D()" or "~spl3D()".
+#' Generalized Additive Models (GAMs) can also be used,
+#' for example "~ spl1D() + spl2D()".Default: \code{NULL}, resulting
+#' in "~spl2D(time, dose, nseg = c(6, 6), degree = 3, pord = 2)" when
+#' \code{treatment.coding} is \code{TRUE}
+#'  and in, \emph{e.g.}
+#' \preformatted{
+#' spl1D(time, nseg = 6, degree = 3, pord = 2) +
+#' spl1D(D1,   nseg = 6, degree = 3, pord = 2) +
+#' spl1D(D2,   nseg = 6, degree = 3, pord = 2) +
+#' spl1D(D3,   nseg = 6, degree = 3, pord = 2)
+#' }
+#' with  \code{treatment.coding} is \code{FALSE},
+#' and the factor\code{Treatment} has four levels.
+#' When both \code{spline} and \code{splineH0} are \code{NULL}, the
+#' resulting formala is \code{NULL}, for both.
 #' @param splineH0 As spline but for the null model. Default: a one dimensional
 #' smooth in time.
 #' \code{~ spl1D(time, nseg = 6, degree = 3, pord = 2)}
@@ -14,8 +31,10 @@
 #  and \code{b}, the species
 #' loading vector, that is optimized.
 #' The default is \code{xstar~1}.
-#' @param randomH0 The default is equal to \code{random}, \emph{i.e.}
-#'  \code{NULL}. Formula for the null model fit.
+#' @param random  Formula of the form "~ pred" for the random term
+#' in the full model fit. The default is \code{NULL}.
+#' @param randomH0 The default is equal to \code{random}.
+#' Random term in the null model fit.
 #' @param start_time numeric time of the start of the treatment application.
 #' Default: \code{0}.
 #' @param treatment.coding logical. Default \code{TRUE} for a quantitative
@@ -24,7 +43,7 @@
 #' containing 1d splines, one 1d-spline for each level.
 #' @param pord named integer vector of the difference order of the
 #' spline penalty.
-#' Default: \code{c(time =2, dose= 2, time.overall= 3, Treatment = 2)},
+#' Default: \code{c(time =2, dose= 2, Treatment = 2)},
 #' where the first two orders are used only with
 #'  \code{treatment.coding} is \code{TRUE}
 #'  and the last two with  \code{treatment.coding} is \code{FALSE}.
@@ -32,7 +51,7 @@
 #' can be large.
 #'  Default \code{ c(time = 6, dose = 6)}.
 #' @param degree degree of the B-splines. Default \code{3}.
-# param referencelevel name of the reference treatment. Default: first level of
+#' @param referencelevel name of the reference treatment. Default: first level of
 #' factor(data$Treatment).
 #' @param scaling The default gives mean square species scores of 1, otherwise
 #' the sum of squares of the species scores is 1. See \link{doPRC}.
@@ -69,13 +88,12 @@
 #'  when \code{treatment.coding} is \code{FALSE}
 #'  and the number of levels of \code{Treatment} is 4,  is
 #' \preformatted{
-#' spl1D(time, nseg = 6, degree = 3, pord = 3) +
+#' spl1D(time, nseg = 6, degree = 3, pord = 2) +
 #' spl1D(D1,   nseg = 6, degree = 3, pord = 2) +
 #' spl1D(D2,   nseg = 6, degree = 3, pord = 2) +
 #' spl1D(D3,   nseg = 6, degree = 3, pord = 2)
 #' }
-#'  This is the default model
-#'  if \code{treatment.coding} is \code{FALSE}.
+#' This is the default model if \code{treatment.coding} is \code{FALSE}.
 #' The default spline model assumes that the Treatment factor has a quantitative
 #' basis, so that the response to Time and Treatment can be analyzed using a
 #' 2D spline model.
@@ -90,7 +108,7 @@ set_smoothPRC_model <-
            random = NULL, residual = NULL, weights= NULL,
            randomH0 = random,
            treatment.coding = TRUE,
-           pord = c(time = 2, dose = 2, time.overall = 3, Treatment = 2),
+           pord = c(time = 2, dose = 2, Treatment = 2),
            nseg =  c(time = 6, dose = 6),
            degree =3,
            start_time = 0,
@@ -131,17 +149,17 @@ set_smoothPRC_model <-
       names(datI) <- paste0("D", idsl)
       if(!is.null(splineH0) && is.null(spline)){
         spline <- paste0("~spl1D(time, nseg =",
-                      nseg[1],", degree =", degree[1],", pord = ", pord[3],")")
+                      nseg[1],", degree =", degree[1],", pord = ", pord["time"],")")
         txt<-  paste("spl1D(D",idsl,", nseg=",
-                      nseg[2],", degree =", degree[1],", pord =", pord[4],")",
+                      nseg["dose"],", degree =", degree[1],", pord =", pord["dose"],")",
                       collapse = "+",sep ="")
         spline <- as.formula(paste0(spline,"+",txt))
       }
       datI[data$time <= 0, ] <- 0
       data <- cbind(data,datI)
     } else {
-      if(!is.null(splineH0) && is.null(spline))spline <- as.formula(paste0("~ spl2D(time, dose, nseg = c(",
-                                  nseg[1],",",nseg[2],"), degree =", degree[1],", pord = ", pord[2],")"))
+      if(!is.null(splineH0) && is.null(spline)) spline <- as.formula(paste0("~ spl2D(time, dose, nseg = c(",
+                                  nseg["time"],",",nseg["dose"],"), degree =", degree[1],", pord = ", pord["time"],")"))
     }
     # sets LMMsolver_model with response in formulafixed and data : Design
     dat0 <- data

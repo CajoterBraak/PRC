@@ -27,26 +27,27 @@
 #' @references
 #' ter Braak (2023) Redundancy analysis includes analysis of variance-simultaneous component analysis (ASCA)
 #'  and outperforms its extensions
-#' Chemometrics and Intelligent Laboratory Systems https://doi.org/10.1016/j.chemolab.2023.104898
+#' Chemometrics and Intelligent Laboratory Systems.
+#' \doi{10.1016/10.1016/j.chemolab.2023.104898}
 #'
 #' ter Braak, C.J.F. & te Beest, D.E. 2022. Testing environmental effects on taxonomic composition
 #'  with canonical correspondence analysis: alternative permutation tests are not equal.
 #'  Environmental and Ecological Statistics. 29 (4), 849-868.
-#'  https://doi.org/10.1007/s10651-022-00545-4
+#'  \doi{10.1007/s10651-022-00545-4}
 #'
 #' van den Brink, P.J. & ter Braak, C. (1998) Multivariate analysis of stress in experimental ecosystems
 #'  by Principal Response Curves and similarity analysis. Aquatic Ecology, 32, 163-178.
-#'  http://dx.doi.org/10.1023/A:1009944004756
+#'  \doi{10.1023/A:1009944004756}
 #'
 #' van den Brink, P.J. & ter Braak, C.J.F. (1999) Principal Response Curves: Analysis of
 #'  time-dependent multivariate responses of a biological community to stress.
 #'  Environmental Toxicology and Chemistry, 18, 138-148.
-#'  https://doi.org/10.1002/etc.5620180207
+#'  \doi{10.1002/etc.5620180207}
 #'
 #' van den Brink, P.J., den Besten, P., bij de Vaate, A. & ter Braak, C.J.F. (2009)
 #'  Principal response curves technique for the analysis of multivariate biomonitoring time series.
 #'  Environmental Monitoring and Assessment, 152, 271-281.
-#'  http://dx.doi.org/10.1007/s10661-008-0314-6
+#'  \doi{10.1007/s10661-008-0314-6}
 #' @example demo/PRC_pyrifos.r
 #' @seealso \code{\link{plotPRC}}, \code{\link{plotPRC2d}}
 #' @export
