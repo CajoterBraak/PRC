@@ -31,6 +31,17 @@ smoothPRC_model$fixed
 smoothPRC_model$spline
 
 smooth_PRC <- smoothPRC(Y, model = smoothPRC_model, formula_covariates = ~Block)
+smooth_PRC$iter
+if (1==0){
+# start the iterations from previous
+opt<- smooth_PRC$options_iter
+opt$init <- smooth_PRC$X
+smooth_PRC2 <- smoothPRC(Y, model = smoothPRC_model, formula_covariates = ~Block,
+                        options_iter = opt)
+smooth_PRC2$iter
+round(diag(cor(smooth_PRC$X,smooth_PRC2$X )),6)
+round(diag(cor(smooth_PRC$B[,1:2],smooth_PRC2$B[,1:2])),6)
+}
 summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,1], b_mod_prc)
 

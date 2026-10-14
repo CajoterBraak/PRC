@@ -11,6 +11,7 @@ b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <- set_smoothPRC_model(data = Design)
 smoothPRC_model$spline
+
 smooth_PRC <- smoothPRC(Y, model = smoothPRC_model)
 summary(smooth_PRC$obj[[1]])
 cor(smooth_PRC$B[,"B1"], b_mod_prc)
@@ -31,3 +32,7 @@ if (0){
   # the warning is from LMMsolve on a permuted data set
 }
 
+D <- vegan::vegdist(pyrifos, method = "bray") # distance
+out_D1<- smoothPRC(D, model = smoothPRC_model)
+plotsmoothPRC(out_D1, with_classical_lines = FALSE,
+              with_unconstrained_scores = FALSE, flip = FALSE)
