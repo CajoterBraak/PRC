@@ -162,7 +162,7 @@ set_smoothPRC_model <-
         spline <- as.formula(paste0(spline,"+",txt))
       }
       datI[data$time <= 0, ] <- 0
-      data <- cbind(data,datI)
+      data <- as.data.frame(cbind(data,datI))
     } else {
       if(!is.null(splineH0) && is.null(spline))
         spline <- as.formula(paste0("~ spl2D(time, dose, nseg = c(",
@@ -176,28 +176,34 @@ set_smoothPRC_model <-
       paste0("~spl1D(time, nseg =",
              nseg[1],", degree =", degree,", pord = ", pord["time"],")")
     )
-    dat0 <- data
-    dat0$dose <- 0
-    dat0$Treatment <- levels(data$Treatment)[1]
-    #dat0$Treatment <- factor(rep(levels(data$Treatment)[1],nrow(data)),
-     #                        level= levels(data$Treatment))
-    if("D1" %in% names(dat0)) {
-      id <- which(names(dat0) %in% "D1")
-      dat0[, id : ncol(dat0)] <- 0
-    }
+#    dat0 <- generate_dat2dat0(data,reflevel = levels(data$Treatment)[1])
     ini_fixed   <-  ~ Treatment:Time
     ini_fixedH0 <-  ~ Time
     out <- list(spline,splineH0,fixed, fixedH0, random,randomH0, residual,
-                weights, scaling, as.data.frame(dat0), as.data.frame(data),
+                weights, scaling, data,
                 treatment.coding, method, ini_fixed,ini_fixedH0)
     names(out) = c("spline","splineH0","fixed","fixedH0", "random","randomH0", "residual",
-                   "weights","scaling", "dat0","data",
+                   "weights","scaling","data",
                    "treatment.coding", "method","ini_fixed", "ini_fixedH0")
     class(out) <- c("smoothPRC_LMMsolver", "smoothPRC", "list")
     return(out)
   }
-
-
+#' @noRd
+#' @keywords internal
+generate_dat2dat0 <-function(data,reflevel = levels(data$Treatment)[1]){
+  #to obtain dat0 from data: set for all samples
+  #                         dose to 0 and
+  #                         Treatment to the reference level reflevel
+  dat0 <- data
+  dat0$dose <- 0
+  dat0$Treatment <- reflevel
+  idsl <- 1:(nlevels(data$Treatment)-1)
+  if("D1" %in% names(dat0)) {
+    id <- which(names(dat0) %in% "D1")
+    dat0[, idsl + (id-1)] <- 0
+  }
+  return(dat0)
+}
 #' @noRd
 #' @keywords internal
 #' @exportS3Method

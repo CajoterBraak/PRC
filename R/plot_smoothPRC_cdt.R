@@ -128,13 +128,8 @@ plot_smoothPRC_cdt <- function(object,
     pred1 <- predict(object$obj[[axis]], newdata = newdat)
 
     # sets LMMsolver_model with response in formulafixed and data : Design
-    newdat0 <- newdat
-    newdat0$dose <- 0
-    newdat0$Treatment <- levels(object$model$data$Treatment)[1]
-    if("D1" %in% names(newdat0)) {
-        id <- which(names(newdat0) %in% "D1")
-        newdat0[, idsl + (id-1)] <- 0
-      }
+
+    newdat0 <- generate_dat2dat0(newdat)
     pred0 <- predict(object$obj[[axis]], newdata = newdat0)
 
     newdat1$ypred <- (pred1$ypred - pred0$ypred)* object$mult

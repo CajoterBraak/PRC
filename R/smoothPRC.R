@@ -193,13 +193,14 @@ smoothPRC <- function(response, model,
   }
 
   PRC<-  PRC_star <- matrix(NA, nrow = nrow(pwr$X), ncol= n_axes)
+  dat0 <- generate_dat2dat0(pwr$model$data)
   if(inherits(pwr,"powerEig")) {
     n1<- sqrt((nrow(pwr$X) - 1)/n_species)
     pwr$mult <- n1/sqrt(pwr$eig[1])
     pwr$X <- pwr$X*n1
     pwr$X_star <- pwr$X_star*n1
     for (ax in 1:n_axes){
-      PRC[, ax] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k = ax)/
+      PRC[, ax] <-  get_PRC(pwr, dat0 = dat0, k = ax)/
         sqrt(pwr$eig[ax])
       PRC[, ax] <- PRC[, ax] * n1
       PRC_star[, ax] <- PRC[, ax] +
@@ -207,7 +208,7 @@ smoothPRC <- function(response, model,
     }
   } else {
     for (ax in 1:n_axes){
-      PRC[,ax] <-  get_PRC(pwr, dat0 = pwr$model$dat0, k = ax)/
+      PRC[,ax] <-  get_PRC(pwr, dat0 = dat0, k = ax)/
         sqrt(ncol(pwr$Y))
       PRC_star[,ax] <- PRC[,ax] + (pwr$X_star[,ax]- pwr$X[,ax])
     }
