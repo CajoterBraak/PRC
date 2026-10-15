@@ -14,7 +14,7 @@ set_smoothPRC_model(
   residual = NULL,
   weights = NULL,
   randomH0 = random,
-  treatment.coding = TRUE,
+  treatment.coding = c("quantitative", "qualitative"),
   pord = c(time = 2, dose = 2, Treatment = 2),
   nseg = c(time = 6, dose = 6),
   degree = 3,
@@ -45,22 +45,23 @@ When both \code{spline} and \code{splineH0} are \code{NULL}, the
 resulting formala is \code{NULL}, for both.}
 
 \item{splineH0}{As spline but for the null model. Default: a one dimensional
-smooth in time.
-\code{~ spl1D(time, nseg = 6, degree = 3, pord = 2)}
+smooth in time:
+\code{~ spl1D(time, nseg = 6, degree = 3, pord = 2)}}
+
+\item{fixed}{Formula for the fixed part of  the full model.
+Default \code{y~1}.
+NB: the response variable needs to be \code{y}, a
+variable internally generated from the abundance table \code{Y} and
+the loading (species) vector, that is optimized.
 See \code{\link[LMMsolver]{LMMsolve}}.}
 
-\item{fixed}{A formula for the fixed part of the model. Should be of the
-form "response ~ pred"}
-
-\item{fixedH0}{Formula for the null model.
+\item{fixedH0}{Formula for the fixed part of the null model.
 The default is equal to \code{fixed}, \emph{i.e.}
- \code{xstar~1}. NB: the response variable needs to be \code{xstar}, a
-variable internally generated from the abundance table \code{Y} and
-loading vector, that is optimized.
-The default is \code{xstar~1}.}
+ \code{y~1}.}
 
 \item{random}{Formula of the form "~ pred" for the random term
-in the full model fit. The default is \code{NULL}.}
+in the full model fit.
+The default: \code{NULL} for no random term in the model.}
 
 \item{residual}{A formula for the residual part of the model. Should be of
 the form "~ pred".}
@@ -70,12 +71,16 @@ of data to use as relative weights in the fit. Default value NULL, weights are
 all equal to one.}
 
 \item{randomH0}{The default is equal to \code{random}.
-Random term in the null model fit.}
+Random term in the null model fit.
+Can be \code{NULL} for no random term in the null model.}
 
-\item{treatment.coding}{logical. Default \code{TRUE} for a quantitative
-analysis using a 2d spline. If \code{FALSE}, for a qualitative analysis in
-in which the default spline model is replaced by default to one
-containing 1d splines, one 1d-spline for each level.}
+\item{treatment.coding}{character: "quantitative" or "qualitative".
+Default \code{"quantitative"} for a quantitative
+analysis using a 2d spline in \code{time} and \code{dose}.
+Set \code{treatment.coding ="qualitative"} for a qualitative analysis in
+in which the default spline model is replaced by one
+containing 1d splines,
+one 1d-spline for each level of the factor \code{Treatment}.}
 
 \item{pord}{named integer vector of the difference order of the
 spline penalty.
@@ -173,7 +178,8 @@ b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <-
   set_smoothPRC_model(data= Design,
-                      treatment.coding =FALSE, start_time = 1958)
+                      treatment.coding ="quali", start_time = 1958)
+
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
