@@ -84,16 +84,16 @@ one 1d-spline for each level of the factor \code{Treatment}.}
 
 \item{pord}{named integer vector of the difference order of the
 spline penalty.
-Default: \code{c(time =2, dose= 2, Treatment = 2)},
-where the first two orders are used only with
- \code{treatment.coding} is \code{TRUE}
- and the last two with  \code{treatment.coding} is \code{FALSE}.}
+Default: \code{c(time =2, dose= 2)}.
+No effect if \code{spline} is not \code{NULL}.}
 
 \item{nseg}{named integer vector of number of segments in P-splines,
 can be large.
- Default \code{ c(time = 6, dose = 6)}.}
+ Default \code{ c(time = 6, dose = 6)}.
+ No effect if \code{spline} is not \code{NULL}.}
 
-\item{degree}{degree of the B-splines. Default \code{3}.}
+\item{degree}{degree of the B-splines. Default \code{3}.
+No effect if \code{spline} is not \code{NULL}.}
 
 \item{start_time}{numeric time of the start of the treatment application.
 Default: \code{0}.}
