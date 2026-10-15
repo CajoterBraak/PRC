@@ -26,7 +26,8 @@ b_mod_prc <- vegan::scores(mod_prc,choices= 1, display = "sp")
 
 smoothPRC_model  <-
   set_smoothPRC_model(data= Design,
-                      treatment.coding =FALSE, start_time = 1958)
+                      treatment.coding ="quali", start_time = 1958)
+
 smoothPRC_model$fixed
 smoothPRC_model$spline
 
