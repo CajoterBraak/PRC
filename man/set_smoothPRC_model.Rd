@@ -15,7 +15,7 @@ set_smoothPRC_model(
   weights = NULL,
   randomH0 = random,
   treatment.coding = c("quantitative", "qualitative"),
-  pord = c(time = 2, dose = 2, Treatment = 2),
+  pord = 2,
   nseg = c(time = 6, dose = 6),
   degree = 3,
   start_time = 0,
@@ -82,9 +82,9 @@ in which the default spline model is replaced by one
 containing 1d splines,
 one 1d-spline for each level of the factor \code{Treatment}.}
 
-\item{pord}{named integer vector of the difference order of the
+\item{pord}{integer for the difference order of the
 spline penalty.
-Default: \code{c(time =2, dose= 2)}.
+Default: 2.
 No effect if \code{spline} is not \code{NULL}.}
 
 \item{nseg}{named integer vector of number of segments in P-splines,
