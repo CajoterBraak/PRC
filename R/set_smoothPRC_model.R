@@ -46,9 +46,9 @@
 #' in which the default spline model is replaced by one
 #' containing 1d splines,
 #' one 1d-spline for each level of the factor \code{Treatment}.
-#' @param pord named integer vector of the difference order of the
+#' @param pord  integer for the difference order of the
 #' spline penalty.
-#' Default: \code{c(time =2, dose= 2)}.
+#' Default: 2.
 #' No effect if \code{spline} is not \code{NULL}.
 #' @param nseg named integer vector of number of segments in P-splines,
 #' can be large.
@@ -113,7 +113,7 @@ set_smoothPRC_model <-
            random = NULL, residual = NULL, weights= NULL,
            randomH0 = random,
            treatment.coding = c("quantitative","qualitative"),
-           pord = c(time = 2, dose = 2, Treatment = 2),
+           pord = 2,
            nseg =  c(time = 6, dose = 6),
            degree =3,
            start_time = 0,
@@ -155,9 +155,9 @@ set_smoothPRC_model <-
       names(datI) <- paste0("D", idsl)
       if(!is.null(splineH0) && is.null(spline)){
         spline <- paste0("~spl1D(time, nseg =",
-                      nseg["time"],", degree =", degree[1],", pord = ", pord["time"],")")
+                      nseg["time"],", degree =", degree[1],", pord = ", pord,")")
         txt<-  paste("spl1D(D",idsl,", nseg=",
-                      nseg["dose"],", degree =", degree[1],", pord =", pord["dose"],")",
+                      nseg["time"],", degree =", degree[1],", pord =", pord,")",
                       collapse = "+",sep ="")
         spline <- as.formula(paste0(spline,"+",txt))
       }
@@ -167,14 +167,13 @@ set_smoothPRC_model <-
       if(!is.null(splineH0) && is.null(spline))
         spline <- as.formula(paste0("~ spl2D(time, dose, nseg = c(",
                   nseg["time"],",",nseg["dose"],"), degree =", degree[1],
-                  ", pord = ", pord["time"],")"))
-        if( !pord["time"]== pord["dose"])
-          warning(paste0("In the 2d spline pord is set to ",pord["time"]))
+                  ", pord = ", pord,")"))
+
     }
-    if(!(nseg["time"] == 6 && degree ==3 && pord["time"] == 2))
+    if(!(nseg["time"] == 6 && degree ==3 && pord==2))
     splineH0 <- as.formula(
       paste0("~spl1D(time, nseg =",
-             nseg[1],", degree =", degree,", pord = ", pord["time"],")")
+             nseg[1],", degree =", degree,", pord = ", pord,")")
     )
 #    dat0 <- generate_dat2dat0(data,reflevel = levels(data$Treatment)[1])
     ini_fixed   <-  ~ Treatment:Time
