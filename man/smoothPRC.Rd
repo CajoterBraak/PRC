@@ -7,7 +7,7 @@
 smoothPRC(
   response,
   model,
-  options_iter = list(init = NULL, k = 2, mA = 4, tol = 1e-08, maxiter = 50),
+  options_iter = list(init = NULL, k = 2, mA = 0, tol = 1e-08, maxiter = 50),
   n_axes = 2,
   formula_covariates = NULL,
   weights = NULL,
@@ -167,9 +167,9 @@ This expansion can be avoided by explicit initialization
 using \code{options_iter$init}.
 
 If \code{response} is a distance object and the maximum distance exceeds 4
-then the distance is divided by n-1 with n the number of samples.
-This choice is taken from vegan::dbrda and usually makes the eigenvalues
-equal to those of vegan::rda if the distance is 'euclidean'.
+then the distance is divided by \code{n-1} with \code{n} the number of samples.
+This choice is taken from \code{vegan::dbrda} and usually makes the eigenvalues
+equal to those of \code{vegan::rda} if the distance is 'euclidean'.
 }
 \references{
 Boer, Martin P. 2023.
