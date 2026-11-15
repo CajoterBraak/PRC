@@ -13,7 +13,7 @@ set_smoothPRC_model(
   random = NULL,
   residual = NULL,
   weights = NULL,
-  randomH0 = random,
+  randomH0 = NULL,
   treatment.coding = c("quantitative", "qualitative"),
   pord = 2,
   nseg = c(time = 6, dose = 6),
@@ -70,9 +70,8 @@ the form "~ pred".}
 of data to use as relative weights in the fit. Default value NULL, weights are
 all equal to one.}
 
-\item{randomH0}{The default is equal to \code{random}.
-Random term in the null model fit.
-Can be \code{NULL} for no random term in the null model.}
+\item{randomH0}{Random term in the null model fit, default \code{NULL}
+for no random term in the null model.}
 
 \item{treatment.coding}{character: "quantitative" or "qualitative".
 Default \code{"quantitative"} for a quantitative
@@ -148,6 +147,14 @@ This is the default model if \code{treatment.coding} is \code{FALSE}.
 The default spline model assumes that the Treatment factor has a quantitative
 basis, so that the response to Time and Treatment can be analyzed using a
 2D spline model.
+The term \code{random} is designed to get an optimal combination of
+within and between level information of the random terms, in ecotoxicology
+within and between cosm information. With pre-application times in the
+experiment there is always also some within-cosm information about the
+treatment effect. Technically,
+the random effects of the factors in \code{random} are subtracted
+from the fit. Interactions or formula symbols other than \code{+}
+are not allowed in this implementation of \code{random}.
 }
 \examples{
 
