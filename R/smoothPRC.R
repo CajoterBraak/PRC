@@ -111,9 +111,9 @@
 #' using \code{options_iter$init}.
 #'
 #' If \code{response} is a distance object and the maximum distance exceeds 4
-#' then the distance is divided by n-1 with n the number of samples.
-#' This choice is taken from vegan::dbrda and usually makes the eigenvalues
-#' equal to those of vegan::rda if the distance is 'euclidean'.
+#' then the distance is divided by \code{n-1} with \code{n} the number of samples.
+#' This choice is taken from \code{vegan::dbrda} and usually makes the eigenvalues
+#' equal to those of \code{vegan::rda} if the distance is 'euclidean'.
 #'
 #'
 #' @return A list.
@@ -155,7 +155,7 @@
 #' @export
 smoothPRC <- function(response, model,
                       options_iter = list(init =NULL,
-                                          k = 2, mA = 4,
+                                          k = 2, mA = 0,
                                           tol = 1e-8, maxiter = 50),
                       n_axes = 2,
                       formula_covariates = NULL,

@@ -19,12 +19,7 @@ powerEig_axis <- function(A, model,
                           axes = NULL,
                           n_covariates = 1,
                           options_iter = list(
-                            init = NULL,
-                            k = 3,
-                            mA = 4,
-                            tol = 1e-8,
-                            maxiter = 50
-                          ),
+                           init = NULL, k = 3, mA = 0, tol = 1e-8,maxiter = 50),
                           fit_state = NULL)
 {
   if (is.null(fit_state)) fit_state <-
@@ -92,11 +87,11 @@ powerEig_axis <- function(A, model,
       x <- fitted(obj) -
         get_fitted_H0(objH0, length(z))
 
+      # take account of contributions of  random factors
+      x <- x - adjustfit4random(obj, model = model)
+
       if (!is.null(qr_prev_axes)){
-        x <- xhat <- qr.resid(
-          qr_prev_axes,
-           x
-        )
+        x <- xhat <- qr.resid(qr_prev_axes, x)
       } else xhat <- x
 
 
@@ -111,14 +106,8 @@ powerEig_axis <- function(A, model,
     x <- normalizex(u1)
 
 
-    ## convergence
-    dx <- sum(
-      ((x - x_old))^2
-    )
 
-    if (dx < options_iter$tol)
-      break
-
+    if (options_iter$mA){
     ## Anderson acceleration
     r <- x - x_old
 
@@ -153,6 +142,12 @@ powerEig_axis <- function(A, model,
           x <- normalizex(x_new)}
       }
     }
+    } # end Anderson iteration
+    ## convergence
+    dx <- sum(((x - x_old))^2)
+
+    if (dx < options_iter$tol)
+      break
   }
   eig <- sum(xhat * x)
   #eig <- sum(xhat * x)*(n/(n-1))# for Euclidean

@@ -14,9 +14,8 @@ powerSVD_axis <- function(Y, model,
                        axes= NULL,
                        qr_covariates_columns = NULL,
                        n_covariates = 1,
-                       options_iter = list(init =NULL,
-                                           k = 3, mA = 4,
-                                           tol = 1e-8, maxiter = 50),
+                       options_iter = list(
+                         init = NULL, k = 3, mA = 0, tol = 1e-8, maxiter = 50),
                        fit_state = NULL
                        ) {
   if (is.null(fit_state)) fit_state <-
@@ -82,6 +81,9 @@ powerSVD_axis <- function(Y, model,
                         axes = axes, options_fit = list(state = fit_state$rows0))
       fit_state$rows0 <- update_fit_state(objH0, state = fit_state$rows0)
       xhat <- fitted(obj) - get_fitted_H0(objH0, length(xstar))
+      # take account of contributions of  random factors
+      xhat <- xhat - adjustfit4random(obj, model = model)
+
       # This centers xhat, corresponding to (C)CA and centered PCA/RDACCA!
       xhat <- qr.resid(qr_prev_axes, weights$sqrtR*xhat)/weights$sqrtR
 
@@ -115,11 +117,7 @@ powerSVD_axis <- function(Y, model,
    b  <- crossprod(Y, u1/weights$sqrtR) / weights$K
    b  <- normalizeb(b, sqrtw = weights$sqrtK)
 
-   ## ---- convergence ----
-   db <- sum( (weights$sqrtK*(b - b_old))^2)
-   dx <-  sum((weights$sqrtR*(xhat - x_old))^2)#/
-   #max(sum((weights$sqrtR * xhat)^2), .Machine$double.eps)
-   if (max(db, dx) <  options_iter$tol) break
+   if (options_iter$mA){
     ## ---- Anderson acceleration ----
     r <- b - b_old
     b_hist <- c(b_hist, list(b_old))
@@ -151,8 +149,18 @@ powerSVD_axis <- function(Y, model,
 
       }
     }
+  } # end if Anderson iteration
+   ## ---- convergence ----
+   db <- sum( (weights$sqrtK*(b - b_old))^2)
+   dx <-  sum((weights$sqrtR*(xhat - x_old))^2)#/
+   # print("db")
+   # print(iter)
+   # print(db)
+   # print(dx)
+   #max(sum((weights$sqrtR * xhat)^2), .Machine$double.eps)
+   if (max(db, dx) <  options_iter$tol) break
   }
-  eig <- sum( (weights$sqrtR*xhat)^2)
+  eig <- sum((weights$sqrtR*xhat)^2)
   eig <- if(model$method == "rda") eig/(n-1) else eig
   mult <-if ( model$method == "rda") 1/sqrt(length(b)) else 1
   B <- as.matrix(b);colnames(B)<- "B1";rownames(B) <- colnames(Y)
@@ -280,3 +288,20 @@ initialize_pwr_alg.default <- function(model, Y, weights, axes)
   n <- if ( inherits(Y, "dist") ) attr(Y,"Size") else ncol(Y)
   rnorm(n)
 }
+#' Adjusts the model fit for random effects (internal)
+#'
+#' Returns the adjustment, which is subtracted from the fitted values.
+#'
+#' @param object Object resulting for the fit.
+#' @param model Model specification.
+#' @export
+adjustfit4random <- function(object, model)
+  UseMethod("adjustfit4random")
+#' @noRd
+#' @keywords internal
+#' @export
+adjustfit4random.default <- function(object, model)
+{
+  return(0)
+}
+
