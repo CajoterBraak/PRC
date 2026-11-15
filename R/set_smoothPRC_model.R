@@ -34,9 +34,8 @@
 #' @param random  Formula of the form "~ pred" for the random term
 #' in the full model fit.
 #' The default: \code{NULL} for no random term in the model.
-#' @param randomH0 The default is equal to \code{random}.
-#' Random term in the null model fit.
-#' Can be \code{NULL} for no random term in the null model.
+#' @param randomH0 Random term in the null model fit, default \code{NULL}
+#' for no random term in the null model.
 #' @param start_time numeric time of the start of the treatment application.
 #' Default: \code{0}.
 #' @param treatment.coding character: "quantitative" or "qualitative".
@@ -102,6 +101,14 @@
 #' The default spline model assumes that the Treatment factor has a quantitative
 #' basis, so that the response to Time and Treatment can be analyzed using a
 #' 2D spline model.
+#' The term \code{random} is designed to get an optimal combination of
+#' within and between level information of the random terms, in ecotoxicology
+#' within and between cosm information. With pre-application times in the
+#' experiment there is always also some within-cosm information about the
+#' treatment effect. Technically,
+#' the random effects of the factors in \code{random} are subtracted
+#' from the fit. Interactions or formula symbols other than \code{+}
+#' are not allowed in this implementation of \code{random}.
 #' @example demo/smoothPRC_Ossenkampen.r
 #' @seealso \code{\link{smoothPRC}}
 #' @export
@@ -111,7 +118,7 @@ set_smoothPRC_model <-
            fixed = y ~ 1,
            fixedH0= fixed,
            random = NULL, residual = NULL, weights= NULL,
-           randomH0 = random,
+           randomH0 = NULL,
            treatment.coding = c("quantitative","qualitative"),
            pord = 2,
            nseg =  c(time = 6, dose = 6),
@@ -178,7 +185,7 @@ set_smoothPRC_model <-
 #    dat0 <- generate_dat2dat0(data,reflevel = levels(data$Treatment)[1])
     ini_fixed   <-  ~ Treatment:Time
     ini_fixedH0 <-  ~ Time
-    out <- list(spline,splineH0,fixed, fixedH0, random,randomH0, residual,
+    out <- list(spline,splineH0,fixed, fixedH0, random, randomH0, residual,
                 weights, scaling, data,
                 treatment.coding, method, ini_fixed,ini_fixedH0)
     names(out) = c("spline","splineH0","fixed","fixedH0", "random","randomH0", "residual",
@@ -214,10 +221,11 @@ fit_full_model_rows.smoothPRC_LMMsolver <-
     if (is.null(st)) {
       st <- list(
         theta = NULL,
-        maxit = 10,
+        maxit = 5,
         tolerance = 1e-3
       )
     }
+    suppressWarnings(
     LMMsolver::LMMsolve(
       fixed    = model$fixed,
       spline   = model$spline,
@@ -232,6 +240,7 @@ fit_full_model_rows.smoothPRC_LMMsolver <-
       theta     = st$theta,
       maxit     = st$maxit,
       tolerance = st$tolerance
+    )
     )
   }
 
@@ -283,16 +292,17 @@ update_fit_state.LMMsolve <- function(object, state = NULL)
   } else {
     dtheta <- sqrt(sum((object$theta - state$theta_old)^2))/
     (sqrt(sum(state$theta^2)) + 1e-12)
-    tol <- min(1e-2, max(1e-6, dtheta / 100))
-    maxit <- min(50, max(5, ceiling(-log10(tol)) * 5))
+    tol <- min(1e-2, max(1e-6, dtheta / 10))
+    maxit <- min(100, max(5, ceiling(-log10(tol)) * 5))
   }
 
-  list(
+  pars <- list(
     theta = object$theta,
     theta_old = state$theta,
     maxit = maxit,
-    tolerance = tol
-  )
+    tolerance = tol)
+  #print(pars)
+  return(pars)
 }
 #'
 #' @noRd
@@ -330,4 +340,18 @@ initialize_pwr_alg.smoothPRC_LMMsolver <- function(model, Y, weights, axes)
   }
   return(init)
 
+}
+#'
+#' @importFrom stats coef
+#' @noRd
+#' @keywords internal
+#' @exportS3Method
+adjustfit4random.LMMsolve <- function(object, model = NULL){
+  # take account of contributions of  random factors
+  adj <- 0
+  if (!is.null(model$random)){
+    cosms <- all.vars(model$random[[2]])
+    for (cosm in cosms) adj <-  adj + coef(object)[[cosm]][model$data[[cosm]]]
+  }
+  return(adj)
 }
