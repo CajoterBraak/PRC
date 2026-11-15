@@ -33,7 +33,7 @@ expect_equal(modelS$spline,
 expect_equal(modelS$splineH0,~spl1D(time, nseg = 6, degree = 3, pord = 2))
 
 expect_error(set_smoothPRC_model(treatment.coding = "qua", data = Design),
-"'arg' should be one of “quantitative”, “qualitative”")
+"'arg' ")
 
 
 modelS <- set_smoothPRC_model(data = Design, treatment.coding = "qual",

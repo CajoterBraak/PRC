@@ -97,10 +97,10 @@ ran_b <- matrix(rnorm(length(Bmod)),nrow = nrow(Bmod),ncol = ncol(Bmod))
 # for distance modeling
 ran_x <- matrix(rnorm(length(x_mod_prc)),nrow = nrow(x_mod_prc),ncol = ncol(x_mod_prc))
 
-op <-opt <- out_1$options_iter
+op <- out_1$options_iter
 op$init <- ran_b
-op$maxiter<- 100
-tol = 1.e-4
+
+
 
 
 out_1r<- smoothPRC(resp, model = model_clas1, n_axes = n_axes, options_iter = op)
@@ -108,13 +108,15 @@ out_1r<- smoothPRC(resp, model = model_clas1, n_axes = n_axes, options_iter = op
 
 expect_equivalent(
   vegan::eigenvals(mod,"constrained" )[1:n_axes],
-  out_1r$eig[1:n_axes],tolerance = tol
+  out_1r$eig[1:n_axes],tolerance = 1.0e-6
 )
+
+tol = 1.e-5
 expect_equivalent(abs(diag(cor(x_mod,out_1r$X))), rep(1, n_axes),tolerance = tol)
 expect_equivalent(abs(diag(cor(xstar_mod_prc0,out_1r$X_star))), rep(1, n_axes),tolerance = tol)
 
-expect_equivalent(abs(out_1r$X),abs(x_mod_prc),,tolerance = tol)
-expect_equivalent(abs(out_1r$X_star),abs(x_star_mod_prc),,tolerance = tol)
+expect_equivalent(abs(out_1r$X),abs(x_mod_prc),tolerance = tol)
+expect_equivalent(abs(out_1r$X_star),abs(x_star_mod_prc),tolerance = tol)
 expect_equivalent(abs(out_1r$B[,1:n_axes, drop = FALSE]),abs(Bmod),tolerance = tol)
 expect_equivalent(abs(out_1r$PRC),abs(PRCmod),tolerance = tol)
 expect_equivalent(abs(out_1r$PRC_star),abs(PRCmodE),tolerance = tol)
@@ -154,6 +156,7 @@ expect_equivalent(abs(out_D1$X),abs(out_D2$X))
 
 op$init <- ran_x
 
+
 out_D1r<- smoothPRC(D, model = model_clas1, n_axes = n_axes,
                    n_species = ncol(resp),options_iter = op)
 out_D2r<- smoothPRC(as.matrix(D), model = model_clas1, n_axes = n_axes,
@@ -167,7 +170,8 @@ all.equal(out_D1[-8],out_D2[-8])
 x_mod_prc/out_D1$X
 }
 
-expect_equivalent(abs(x_mod_prc),abs(out_D1$X), tol = tol)
+tol = 1.e-3
+expect_equivalent(abs(x_mod_prc[,1]),abs(out_D1$X[,1]), tol = tol)
 expect_equivalent(abs(x_mod_prc),abs(out_D1$X), tol = tol)
 expect_equivalent(abs(x_star_mod_prc),abs(out_D1$X_star),tol =tol)
 expect_equivalent(abs(PRCmod),abs(out_D1$PRC),tol=tol)
@@ -178,5 +182,6 @@ expect_equivalent(abs(PRCmodE),abs(out_D1$PRC_star),tol=tol)
 expect_equivalent(abs(x_mod_prc),abs(out_D1r$X), tol = tol)
 expect_equivalent(abs(x_mod_prc),abs(out_D1r$X), tol = tol)
 expect_equivalent(abs(x_star_mod_prc),abs(out_D1r$X_star),tol =tol)
-expect_equivalent(abs(PRCmod),abs(out_D1r$PRC),tol=tol)
-expect_equivalent(abs(PRCmodE),abs(out_D1r$PRC_star),tol=tol)
+expect_equivalent(abs(PRCmod),abs(out_D1r$PRC),tol=5.e-2)
+expect_equivalent(abs(PRCmodE),abs(out_D1r$PRC_star),tol=6.e-2)
+

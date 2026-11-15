@@ -34,6 +34,7 @@ model_clas1 <- set_smoothPRC_model(
 D <- vegan::vegdist(resp, method = distance) # distance
 
 out_D1<- smoothPRC(D, model = model_clas1, n_axes = n_axes)
+out_D2<- smoothPRC(as.matrix(D), model = model_clas1, n_axes = n_axes)
 
 set.seed(1)
 an_D1 <- anova(out_D1, permutations = 19)

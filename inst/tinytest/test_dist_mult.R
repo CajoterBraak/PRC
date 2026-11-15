@@ -12,7 +12,7 @@ x <- seq_len(n)
 
 
 expect_equivalent(
-  drop(A_mult(D, x)),
+  drop(PRC:::A_mult(D, x)),
   drop(as.matrix(D) %*% x),
   tolerance = 1e-12
 )
@@ -25,7 +25,7 @@ x <- rnorm(n)
 x <- x - mean(x)
 
 expect_equivalent(
-  drop(A_mult(D, x)),
+  drop(PRC:::A_mult(D, x)),
   drop(as.matrix(D) %*% x),
   tolerance = 1e-12
 )

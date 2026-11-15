@@ -19,7 +19,7 @@ resp <- pyrifos
 
 meth <- "rda"
 
-n_axes =2
+n_axes <- 2
 
 distance <- "bray"
 f <- resp ~ Treatment:Time + Condition(Time)
@@ -52,11 +52,15 @@ out_D1<- smoothPRC(D, model = model_clas1, n_axes = n_axes,
 out_D1_ax1<- smoothPRC(D, model = model_clas1, n_axes = 1,
                    n_species = ncol(resp))
 expect_equivalent(
-  out_D1$X[,1,drop = FALSE],
-  out_D1_ax1$X
+  abs(out_D1$X[,1,drop = FALSE]),
+  abs(out_D1_ax1$X)
 )
 
 
-expect_equivalent(abs(diag(cor(out_D1$X,x_mod))), rep(1, n_axes))
+expect_equivalent(abs(diag(cor(out_D1$X,x_mod))), rep(1, n_axes),tol = 1.e-7)
 expect_equivalent(abs(diag(cor(out_D1$X_star,x_star_mod))), rep(1, n_axes))
 
+out_D2 <- smoothPRC(D,model = model_clas2, n_axes = n_axes, formula_covariates = ~Time)
+
+expect_equivalent(abs(diag(cor(out_D2$X,x_mod))), rep(1, n_axes),tol = 1.e-7)
+expect_equivalent(abs(diag(cor(out_D2$X_star,x_star_mod))), rep(1, n_axes))

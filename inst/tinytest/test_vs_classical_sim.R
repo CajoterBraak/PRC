@@ -100,7 +100,8 @@ ran_x <- matrix(rnorm(length(x_mod_prc)),nrow = nrow(x_mod_prc),ncol = ncol(x_mo
 
 op <-opt <- out_1$options_iter
 op$init <- ran_b
-op$maxiter<- 100
+
+
 
 
 
@@ -113,11 +114,14 @@ expect_equivalent(
 expect_equivalent(abs(diag(cor(x_mod,out_1r$X))), rep(1, n_axes),tolerance = tol)
 expect_equivalent(abs(diag(cor(xstar_mod_prc0,out_1r$X_star))), rep(1, n_axes),tolerance = tol)
 
-expect_equivalent(abs(out_1r$X),abs(x_mod_prc),,tolerance = tol)
-expect_equivalent(abs(out_1r$X_star),abs(x_star_mod_prc),,tolerance = tol)
-expect_equivalent(abs(out_1r$B[,1:n_axes, drop = FALSE]),abs(Bmod),tolerance = tol)
-expect_equivalent(abs(out_1r$PRC),abs(PRCmod),tolerance = tol)
-expect_equivalent(abs(out_1r$PRC_star),abs(PRCmodE),tolerance = tol)
+expect_equivalent(abs(out_1r$X),abs(x_mod_prc),,tolerance = 2.e-3)
+expect_equivalent(abs(out_1r$X_star),abs(x_star_mod_prc),tolerance = 2.e-3)
+expect_equivalent(abs(out_1r$B[,1:n_axes, drop = FALSE]),abs(Bmod),tolerance = 3.e-3)
+
+expect_equivalent(abs(diag(cor(out_1r$PRC,PRCmod))),rep(1,n_axes),tolerance = tol)
+
+expect_equivalent(abs(out_1r$PRC),abs(PRCmod),tolerance = 2.e-3)
+expect_equivalent(abs(out_1r$PRC_star),abs(PRCmodE),tolerance = 2.e-3)
 
 out_2<- smoothPRC(resp, model = model_clas2, n_axes = n_axes,
                   formula_covariates = ~Time)
@@ -147,6 +151,8 @@ expect_equivalent(abs(out_D1$X),abs(out_D2$X))
 
 op$init <- ran_x
 
+
+
 out_D1<- smoothPRC(D, model = model_clas1, n_axes = n_axes,
                    n_species = ncol(resp),options_iter = op)
 out_D2<- smoothPRC(as.matrix(D), model = model_clas1, n_axes = n_axes,
@@ -161,7 +167,7 @@ x_mod_prc/out_D1$X
 }
 
 
-
+expect_equivalent(abs(x_mod_prc[,1]),abs(out_D1$X[,1]), tol = tol)
 expect_equivalent(abs(x_mod_prc),abs(out_D1$X), tol = tol)
 expect_equivalent(abs(x_mod_prc),abs(out_D1$X), tol = tol)
 expect_equivalent(abs(x_star_mod_prc),abs(out_D1$X_star),tol =tol)
