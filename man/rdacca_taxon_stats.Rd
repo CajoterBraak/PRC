@@ -32,7 +32,7 @@ or \code{\link[vegan]{cca}} ordination.
 }
 \details{
 The code uses \code{\link[vegan]{ordiYbar}} and  \code{\link[vegan]{scores}} and also works for unconstrained ordination
-using \code{\link[vegan]{rda}}and \code{\link[vegan]{cca}}. The software Canoco 5 (ter Braak & Smilauer, 2018) contains Cfit and a rescaled
+using \code{\link[vegan]{rda}} and \code{\link[vegan]{cca}}. The software Canoco 5 (ter Braak & Smilauer, 2018) contains Cfit and a rescaled
 version of the column Var but not the columns Fratio.k.
 }
 \examples{

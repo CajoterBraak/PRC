@@ -11,9 +11,9 @@
 
 \item{...}{unused.}
 
-\item{permutations}{a list of control values for the permutations as
-returned by the function \code{\link[permute]{how}}, or the number of
-permutations required (default 19) or a permutation matrix where each row
+\item{permutations}{the number of
+permutations required (default 19), a list of control values for the permutations as
+returned by the function \code{\link[permute]{how}} or a permutation matrix where each row
 gives the permuted indices.}
 
 \item{verbose}{logical for printing progress of the permutations}

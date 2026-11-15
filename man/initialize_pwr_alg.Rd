@@ -2,19 +2,19 @@
 % Please edit documentation in R/powerSVD_axis.R
 \name{initialize_pwr_alg}
 \alias{initialize_pwr_alg}
-\title{initializes the power algorthm (internal)}
+\title{initializes the power algorithm to solve the eigen vector problem (internal)}
 \usage{
 initialize_pwr_alg(model, Y, weights, axes)
 }
 \arguments{
 \item{model}{Model specification.}
 
-\item{Y}{response}
+\item{Y}{response.}
 
-\item{weights}{optional weights}
+\item{weights}{optional weights.}
 
-\item{axes}{prior axes and covariable data}
+\item{axes}{prior axes and covariable data.}
 }
 \description{
-initializes the power algorthm (internal)
+initializes the power algorithm to solve the eigen vector problem (internal)
 }
