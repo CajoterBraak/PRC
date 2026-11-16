@@ -3,7 +3,7 @@
 
 * Improved convergence checks
 
-* Default iteration option without Anderson iteration
+* Anderson iteration removed
 
 # PRC 2.0.4
 * Adds distance-based smooth PRC.
