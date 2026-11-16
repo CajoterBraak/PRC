@@ -1,2 +1,0 @@
-library(PRC)
-data("Ossenkampen")
