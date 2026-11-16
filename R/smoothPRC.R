@@ -35,7 +35,6 @@
 #' and (smooth) axes that are already extracted.
 #' \item \code{k}: number of cycles in block-power updating to  better separate
 #' the first eigen vector from the second. Default \code{2}.
-#' \item \code{mA}: number of vectors in Anderson acceleration. Default \code{4}.
 #' \item \code{tol}: stopping criterion, tolarance. Default \code{1e-4}.
 #' \item \code{maxiter}:maximum number of iterations. Default \code{20}.
 #' }
@@ -89,7 +88,7 @@
 #' are calculated, which are then used as response vector in
 #' \code{\link[LMMsolver]{LMMsolve}} to give a constrained site scores
 #' \code{x} by the P-spline model specified in \code{model}. This
-#' is part of a power algorithm with block and Anderson acceleration to solve
+#' is part of a power algorithm with block acceleration to solve
 #' the dominant eigen vector of the
 #' underlying eigen problem while optimizing simultaneously the penalties
 #' using \code{\link[LMMsolver]{LMMsolve}}.
@@ -97,8 +96,7 @@
 #' The \code{smoothPRC} algorithm uses one and two-sided power iterations.
 #' It thus iterates through the transition formulas of the method with
 #' (P-spline) regression fits.
-#' It uses two acceleration methods:
-#' blocking and Anderson iteration.
+#' It uses block acceleration.
 #'
 #' The \code{response} is taken as a distance object if
 #' it inherits class  \link[stats:dist]{dist} or if it a matrix-like object with
@@ -155,8 +153,8 @@
 #' @export
 smoothPRC <- function(response, model,
                       options_iter = list(init =NULL,
-                                          k = 2, mA = 0,
-                                          tol = 1e-8, maxiter = 50),
+                                          k = 2,
+                                          tol = 1e-8, maxiter = 100),
                       n_axes = 2,
                       formula_covariates = NULL,
                       weights = NULL,

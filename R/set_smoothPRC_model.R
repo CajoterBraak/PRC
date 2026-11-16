@@ -284,26 +284,66 @@ fit_null_model_rows.smoothPRC_LMMsolver <-
 #' @noRd
 #' @keywords internal
 #' @exportS3Method
-update_fit_state.LMMsolve <- function(object, state = NULL)
-{
-  if (is.null(state) || is.null(state$theta_old)) {
-    maxit <- 10
-    tol <- 1e-3
-  } else {
-    dtheta <- sqrt(sum((object$theta - state$theta_old)^2))/
-    (sqrt(sum(state$theta^2)) + 1e-12)
-    tol <- min(1e-2, max(1e-6, dtheta / 10))
-    maxit <- min(100, max(5, ceiling(-log10(tol)) * 5))
-  }
+update_fit_state.LMMsolve<- function(object, state = NULL)
+  {
+    theta <- object$theta
 
-  pars <- list(
-    theta = object$theta,
-    theta_old = state$theta,
-    maxit = maxit,
-    tolerance = tol)
-  #print(pars)
-  return(pars)
-}
+    if (is.null(state)) {
+
+      return(list(
+        theta = theta,
+        theta_old = theta,
+        maxit = 10,
+        tolerance = 1e-4,
+        update_counter = 1
+      ))
+    }
+
+    update_counter <- state$update_counter + 1
+
+    dtheta <- max(
+      abs(log(
+        pmax(theta, 1e-12) /
+          pmax(state$theta, 1e-12)
+      ))
+    )
+    # dtheta <- sqrt(sum((object$theta - state$theta_old)^2))/
+    #   (sqrt(sum(state$theta^2)) + 1e-12)
+
+    refresh_every <- 5
+
+    ## periodic full REML update
+    full_update <-
+      (update_counter %% refresh_every == 0)
+
+    ## theta essentially converged
+    theta_stable <- dtheta < 1e-3
+
+    if (theta_stable) {
+
+      maxit <- 5
+      tolerance <- 1e-1
+
+    } else if (full_update) {
+
+      maxit <- 25
+      tolerance <- 1e-4
+
+    } else {
+
+      maxit <- 10
+      tolerance <- 1e-2
+
+    }
+
+    list(
+      theta = theta,
+      theta_old = state$theta,
+      maxit = maxit,
+      tolerance = tolerance,
+      update_counter = update_counter
+    )
+  }
 #'
 #' @noRd
 #' @keywords internal

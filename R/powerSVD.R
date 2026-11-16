@@ -28,7 +28,6 @@
 #' Default \code{NULL} for solver and model specific initialization.
 #' \item \code{k}: number of cycles in block-power updating to  better separate
 #' the first eigen vector from the second. Default \code{NULL}.
-#' \item \code{mA}: number of vectors in Anderson acceleration. Default \code{3}.
 #' \item \code{tol}: stopping criterion, tolarance. Default \code{1e-8}.
 #' \item \code{maxiter}:maximum number of iterations. Default \code{50}.
 #' }
@@ -76,8 +75,7 @@
 #'
 #' The \code{powerSVD} algorithm implements two-sided power iteration.
 #' It thus iterates through  the transition formulas of the method.
-#' It uses two acceleration methods:
-#' blocking and Anderson iteration.
+#' It uses block acceleration.
 #'
 #' Beyond algorithm differences, \code{powerSVD} differs from standard
 #'  \code{\link{svd}} in at least two aspects. First,
@@ -138,7 +136,7 @@
 #' @keywords internal
 powerSVD <- function(Y, model,
                         options_iter = list(init =NULL,
-                                          k = 2, mA = 4,
+                                          k = 2,
                                           tol = 1e-3, maxiter = 5),
                         options_fit = list(
                          maxIter = NULL, tol = NULL, warm_start = TRUE,

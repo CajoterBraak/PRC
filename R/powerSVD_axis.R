@@ -15,7 +15,7 @@ powerSVD_axis <- function(Y, model,
                        qr_covariates_columns = NULL,
                        n_covariates = 1,
                        options_iter = list(
-                         init = NULL, k = 3, mA = 0, tol = 1e-8, maxiter = 50),
+                         init = NULL, k = 3, tol = 1e-8, maxiter = 50),
                        fit_state = NULL
                        ) {
   if (is.null(fit_state)) fit_state <-
@@ -52,9 +52,6 @@ powerSVD_axis <- function(Y, model,
 
   b <- normalizeb(b, sqrtw = weights$sqrtK)
 
-  # Anderson history
-  b_hist <- list()
-  r_hist <- list()
   # block-power buffer
   Xblock <- matrix(0, n, options_iter$k)
   xhat <- rep(0, nrow(Y))
@@ -117,39 +114,6 @@ powerSVD_axis <- function(Y, model,
    b  <- crossprod(Y, u1/weights$sqrtR) / weights$K
    b  <- normalizeb(b, sqrtw = weights$sqrtK)
 
-   if (options_iter$mA){
-    ## ---- Anderson acceleration ----
-    r <- b - b_old
-    b_hist <- c(b_hist, list(b_old))
-    r_hist <- c(r_hist, list(r))
-
-    if (length(r_hist) > options_iter$mA) {
-      b_hist <- b_hist[(length(b_hist)-options_iter$mA+1):length(b_hist)]
-      r_hist <- r_hist[(length(r_hist)-options_iter$mA+1):length(r_hist)]
-    }
-
-    if (length(r_hist) == options_iter$mA) {
-
-      Rmat <- do.call(cbind, r_hist)
-      rhs  <- r_hist[[options_iter$mA]]
-
-      alpha <- tryCatch(
-        qr.solve(Rmat, rhs, tol = 1e-12),
-        error = function(e) NULL
-      )
-
-      if (!is.null(alpha)) {
-
-        b_new <- as.numeric(b - Rmat %*% alpha)
-
-        if (all(is.finite(b_new)) &&
-            sum(b_new^2) > .Machine$double.eps) {
-          b <- normalizeb(b_new, sqrtw = weights$sqrtK)
-        }
-
-      }
-    }
-  } # end if Anderson iteration
    ## ---- convergence ----
    db <- sum( (weights$sqrtK*(b - b_old))^2)
    dx <-  sum((weights$sqrtR*(xhat - x_old))^2)#/

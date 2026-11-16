@@ -19,7 +19,7 @@ powerEig_axis <- function(A, model,
                           axes = NULL,
                           n_covariates = 1,
                           options_iter = list(
-                           init = NULL, k = 3, mA = 0, tol = 1e-8,maxiter = 50),
+                           init = NULL, k = 3, tol = 1e-8,maxiter = 50),
                           fit_state = NULL)
 {
   if (is.null(fit_state)) fit_state <-
@@ -52,9 +52,6 @@ powerEig_axis <- function(A, model,
       stop("wrong length of initial values in options_iter$init")
   }
   x <- normalizex(x)
-
-  x_hist <- list()
-  r_hist <- list()
 
   Xblock <- matrix(0, n, options_iter$k)
 
@@ -105,44 +102,6 @@ powerEig_axis <- function(A, model,
 
     x <- normalizex(u1)
 
-
-
-    if (options_iter$mA){
-    ## Anderson acceleration
-    r <- x - x_old
-
-    x_hist <- c(x_hist, list(x_old))
-    r_hist <- c(r_hist, list(r))
-
-    if (length(r_hist) > options_iter$mA) {
-      keep <- (length(r_hist) -
-                 options_iter$mA + 1):length(r_hist)
-      x_hist <- x_hist[keep]
-      r_hist <- r_hist[keep]
-    }
-
-    if (length(r_hist) == options_iter$mA) {
-
-      Rmat <- do.call(cbind, r_hist)
-      rhs <- r_hist[[options_iter$mA]]
-
-      alpha <- tryCatch(
-        qr.solve(Rmat, rhs, tol = 1e-12),
-        error = function(e) NULL
-      )
-
-      if (!is.null(alpha)) {
-
-        x_new <- as.numeric(
-          x - Rmat %*% alpha
-        )
-
-        if (all(is.finite(x_new)) && sum(x_new^2) > .Machine$double.eps){
-          iA <- iA+1
-          x <- normalizex(x_new)}
-      }
-    }
-    } # end Anderson iteration
     ## convergence
     dx <- sum(((x - x_old))^2)
 
