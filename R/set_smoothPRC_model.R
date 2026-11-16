@@ -321,7 +321,7 @@ update_fit_state.LMMsolve<- function(object, state = NULL)
 
     if (theta_stable) {
 
-      maxit <- 5
+      maxit <- 3
       tolerance <- 1e-1
 
     } else if (full_update) {
@@ -331,7 +331,7 @@ update_fit_state.LMMsolve<- function(object, state = NULL)
 
     } else {
 
-      maxit <- 10
+      maxit <- 5
       tolerance <- 1e-2
 
     }
