@@ -96,7 +96,8 @@ set.seed(1)
 # for abundance modeling
 ran_b <- matrix(rnorm(length(Bmod)),nrow = nrow(Bmod),ncol = ncol(Bmod))
 # for distance modeling
-ran_x <- matrix(rnorm(length(x_mod_prc)),nrow = nrow(x_mod_prc),ncol = ncol(x_mod_prc))
+ran_x <- matrix(rnorm(length(x_mod_prc)),nrow = nrow(x_mod_prc),
+                ncol = ncol(x_mod_prc))
 
 op <-opt <- out_1$options_iter
 op$init <- ran_b
@@ -105,18 +106,21 @@ op$init <- ran_b
 
 
 
-out_1r<- smoothPRC(resp, model = model_clas1, n_axes = n_axes, options_iter = op)
+out_1r<- smoothPRC(resp, model = model_clas1, n_axes = n_axes,
+                   options_iter = op)
 tol = 1.0e-4
 expect_equivalent(
   vegan::eigenvals(mod,"constrained" )[1:n_axes],
   out_1r$eig[1:n_axes],tolerance = tol
 )
-expect_equivalent(abs(diag(cor(x_mod,out_1r$X))), rep(1, n_axes),tolerance = tol)
-expect_equivalent(abs(diag(cor(xstar_mod_prc0,out_1r$X_star))), rep(1, n_axes),tolerance = tol)
+expect_equivalent(abs(diag(cor(x_mod,out_1r$X))), rep(1, n_axes),
+                  tolerance = tol)
+expect_equivalent(abs(diag(cor(xstar_mod_prc0,out_1r$X_star))), rep(1, n_axes),
+                  tolerance = tol)
 
-expect_equivalent(abs(out_1r$X),abs(x_mod_prc),,tolerance = 2.e-3)
-expect_equivalent(abs(out_1r$X_star),abs(x_star_mod_prc),tolerance = 2.e-3)
-expect_equivalent(abs(out_1r$B[,1:n_axes, drop = FALSE]),abs(Bmod),tolerance = 3.e-3)
+expect_equivalent(abs(out_1r$X),abs(x_mod_prc), tolerance = 2.e-3)
+expect_equivalent(abs(out_1r$X_star),abs(x_star_mod_prc), tolerance = 2.e-3)
+expect_equivalent(abs(out_1r$B[,1:n_axes, drop = FALSE]),abs(Bmod), tolerance = 3.e-3)
 
 expect_equivalent(abs(diag(cor(out_1r$PRC,PRCmod))),rep(1,n_axes),tolerance = tol)
 
