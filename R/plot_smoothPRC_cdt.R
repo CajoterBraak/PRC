@@ -27,6 +27,9 @@
 #' @importFrom ggplot2 guide_legend guides labs
 #' @importFrom ggplot2 theme_bw theme
 #' @importFrom ggplot2 element_blank element_text
+#' @importFrom ggplot2 scale_color_manual
+#'
+#' @importFrom grDevices hcl.colors
 #' @export
 plot_smoothPRC_cdt <- function(object,
                                axis = 1,
@@ -232,7 +235,7 @@ plot_smoothPRC_cdt <- function(object,
       axis.title = element_text(face = "bold"),
       legend.position = "right"
     ) +
-  scale_colour_manual(values = cols)
+  scale_color_manual(values = cols)
   return(p1)
  # return(list(p1= p1, PRC = ))
 }

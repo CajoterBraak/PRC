@@ -38,6 +38,7 @@
 #' @return  a ggplot object
 #' @example demo/PRC_pyrifos_cdt.R
 #' @seealso \code{\link{PRC_scores}}, \code{\link{get_focal_and_conditioning_factors}}, \code{\link{plotPRC}} and \code{\link{fvalues4levels}}
+#' @importFrom grDevices hcl.colors
 #' @export
 plot_sample_scores_cdt <- function(object, treatment= NULL, condition = NULL,  plot=1, xvals = NULL, score_name ="PRC1",
                                    size= c(2,2), symbols_on_curves= FALSE,  verbose = TRUE){
@@ -126,7 +127,7 @@ plot_sample_scores_cdt <- function(object, treatment= NULL, condition = NULL,  p
     "grey40", hcl.colors(nlevels(plotdat[[treatment[1]]]) - 1 + nskip,
                palette = "Inferno",rev = TRUE)[-seq_len(nskip)])
   pl.cdt1 <- pl.cdt1 +
-    scale_colour_manual(values = cols)
+    scale_color_manual(values = cols)
   return(pl.cdt1)
 
 }
