@@ -122,10 +122,10 @@ plot_sample_scores_cdt <- function(object, treatment= NULL, condition = NULL,  p
   if (is.factor(plotdat[[condition[1]]])&& max(nchar(levels(plotdat[[condition[1]]])))> 3){
     pl.cdt1 <- pl.cdt1 + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=-20,hjust=0, vjust = 0.5, size =20))
   }
-  nskip <- 2  # number of light colours to skip
-  cols <- c(
-    "grey40", hcl.colors(nlevels(plotdat[[treatment[1]]]) - 1 + nskip,
-               palette = "Inferno",rev = TRUE)[-seq_len(nskip)])
+  nskip <-if (nlevels(plotdat[[treatment[1]]])>5) 1 else 2  # number of light colours to skip
+  tmp <- hcl.colors(nlevels(plotdat[[treatment[1]]]) - 1 + nskip,
+                    palette = "Inferno",rev = TRUE)
+  cols <- c("grey40", tmp[-seq_len(nskip)])
   pl.cdt1 <- pl.cdt1 +
     scale_color_manual(values = cols)
   return(pl.cdt1)

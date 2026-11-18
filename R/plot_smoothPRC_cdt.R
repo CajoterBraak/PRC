@@ -147,16 +147,15 @@ plot_smoothPRC_cdt <- function(object,
       levels(object$model$data$Treatment)
     }
   nskip <- 2  # number of light colours to skip
+  nskip <-if (nlevels(object$model$data$Treatment)>5) 1 else 2  # number of light colours to skip
   tmp <- hcl.colors(nlevels(object$model$data$Treatment) - 1 + nskip,
                     palette = "Inferno",rev = TRUE)
   cols <- c("grey40", tmp[-seq_len(nskip)])
 
-  nskip <- 2  # number of light colours to skip
 
-  cols <- c(
-    "grey40",
-    tmp[-seq_len(nskip)]
-  )
+
+
+
   p1 <- ggplot(
     smooth_prc_df,
     aes(
