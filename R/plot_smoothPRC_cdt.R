@@ -142,8 +142,18 @@ plot_smoothPRC_cdt <- function(object,
 
     levels(smooth_prc_df2$Treatment) <-
       levels(object$model$data$Treatment)
-  }
+    }
+  nskip <- 2  # number of light colours to skip
+  tmp <- hcl.colors(nlevels(object$model$data$Treatment) - 1 + nskip,
+                    palette = "Inferno",rev = TRUE)
+  cols <- c("grey40", tmp[-seq_len(nskip)])
 
+  nskip <- 2  # number of light colours to skip
+
+  cols <- c(
+    "grey40",
+    tmp[-seq_len(nskip)]
+  )
   p1 <- ggplot(
     smooth_prc_df,
     aes(
@@ -194,8 +204,7 @@ plot_smoothPRC_cdt <- function(object,
       )
 
   }
-  p1 <- p1 +
-    scale_colour_brewer(palette = "Dark2") +
+  p1 <- p1+
     scale_linetype_manual(
       name = "PRC",
       values = c(
@@ -222,8 +231,8 @@ plot_smoothPRC_cdt <- function(object,
       panel.grid = element_blank(),
       axis.title = element_text(face = "bold"),
       legend.position = "right"
-    )
-
+    ) +
+  scale_colour_manual(values = cols)
   return(p1)
  # return(list(p1= p1, PRC = ))
 }
