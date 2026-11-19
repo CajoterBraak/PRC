@@ -51,11 +51,13 @@ importFrom(ggplot2,
   guide_legend,
   guides,
   labs,
+  scale_color_manual,
   scale_colour_brewer,
   scale_linetype_manual,
   theme,
   theme_bw
 )
+importFrom(grDevices,hcl.colors)
 importFrom(rlang,.data)
 importFrom(stats,
   as.formula,
